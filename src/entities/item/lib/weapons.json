@@ -1,0 +1,4 @@
+[
+  { "power": 3, "maxHp": 10, "chanceCrit": 2, "haste": 4 },
+  { "power": 3, "evasion": 1, "hit": 2, "haste": 4 }
+]

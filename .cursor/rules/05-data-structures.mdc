@@ -1,0 +1,48 @@
+---
+description: Описание формата данных для персонажа, боссов и способностей
+globs: *
+alwaysApply: true
+---
+
+# Структуры данных
+
+## Статы (Stats)
+Общий интерфейс для персонажа и боссов:
+
+```typescript
+interface Stats {
+  hp: number;          // текущее здоровье
+  maxHp: number;       // максимальное здоровье
+  power: number;       // сила атаки (базовый урон)
+  chanceCrit: number;  // шанс крита (0..1)
+  evasion: number;     // шанс уклонения (0..1)
+}
+
+# Сущность босса
+interface Boss {
+  id: string;
+  name: string;
+  image?: string;      // путь к картинке
+  stats: Stats;
+}
+
+# Сущность персонажа
+# Пока просто объект со статами, возможно, тоже с именем.
+
+# Способность (Ability)
+interface Ability {
+  id: string;
+  name: string;           // отображаемое название (на русском)
+  type: 'damage' | 'heal' | 'buff';  // тип эффекта
+  value: number;          // величина эффекта (например, урон или лечение)
+  cooldown: number;       // перезарядка в секундах
+  // Дополнительные поля для баффов: duration, target, etc.
+}
+
+# Состояние битвы
+interface BattleState {
+  character: Stats;
+  boss: Stats;
+  abilitiesCooldown: Record<string, number>;  // id способности -> оставшееся время
+  battleLog?: string[];    // опционально для отладки
+}

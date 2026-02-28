@@ -1,0 +1,170 @@
+.hero-stats {
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 0 1 300px;
+  justify-content: space-between;
+
+  &__avatar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 2px solid rgba(99, 102, 241, 0.5);
+    background: rgba(99, 102, 241, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  &__avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  &__avatar-svg {
+    width: 56px;
+    height: 56px;
+    color: rgba(148, 163, 184, 0.7);
+  }
+
+  &__avatar-select {
+    width: 100%;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    padding: 5px 8px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+
+    &:hover,
+    &:focus {
+      border-color: rgba(99, 102, 241, 0.75);
+    }
+
+    option {
+      background: #0f172a;
+      color: rgba(255, 255, 255, 0.85);
+    }
+  }
+
+  &__title {
+    font-size: 16px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  // Блок с уровнем + полосами
+  &__bars {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  &__level {
+    font-size: 40px;
+    font-weight: 700;
+    color: rgba(253, 224, 71, 0.95);
+    line-height: 1;
+    min-width: 44px;
+    text-align: center;
+    text-shadow: 0 0 12px rgba(253, 224, 71, 0.4);
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+
+  &__bars-tracks {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__bar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  &__bar-wrap {
+    height: 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+
+  &__bar {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.4s ease;
+
+    &--hp {
+      background: linear-gradient(90deg, #16a34a, #4ade80);
+    }
+
+    &--xp {
+      background: linear-gradient(90deg, #6366f1, #a78bfa);
+    }
+  }
+
+  &__bar-label {
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+
+    &--hp {
+      color: rgba(74, 222, 128, 0.9);
+    }
+
+    &--xp {
+      color: rgba(167, 139, 250, 0.9);
+    }
+  }
+
+  &__regen-hint {
+    font-size: 10px;
+    opacity: 0.6;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  // Таблица статов
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    background-color: #1e1e3e;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+
+  &__value {
+    font-weight: 500;
+    color: rgba(96, 165, 250, 0.95);
+  }
+}

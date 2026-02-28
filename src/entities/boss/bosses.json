@@ -1,0 +1,272 @@
+[
+  {
+    "id": "slime",
+    "name": "Слизь",
+    "image": "/images/bosses/slime.jpg",
+    "level": 1,
+    "rarity": "common",
+    "xpReward": 30,
+    "loot": [],
+    "stats": {
+      "hp": 60,
+      "maxHp": 60,
+      "power": 8,
+      "chanceCrit": 0.05,
+      "evasion": 0.02,
+      "speed": 1,
+      "armor": 0
+    },
+    "buffs": [
+      { "id": "regen", "name": "Регенерация", "icon": "♻", "description": "Восстанавливает HP каждый ход" }
+    ],
+    "debuffs": [
+      { "id": "slow", "name": "Замедление", "icon": "❄", "description": "Снижает скорость атаки" }
+    ]
+  },
+  {
+    "id": "boar",
+    "name": "Дикий Кабан",
+    "image": "/images/bosses/boar.jpg",
+    "level": 2,
+    "rarity": "common",
+    "xpReward": 55,
+    "loot": ["belt-leather"],
+    "stats": {
+      "hp": 100,
+      "maxHp": 100,
+      "power": 14,
+      "chanceCrit": 0.08,
+      "evasion": 0.04,
+      "speed": 2,
+      "armor": 2
+    },
+    "buffs": [
+      { "id": "charge", "name": "Натиск", "icon": "⚡", "description": "Увеличивает урон при рывке" },
+      { "id": "tough", "name": "Толстокожесть", "icon": "🛡", "description": "+2 к броне" }
+    ],
+    "debuffs": [
+      { "id": "bleed", "name": "Кровотечение", "icon": "🩸", "description": "Наносит урон каждый ход" }
+    ]
+  },
+  {
+    "id": "wolf",
+    "name": "Серый Волк",
+    "image": "/images/bosses/wolf.jpg",
+    "level": 3,
+    "rarity": "common",
+    "xpReward": 80,
+    "loot": ["boots-leather"],
+    "stats": {
+      "hp": 130,
+      "maxHp": 130,
+      "power": 18,
+      "chanceCrit": 0.12,
+      "evasion": 0.10,
+      "speed": 4,
+      "armor": 1
+    },
+    "buffs": [
+      { "id": "pack", "name": "Стая", "icon": "🐺", "description": "+10% урона за каждого союзника" },
+      { "id": "swift", "name": "Стремительность", "icon": "💨", "description": "Повышен шанс уклонения" }
+    ],
+    "debuffs": [
+      { "id": "bleed", "name": "Кровотечение", "icon": "🩸", "description": "Наносит урон каждый ход" },
+      { "id": "fear", "name": "Страх", "icon": "😱", "description": "Снижает точность противника" }
+    ]
+  },
+  {
+    "id": "goblin",
+    "name": "Гоблин",
+    "image": "/images/bosses/goblin.jpg",
+    "level": 3,
+    "rarity": "common",
+    "xpReward": 75,
+    "loot": ["ring-copper"],
+    "stats": {
+      "hp": 110,
+      "maxHp": 110,
+      "power": 16,
+      "chanceCrit": 0.10,
+      "evasion": 0.08,
+      "speed": 3,
+      "armor": 2
+    },
+    "buffs": [
+      { "id": "cunning", "name": "Хитрость", "icon": "🎭", "description": "+10% к уклонению" }
+    ],
+    "debuffs": [
+      { "id": "poison", "name": "Яд", "icon": "☠", "description": "Отравляет противника" },
+      { "id": "slow", "name": "Замедление", "icon": "❄", "description": "Снижает скорость атаки" }
+    ]
+  },
+  {
+    "id": "goblin-crossbowman",
+    "name": "Гоблин-арбалетчик",
+    "image": "/images/bosses/goblin_crossbower.jpg",
+    "level": 4,
+    "rarity": "rare",
+    "xpReward": 120,
+    "loot": ["pants-leather", "ring-copper"],
+    "stats": {
+      "hp": 150,
+      "maxHp": 150,
+      "power": 22,
+      "chanceCrit": 0.18,
+      "evasion": 0.12,
+      "speed": 3,
+      "armor": 3
+    },
+    "buffs": [
+      { "id": "aim", "name": "Прицел", "icon": "🎯", "description": "+15% к шансу крита" },
+      { "id": "cover", "name": "Укрытие", "icon": "🪨", "description": "+5 к броне при уклонении" },
+      { "id": "reload", "name": "Быстрая перезарядка", "icon": "⚙", "description": "Сокращает время между выстрелами" }
+    ],
+    "debuffs": [
+      { "id": "bleed", "name": "Кровотечение", "icon": "🩸", "description": "Стрелы вызывают кровотечение" },
+      { "id": "slow", "name": "Замедление", "icon": "❄", "description": "Тяжёлые болты замедляют цель" }
+    ]
+  },
+  {
+    "id": "goblin-mage",
+    "name": "Гоблин-маг",
+    "image": "/images/bosses/goblin_mage.jpg",
+    "level": 5,
+    "rarity": "rare",
+    "xpReward": 160,
+    "loot": ["necklace-bone", "ring-mystic"],
+    "stats": {
+      "hp": 170,
+      "maxHp": 170,
+      "power": 28,
+      "chanceCrit": 0.20,
+      "evasion": 0.15,
+      "speed": 2,
+      "armor": 4
+    },
+    "buffs": [
+      { "id": "arcane", "name": "Тайная сила", "icon": "✨", "description": "+20% к магическому урону" },
+      { "id": "barrier", "name": "Барьер", "icon": "🔮", "description": "Поглощает часть входящего урона" }
+    ],
+    "debuffs": [
+      { "id": "silence", "name": "Немота", "icon": "🔇", "description": "Блокирует использование способностей" },
+      { "id": "burn", "name": "Горение", "icon": "🔥", "description": "Поджигает противника" },
+      { "id": "curse", "name": "Проклятие", "icon": "💀", "description": "Снижает все статы на 10%" }
+    ]
+  },
+  {
+    "id": "bear",
+    "name": "Бурый Медведь",
+    "image": "/images/bosses/bear.jpg",
+    "level": 5,
+    "rarity": "rare",
+    "xpReward": 180,
+    "loot": ["chest-dragon"],
+    "stats": {
+      "hp": 250,
+      "maxHp": 250,
+      "power": 30,
+      "chanceCrit": 0.14,
+      "evasion": 0.05,
+      "speed": 2,
+      "armor": 8
+    },
+    "buffs": [
+      { "id": "tough", "name": "Толстокожесть", "icon": "🛡", "description": "+8 к броне" },
+      { "id": "regen", "name": "Регенерация", "icon": "♻", "description": "Восстанавливает 5 HP каждый ход" },
+      { "id": "rage", "name": "Ярость", "icon": "😡", "description": "При низком HP удары сильнее" }
+    ],
+    "debuffs": [
+      { "id": "maul", "name": "Разрыв", "icon": "🩸", "description": "Удар когтями вызывает сильное кровотечение" }
+    ]
+  },
+  {
+    "id": "goblin-chief",
+    "name": "Вождь Гоблинов",
+    "image": "/images/bosses/goblin_king.jpg",
+    "level": 7,
+    "rarity": "epic",
+    "xpReward": 300,
+    "loot": ["helmet-leather", "weapon-iron-sword", "ring-mystic"],
+    "stats": {
+      "hp": 380,
+      "maxHp": 380,
+      "power": 40,
+      "chanceCrit": 0.25,
+      "evasion": 0.18,
+      "speed": 4,
+      "armor": 10
+    },
+    "buffs": [
+      { "id": "warcry", "name": "Боевой клич", "icon": "📣", "description": "+20% урона всем союзникам" },
+      { "id": "cunning", "name": "Хитрость", "icon": "🎭", "description": "+15% к уклонению" },
+      { "id": "leadership", "name": "Лидерство", "icon": "👑", "description": "Призывает гоблинов-миньонов" },
+      { "id": "tough", "name": "Крепкий", "icon": "🛡", "description": "+10 к броне" }
+    ],
+    "debuffs": [
+      { "id": "poison", "name": "Яд", "icon": "☠", "description": "Отравляет противника" },
+      { "id": "fear", "name": "Страх", "icon": "😱", "description": "Снижает точность противника" },
+      { "id": "bleed", "name": "Кровотечение", "icon": "🩸", "description": "Удар ятаганом вызывает кровотечение" }
+    ]
+  },
+  {
+    "id": "golem",
+    "name": "Каменный Голем",
+    "image": "/images/bosses/golem.jpg",
+    "level": 6,
+    "rarity": "rare",
+    "xpReward": 220,
+    "loot": ["helmet-leather", "weapon-iron-sword"],
+    "stats": {
+      "hp": 300,
+      "maxHp": 300,
+      "power": 25,
+      "chanceCrit": 0.10,
+      "evasion": 0.03,
+      "speed": 1,
+      "armor": 15
+    },
+    "buffs": [
+      { "id": "stone-skin", "name": "Каменная кожа", "icon": "🪨", "description": "+15 к броне" },
+      { "id": "immovable", "name": "Несокрушимость", "icon": "⚓", "description": "Иммунитет к эффектам замедления" },
+      { "id": "regen", "name": "Самовосстановление", "icon": "♻", "description": "Восстанавливает 8 HP каждый ход" },
+      { "id": "earthshake", "name": "Землетрясение", "icon": "🌋", "description": "Наносит урон всем при ударе в землю" },
+      { "id": "tough", "name": "Монолит", "icon": "🛡", "description": "Получает лишь половину урона от обычных атак" }
+    ],
+    "debuffs": [
+      { "id": "slow", "name": "Замедление", "icon": "❄", "description": "Крайне медленный, уязвим к быстрым атакам" },
+      { "id": "stun", "name": "Оглушение", "icon": "⭐", "description": "При критическом уроне может быть оглушён" }
+    ]
+  },
+  {
+    "id": "dragon",
+    "name": "Пещерный Дракон",
+    "image": "/images/bosses/dragon.jpg",
+    "level": 10,
+    "rarity": "epic",
+    "xpReward": 500,
+    "loot": ["chest-dragon", "ring-mystic"],
+    "stats": {
+      "hp": 600,
+      "maxHp": 600,
+      "power": 55,
+      "chanceCrit": 0.25,
+      "evasion": 0.12,
+      "speed": 3,
+      "armor": 12
+    },
+    "buffs": [
+      { "id": "fire-breath", "name": "Огненное дыхание", "icon": "🔥", "description": "Поджигает область перед собой" },
+      { "id": "scales", "name": "Чешуя", "icon": "🐉", "description": "+12 к броне" },
+      { "id": "ancient", "name": "Древний", "icon": "⚔", "description": "+25% к урону" },
+      { "id": "flight", "name": "Полёт", "icon": "🦅", "description": "Уклоняется от части атак" }
+    ],
+    "debuffs": [
+      { "id": "burn", "name": "Горение", "icon": "🔥", "description": "Поджигает противника" },
+      { "id": "fear", "name": "Ужас", "icon": "😱", "description": "Вселяет ужас, снижая эффективность героя" },
+      { "id": "curse", "name": "Древнее проклятие", "icon": "💀", "description": "Снижает все статы на 20%" },
+      { "id": "stun", "name": "Оглушение", "icon": "⭐", "description": "Удар хвостом может оглушить" },
+      { "id": "bleed", "name": "Разрыв", "icon": "🩸", "description": "Когти оставляют глубокие раны" },
+      { "id": "slow", "name": "Замедление", "icon": "❄", "description": "Жар замедляет движения" }
+    ]
+  }
+]

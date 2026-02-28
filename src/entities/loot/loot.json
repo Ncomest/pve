@@ -1,0 +1,83 @@
+[
+  {
+    "id": "belt-leather",
+    "name": "Кожаный пояс",
+    "icon": "🪢",
+    "slot": "belt",
+    "rarity": "common",
+    "description": "Прочный пояс из выдубленной кожи.",
+    "stats": { "armor": 1 }
+  },
+  {
+    "id": "boots-leather",
+    "name": "Кожаные сапоги",
+    "icon": "👢",
+    "slot": "boots",
+    "rarity": "common",
+    "description": "Лёгкие сапоги, улучшающие подвижность.",
+    "stats": { "evasion": 0.03 }
+  },
+  {
+    "id": "ring-copper",
+    "name": "Медное кольцо",
+    "icon": "💍",
+    "slot": "ring",
+    "rarity": "common",
+    "description": "Простое медное кольцо с небольшим усилением.",
+    "stats": { "power": 2 }
+  },
+  {
+    "id": "pants-leather",
+    "name": "Кожаные штаны",
+    "icon": "👖",
+    "slot": "pants",
+    "rarity": "common",
+    "description": "Прочные штаны из дублёной кожи.",
+    "stats": { "armor": 2, "evasion": 0.01 }
+  },
+  {
+    "id": "necklace-bone",
+    "name": "Костяное ожерелье",
+    "icon": "🦴",
+    "slot": "necklace",
+    "rarity": "rare",
+    "description": "Ожерелье из костей монстров, дарует тёмную силу.",
+    "stats": { "power": 5, "chanceCrit": 0.03 }
+  },
+  {
+    "id": "ring-mystic",
+    "name": "Мистическое кольцо",
+    "icon": "🔮",
+    "slot": "ring",
+    "rarity": "rare",
+    "description": "Кольцо с магическим кристаллом внутри.",
+    "stats": { "power": 6, "chanceCrit": 0.05 }
+  },
+  {
+    "id": "chest-dragon",
+    "name": "Нагрудник Дракона",
+    "icon": "🐉",
+    "slot": "chest",
+    "rarity": "epic",
+    "description": "Доспех, выкованный из чешуи древнего дракона. Невероятно прочен.",
+    "stats": { "armor": 15, "maxHp": 50 }
+  },
+  {
+    "id": "helmet-leather",
+    "name": "Кожаный шлем",
+    "icon": "⛑",
+    "slot": "helmet",
+    "rarity": "common",
+    "description": "Мягкий шлем, защищающий голову от несильных ударов.",
+    "stats": { "armor": 2 }
+  },
+  {
+    "id": "weapon-iron-sword",
+    "name": "Железный меч",
+    "icon": "⚔",
+    "slot": "weapon",
+    "rarity": "rare",
+    "description": "Надёжный меч из закалённого железа. Хорошо сбалансирован.",
+    "stats": { "power": 12, "chanceCrit": 0.04 }
+  }
+]

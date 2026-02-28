@@ -1,0 +1,167 @@
+.equipment-slots {
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 14px 16px;
+  background: rgba(15, 23, 42, 0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+
+  &__title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  &__layout {
+    display: grid;
+    grid-template-columns: 1fr 30% 1fr;
+    gap: 4px;
+    align-items: stretch;
+  }
+
+  &__column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__avatar {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: 0 8px;
+    align-self: stretch;
+  }
+
+  &__avatar-svg {
+    width: 200px;
+    height: 100%;
+    filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.35));
+  }
+
+  &__avatar-img {
+    width: 100%;
+    height: 100%;
+    max-height: 352px;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 10px;
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.35));
+  }
+
+  &__card {
+    height: 64px;
+    border-radius: 10px;
+    border: 1px dashed rgba(148, 163, 184, 0.45);
+    background: rgba(15, 23, 42, 0.9);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px 0 8px;
+    transition: border-color 0.12s ease-out, background 0.12s ease-out;
+    box-sizing: border-box;
+
+    &--filled {
+      border-style: solid;
+      border-color: rgba(148, 163, 184, 0.5);
+      cursor: pointer;
+
+      &:hover {
+        border-color: rgba(148, 163, 184, 0.8);
+        background: rgba(30, 41, 59, 0.7);
+      }
+    }
+
+    &--selected {
+      border-color: #60a5fa !important;
+      background: rgba(37, 99, 235, 0.15) !important;
+      box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.4);
+    }
+  }
+
+  /* Квадратик-иконка слева */
+  &__icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background: rgba(8, 14, 30, 0.75);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(148, 163, 184, 0.45);
+    transition: color 0.12s, border-color 0.12s;
+
+    svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    &--filled {
+      border-color: rgba(148, 163, 184, 0.5);
+      color: rgba(148, 163, 184, 0.85);
+      background: rgba(15, 30, 60, 0.85);
+    }
+  }
+
+  /* Правая часть карточки — вертикальный flex */
+  &__info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  &__label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.65;
+    white-space: nowrap;
+  }
+
+  &__item-name {
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__empty {
+    font-size: 12px;
+    opacity: 0.4;
+    white-space: nowrap;
+  }
+
+  &__unequip-btn {
+    flex-shrink: 0;
+    font-size: 11px;
+    padding: 3px 7px;
+    border-radius: 5px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(30, 41, 59, 0.8);
+    color: rgba(248, 250, 252, 0.8);
+    cursor: pointer;
+    transition: background-color 0.12s ease-out, border-color 0.12s ease-out;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(51, 65, 85, 0.9);
+      border-color: rgba(148, 163, 184, 0.6);
+    }
+  }
+}

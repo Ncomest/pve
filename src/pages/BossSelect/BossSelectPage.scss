@@ -1,0 +1,378 @@
+/* Блок: страница выбора босса */
+.boss-select-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__title {
+    font-size: 28px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  &__subtitle {
+    opacity: 0.8;
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 680px;
+  }
+}
+
+/* Блок: карточка босса в списке */
+.boss-select-entry {
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.9);
+  overflow: hidden;
+  transition: border-color 0.12s ease-out, box-shadow 0.12s ease-out;
+
+  &:hover {
+    border-color: rgba(96, 165, 250, 0.45);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  &--rare {
+    border-color: rgba(52, 211, 153, 0.2);
+
+    &:hover {
+      border-color: rgba(52, 211, 153, 0.6);
+    }
+  }
+
+  &--epic {
+    border-color: rgba(167, 139, 250, 0.25);
+
+    &:hover {
+      border-color: rgba(167, 139, 250, 0.7);
+    }
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  &__avatar {
+    flex-shrink: 0;
+    position: relative;
+    width: 52px;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  &__avatar-img,
+  &__avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  &__level {
+    position: absolute;
+    bottom: -4px;
+    left: -4px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  &__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  &__name {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  &__effects-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__effect-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  &__effect-row {
+    display: flex;
+    flex-direction: row;
+    gap: 3px;
+  }
+
+  &__effect-cell {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    border: 1.5px solid transparent;
+    font-size: 13px;
+    cursor: default;
+    user-select: none;
+    flex-shrink: 0;
+    transition: transform 0.1s;
+
+    &:hover {
+      transform: scale(1.2);
+    }
+
+    &--buff {
+      border-color: rgba(96, 165, 250, 0.65);
+      background: rgba(96, 165, 250, 0.08);
+    }
+
+    &--debuff {
+      border-color: rgba(239, 68, 68, 0.65);
+      background: rgba(239, 68, 68, 0.08);
+    }
+  }
+
+  &__loot-row {
+    display: flex;
+    flex-direction: row;
+    gap: 3px;
+    align-items: center;
+    padding-left: 4px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    margin-left: 2px;
+  }
+
+  &__loot-cell {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    font-size: 13px;
+    cursor: default;
+    user-select: none;
+    flex-shrink: 0;
+    transition: transform 0.1s;
+
+    &:hover {
+      transform: scale(1.2);
+    }
+
+    &--common {
+      border: 1.5px solid rgba(156, 163, 175, 0.55);
+      background: rgba(156, 163, 175, 0.07);
+    }
+
+    &--rare {
+      border: 1.5px solid rgba(52, 211, 153, 0.6);
+      background: rgba(52, 211, 153, 0.08);
+    }
+
+    &--epic {
+      border: 1.5px solid rgba(167, 139, 250, 0.65);
+      background: rgba(167, 139, 250, 0.1);
+    }
+  }
+
+  &__rarity {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  &--rare &__rarity {
+    background: rgba(52, 211, 153, 0.12);
+    color: rgb(52, 211, 153);
+  }
+
+  &--epic &__rarity {
+    background: rgba(167, 139, 250, 0.15);
+    color: rgb(167, 139, 250);
+  }
+
+  &__actions {
+    flex-shrink: 0;
+    display: flex;
+    gap: 6px;
+    margin-left: 4px;
+  }
+
+  &__action {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+    flex-shrink: 0;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    &--fight:hover {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(239, 68, 68, 0.6);
+      color: rgb(252, 165, 165);
+    }
+
+    &--info:hover,
+    &--info-active {
+      background: rgba(96, 165, 250, 0.12);
+      border-color: rgba(96, 165, 250, 0.5);
+      color: rgb(147, 197, 253);
+    }
+  }
+
+  &__info-panel {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    padding: 12px 16px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  &__stats {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 180px;
+  }
+
+  &__stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+
+    span:first-child {
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+}
+
+/* Блок: тултип предмета лута */
+.loot-tooltip {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  min-width: 200px;
+  max-width: 260px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(10, 18, 36, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  &__icon {
+    font-size: 22px;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &__name {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+
+    &--common {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    &--rare {
+      color: rgb(52, 211, 153);
+    }
+
+    &--epic {
+      color: rgb(167, 139, 250);
+    }
+  }
+
+  &__meta {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.38);
+    margin-top: 2px;
+  }
+
+  &__desc {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  &__stats {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    padding-top: 6px;
+  }
+
+  &__stat {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__stat-label {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  &__stat-value {
+    color: rgb(134, 239, 172);
+    font-weight: 500;
+  }
+}

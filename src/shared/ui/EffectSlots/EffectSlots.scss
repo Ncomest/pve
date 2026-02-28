@@ -1,0 +1,60 @@
+.effect-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+    min-height: 28px;
+  }
+
+  &__empty {
+    font-size: 12px;
+    opacity: 0.3;
+    padding: 0 4px;
+  }
+
+  &__cell {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.2;
+
+    &--buff {
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: rgba(167, 243, 208, 0.95);
+    }
+
+    &--debuff {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: rgba(254, 202, 202, 0.95);
+    }
+  }
+
+  &__icon {
+    font-size: 16px;
+
+    &--svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+      flex-shrink: 0;
+    }
+  }
+
+  &__duration {
+    font-size: 10px;
+    opacity: 0.9;
+    margin-top: 2px;
+  }
+}

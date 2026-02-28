@@ -1,0 +1,29 @@
+.player-level {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+
+  &__label {
+    opacity: 0.9;
+  }
+
+  &__xp-bar {
+    width: 120px;
+    height: 8px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.4);
+  }
+
+  &__xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(56, 189, 248, 0.95), rgba(59, 130, 246, 0.95));
+    transition: width 0.15s ease-out;
+  }
+
+  &__xp-text {
+    opacity: 0.8;
+  }
+}

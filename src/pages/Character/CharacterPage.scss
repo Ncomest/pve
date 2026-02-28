@@ -1,0 +1,23 @@
+.character-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  &__title {
+    font-size: 26px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  &__subtitle {
+    opacity: 0.8;
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  &__top {
+    display: flex;
+    flex-direction: row;
+    gap: 18px;
+  }
+}
