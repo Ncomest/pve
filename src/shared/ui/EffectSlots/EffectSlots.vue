@@ -11,7 +11,9 @@ defineProps<{
 
 const iconMap: Record<string, ReturnType<typeof defineAsyncComponent>> = Icons as never;
 
-const getIcon = (icon: string) => iconMap[icon] ?? null;
+const isImagePath = (icon: string) => icon.startsWith("/") || icon.startsWith("http");
+
+const getSvgIcon = (icon: string) => (!isImagePath(icon) ? (iconMap[icon] ?? null) : null);
 
 const formatDuration = (seconds: number) => {
   if (seconds <= 0) return "";
@@ -33,12 +35,21 @@ const formatDuration = (seconds: number) => {
         :title="`${effect.name}${effect.description ? ': ' + effect.description : ''}${effect.durationSeconds > 0 ? ' — ' + formatDuration(effect.durationSeconds) : ''}`"
       >
         <component
-          :is="getIcon(effect.icon)"
-          v-if="getIcon(effect.icon)"
+          :is="getSvgIcon(effect.icon)"
+          v-if="getSvgIcon(effect.icon)"
           class="effect-slots__icon effect-slots__icon--svg"
         />
+        <img
+          v-else-if="isImagePath(effect.icon)"
+          :src="effect.icon"
+          :alt="effect.name"
+          class="effect-slots__icon effect-slots__icon--img"
+        />
         <span v-else class="effect-slots__icon">{{ effect.icon }}</span>
-        <span v-if="effect.durationSeconds > 0" class="effect-slots__duration">
+        <span v-if="effect.stacks !== undefined" class="effect-slots__stacks">
+          {{ effect.stacks }}
+        </span>
+        <span v-else-if="effect.durationSeconds > 0" class="effect-slots__duration">
           {{ formatDuration(effect.durationSeconds) }}
         </span>
       </div>
@@ -53,9 +64,15 @@ const formatDuration = (seconds: number) => {
         :title="`${effect.name}${effect.description ? ': ' + effect.description : ''}${effect.durationSeconds > 0 ? ' — ' + formatDuration(effect.durationSeconds) : ''}`"
       >
         <component
-          :is="getIcon(effect.icon)"
-          v-if="getIcon(effect.icon)"
+          :is="getSvgIcon(effect.icon)"
+          v-if="getSvgIcon(effect.icon)"
           class="effect-slots__icon effect-slots__icon--svg"
+        />
+        <img
+          v-else-if="isImagePath(effect.icon)"
+          :src="effect.icon"
+          :alt="effect.name"
+          class="effect-slots__icon effect-slots__icon--img"
         />
         <span v-else class="effect-slots__icon">{{ effect.icon }}</span>
         <span v-if="effect.durationSeconds > 0" class="effect-slots__duration">

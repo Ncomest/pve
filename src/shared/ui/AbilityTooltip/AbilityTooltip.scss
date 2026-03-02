@@ -1,0 +1,44 @@
+.ability-tooltip {
+  min-width: 200px;
+  max-width: 280px;
+  padding: 0.6rem 0.75rem;
+  background: rgba(20, 20, 30, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 100;
+  pointer-events: none;
+
+  &__title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 4px;
+    white-space: nowrap;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    white-space: nowrap;
+
+    &--class .ability-tooltip__value {
+      color: rgba(147, 197, 253, 0.9);
+    }
+  }
+
+  &__label {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  &__value {
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+  }
+}

@@ -27,9 +27,13 @@ const emit = defineEmits<{
 
 const iconMap: Record<string, ReturnType<typeof defineAsyncComponent>> = Icons as never;
 
+const isImageIcon = computed(() =>
+  !!props.ability?.icon && (props.ability.icon.startsWith("/") || props.ability.icon.startsWith("http"))
+);
+
 const iconComponent = computed(() => {
-  if (!props.ability?.icon || !iconMap[props.ability.icon]) return null;
-  return iconMap[props.ability.icon];
+  if (!props.ability?.icon || isImageIcon.value) return null;
+  return iconMap[props.ability.icon] ?? null;
 });
 
 function onContentClick(event: MouseEvent) {
@@ -76,7 +80,8 @@ const cdProgress = computed(() => {
     >
       <AbilitySlotPlaceholder v-if="!ability" />
       <template v-else>
-        <component :is="iconComponent" class="skill-bar-slot__icon" />
+        <img v-if="isImageIcon" :src="ability!.icon" class="skill-bar-slot__icon" :alt="ability!.name" />
+        <component v-else :is="iconComponent" class="skill-bar-slot__icon" />
         <CooldownOverlay
           v-if="!editable"
           :progress="cdProgress"

@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import type { Ability } from "@/features/abilities/model/types";
-import { ABILITIES } from "@/features/abilities/model/abilities";
+import { ALL_ABILITIES } from "@/features/abilities/model/abilities";
 import type { SkillBar } from "@/app/store/skills";
 import SkillBarSlot from "@/features/skills/ui/SkillBarSlot.vue";
+import { AbilityTooltip } from "@/shared/ui/AbilityTooltip";
 import "./BattleAbilityBars.scss";
-
-const GCD_MS = 2000;
 
 const props = defineProps<{
   panels: [SkillBar, SkillBar];
@@ -16,25 +15,22 @@ const props = defineProps<{
   cooldownLeftMs: (id: string) => number;
   /** Только собственный кулдаун способности, без GCD */
   ownCooldownLeftMs: (id: string) => number;
+  /** Эффективный макс. кулдаун для прогресса (с учётом скорости), чтобы анимация затемнения шла с верха */
+  effectiveMaxCooldownMs: (id: string) => number;
 }>();
 
 const emit = defineEmits<{
   useAbility: [ability: Ability];
 }>();
 
-const abilityById = (id: string): Ability | undefined => ABILITIES.find((a) => a.id === id);
+/** Поиск по всем способностям (базовые + класс «Клинок и Яд»), иначе слоты с новыми способностями пустые */
+const abilityById = (id: string): Ability | undefined => ALL_ABILITIES.find((a) => a.id === id);
 
 /**
- * Максимальный кулдаун для расчёта прогресса.
- * Если способность уже отошла (ownCD=0), но висит на GCD — используем GCD_MS.
- * Иначе — собственный КД способности.
+ * Максимальный кулдаун для расчёта прогресса (с учётом скорости персонажа).
+ * Берётся из effectiveMaxCooldownMs, чтобы анимация осветления всегда начиналась с верха иконки.
  */
-const maxCooldownMs = (abilityId: string): number => {
-  const own = props.ownCooldownLeftMs(abilityId);
-  if (own <= 0) return GCD_MS; // Блокирует только GCD
-  const ability = abilityById(abilityId);
-  return ability ? ability.cooldownMs : GCD_MS;
-};
+const maxCooldownMs = (abilityId: string): number => props.effectiveMaxCooldownMs(abilityId);
 
 /**
  * Оставшийся кулдаун для отображения анимации:
@@ -52,23 +48,32 @@ const displayCooldownMs = (abilityId: string): number => {
     <div v-for="(bar, panelIndex) in panels" :key="panelIndex" class="battle-ability-bars__panel">
       <div class="battle-ability-bars__slots">
         <template v-for="(slot, slotIndex) in bar" :key="slotIndex">
-          <button
+          <div
             v-if="slot.abilityId && abilityById(slot.abilityId)"
-            type="button"
-            class="battle-ability-bars__btn"
-            :disabled="isBattleOver || !isAbilityReady(slot.abilityId)"
-            :title="abilityById(slot.abilityId)?.name + (abilityCooldownText(slot.abilityId) ? ' (' + abilityCooldownText(slot.abilityId) + ')' : '')"
-            @click="emit('useAbility', abilityById(slot.abilityId)!)"
+            class="battle-ability-bars__slot-wrap"
           >
-            <SkillBarSlot
-              :ability="abilityById(slot.abilityId) ?? null"
-              :hotkey="slot.hotkey"
-              :editable="false"
-              :cooldown-ms="displayCooldownMs(slot.abilityId)"
-              :cooldown-max-ms="maxCooldownMs(slot.abilityId)"
-              :cooldown-text="abilityCooldownText(slot.abilityId)"
-            />
-          </button>
+            <button
+              type="button"
+              class="battle-ability-bars__btn"
+              :disabled="isBattleOver || !isAbilityReady(slot.abilityId)"
+              @click="emit('useAbility', abilityById(slot.abilityId)!)"
+            >
+              <SkillBarSlot
+                :ability="abilityById(slot.abilityId) ?? null"
+                :hotkey="slot.hotkey"
+                :editable="false"
+                :cooldown-ms="displayCooldownMs(slot.abilityId)"
+                :cooldown-max-ms="maxCooldownMs(slot.abilityId)"
+                :cooldown-text="abilityCooldownText(slot.abilityId)"
+              />
+            </button>
+            <div class="battle-ability-bars__tooltip">
+              <AbilityTooltip
+                :ability="abilityById(slot.abilityId)!"
+                :cooldown-text="abilityCooldownText(slot.abilityId)"
+              />
+            </div>
+          </div>
           <div v-else class="battle-ability-bars__empty">
             <SkillBarSlot :ability="null" :hotkey="''" :editable="false" />
           </div>

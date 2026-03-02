@@ -3,7 +3,7 @@ import { computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { useBattle } from "@/features/battle/model/useBattle";
 import { useSkillsStore } from "@/app/store/skills";
-import { ABILITIES } from "@/features/abilities/model/abilities";
+import { ALL_ABILITIES } from "@/features/abilities/model/abilities";
 import { buildHotkeyString } from "@/shared/lib/hotkey/buildHotkeyString";
 import { CharacterCard } from "@/entities/character/ui";
 import { BossCard } from "@/entities/boss/ui";
@@ -14,6 +14,7 @@ import {
   LootPanel,
 } from "@/features/battle/ui";
 import IconFlee from "@/shared/ui/icons/IconFlee.vue";
+import DamageNumbers from "@/shared/ui/DamageNumbers/DamageNumbers.vue";
 import "./BattlePage.scss";
 
 const props = defineProps<{
@@ -35,6 +36,7 @@ const {
   abilityCooldownText,
   cooldownLeftMs,
   ownCooldownLeftMs,
+  effectiveMaxCooldownMs,
   handleAbility,
   resetBattle,
   powerBoostLeftMs,
@@ -47,6 +49,9 @@ const {
   playerDebuffs,
   bossBuffs,
   bossDebuffs,
+  comboPoints,
+  bossDamageNumbers,
+  playerDamageNumbers,
 } = useBattle(() => props.bossId);
 
 const powerBoostText = computed(() => {
@@ -66,7 +71,7 @@ function onKeyDown(event: KeyboardEvent) {
   for (const panel of skillsStore.panels) {
     for (const slot of panel) {
       if (slot.abilityId && slot.hotkey && slot.hotkey.toLowerCase() === hotkey.toLowerCase()) {
-        const ability = ABILITIES.find((a) => a.id === slot.abilityId);
+        const ability = ALL_ABILITIES.find((a) => a.id === slot.abilityId);
         if (ability && isAbilityReady(slot.abilityId)) {
           event.preventDefault();
           handleAbility(ability);
@@ -97,31 +102,38 @@ onUnmounted(() => {
     </header>
 
     <div class="battle-page__arena">
-      <CharacterCard
-        :name="player.name"
-        :hp="player.stats.hp"
-        :max-hp="player.stats.maxHp"
-        :hp-percent="playerHpPercent"
-        :power="playerPower"
-        :chance-crit="player.stats.chanceCrit"
-        :evasion="player.stats.evasion"
-        :power-boost-text="powerBoostText"
-        :buffs="playerBuffs"
-        :debuffs="playerDebuffs"
-      />
-      <BossCard
-        :name="boss.name"
-        :level="boss.level"
-        :hp="boss.stats.hp"
-        :max-hp="boss.stats.maxHp"
-        :hp-percent="bossHpPercent"
-        :power="boss.stats.power"
-        :chance-crit="boss.stats.chanceCrit"
-        :evasion="boss.stats.evasion"
-        :image="boss.image"
-        :buffs="bossBuffs"
-        :debuffs="bossDebuffs"
-      />
+      <div class="battle-page__card-wrap">
+        <CharacterCard
+          :name="player.name"
+          :hp="player.stats.hp"
+          :max-hp="player.stats.maxHp"
+          :hp-percent="playerHpPercent"
+          :power="playerPower"
+          :chance-crit="player.stats.chanceCrit"
+          :evasion="player.stats.evasion"
+          :power-boost-text="powerBoostText"
+          :buffs="playerBuffs"
+          :debuffs="playerDebuffs"
+          :combo-points="comboPoints"
+        />
+        <DamageNumbers :numbers="playerDamageNumbers" />
+      </div>
+      <div class="battle-page__card-wrap">
+        <BossCard
+          :name="boss.name"
+          :level="boss.level"
+          :hp="boss.stats.hp"
+          :max-hp="boss.stats.maxHp"
+          :hp-percent="bossHpPercent"
+          :power="boss.stats.power"
+          :chance-crit="boss.stats.chanceCrit"
+          :evasion="boss.stats.evasion"
+          :image="boss.image"
+          :buffs="bossBuffs"
+          :debuffs="bossDebuffs"
+        />
+        <DamageNumbers :numbers="bossDamageNumbers" />
+      </div>
     </div>
 
     <BattleAbilityBars
@@ -131,6 +143,7 @@ onUnmounted(() => {
       :ability-cooldown-text="abilityCooldownText"
       :cooldown-left-ms="cooldownLeftMs"
       :own-cooldown-left-ms="ownCooldownLeftMs"
+      :effective-max-cooldown-ms="effectiveMaxCooldownMs"
       @use-ability="handleAbility"
     />
 

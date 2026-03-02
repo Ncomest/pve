@@ -6,8 +6,8 @@
 .skill-bar-slot {
   position: relative;
   flex-shrink: 0;
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
 
   &__hotkey {
     position: absolute;
@@ -85,10 +85,11 @@
   }
 
   &__icon {
-    width: 26px;
-    height: 26px;
+    width: 50px;
+    height: 50px;
     flex-shrink: 0;
     color: rgba(255, 255, 255, 0.95);
+    object-fit: contain;
   }
 
 }

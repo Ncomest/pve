@@ -53,7 +53,6 @@ interface HpState {
 }
 
 const state = reactive<HpState>({ hp: 0, maxHp: 0 });
-let initialized = false;
 let isWatchAttached = false;
 
 /**
@@ -97,7 +96,6 @@ export function usePlayerHp() {
 
     state.maxHp = maxHp;
     state.hp = loadHp(maxHp);
-    initialized = true;
   };
 
   /** Вызывать при смене уровня / экипировки, чтобы пересчитать maxHp */

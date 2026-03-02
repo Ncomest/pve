@@ -1,6 +1,7 @@
 <template>
-  <!-- Усиление атаки: стрела вверх с молнией -->
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M13 2.05V11h4a1 1 0 0 1 .78 1.63l-6 7a1 1 0 0 1-1.56 0l-6-7A1 1 0 0 1 5 11h4V2.05a10 10 0 1 0 4 0Z"/>
+  <!-- Усиление атаки: стрелка вверх + всплеск силы -->
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 19V5M12 5l-5 6h3v4H7l5 4M12 5l5 6h-3v4h3l-5 4" />
+    <circle cx="12" cy="12" r="2.5" fill="currentColor" opacity="0.6" />
   </svg>
 </template>

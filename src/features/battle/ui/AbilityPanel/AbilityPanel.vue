@@ -32,7 +32,14 @@ const iconMap: Record<string, ReturnType<typeof defineAsyncComponent>> = Icons a
       :title="ability.name + (abilityCooldownText(ability.id) ? ' (' + abilityCooldownText(ability.id) + ')' : '')"
       @click="emit('useAbility', ability)"
     >
+      <img
+        v-if="ability.icon && (ability.icon.startsWith('/') || ability.icon.startsWith('http'))"
+        :src="ability.icon"
+        :alt="ability.name"
+        class="ability-panel__icon"
+      />
       <component
+        v-else
         :is="ability.icon && iconMap[ability.icon] ? iconMap[ability.icon] : null"
         class="ability-panel__icon"
       />

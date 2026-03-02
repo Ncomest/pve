@@ -6,7 +6,7 @@ import { HealthBar } from "@/shared/ui/HealthBar";
 import { useHeroAvatar } from "@/features/inventory/model/useHeroAvatar";
 import "./CharacterCard.scss";
 
-defineProps<{
+const props = defineProps<{
   name: string;
   hp: number;
   maxHp: number;
@@ -17,7 +17,12 @@ defineProps<{
   powerBoostText?: string;
   buffs?: ActiveEffect[];
   debuffs?: ActiveEffect[];
+  /** Комбо-поинты (0–6), отображаются под полосой здоровья */
+  comboPoints?: number;
 }>();
+
+const COMBO_MAX = 6;
+const comboFilled = () => Math.min(COMBO_MAX, Math.max(0, props.comboPoints ?? 0));
 
 const { selectedSrc } = useHeroAvatar();
 const avatarSrc = computed(() => selectedSrc());
@@ -47,6 +52,14 @@ const avatarSrc = computed(() => selectedSrc());
     <div class="character-card__body">
       <div class="character-card__title">{{ name }}</div>
       <HealthBar :percent="hpPercent" :current="hp" :max="maxHp" variant="player" />
+      <div v-if="comboPoints !== undefined" class="character-card__combo" aria-label="Комбо-поинты">
+        <span
+          v-for="i in COMBO_MAX"
+          :key="i"
+          class="character-card__combo-dot"
+          :class="{ 'character-card__combo-dot--filled': i <= comboFilled() }"
+        />
+      </div>
       <EffectSlots
         :buffs="buffs ?? []"
         :debuffs="debuffs ?? []"

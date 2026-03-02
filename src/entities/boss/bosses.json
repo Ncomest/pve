@@ -8,8 +8,8 @@
     "xpReward": 30,
     "loot": [],
     "stats": {
-      "hp": 60,
-      "maxHp": 60,
+      "hp": 3000,
+      "maxHp": 3000,
       "power": 8,
       "chanceCrit": 0.05,
       "evasion": 0.02,

@@ -10,6 +10,61 @@ import "./HeroStats.scss";
 const { level, xp, xpToNext, percentToNext } = usePlayerProgress();
 const characterStore = useCharacterStore();
 
+const base = PLAYER_CHARACTER.stats;
+const eq = computed(() => characterStore.equipmentStats);
+
+interface StatRow {
+  label: string;
+  base: number;
+  bonus: number;
+  fmt: (v: number) => string;
+}
+
+const statRows = computed<StatRow[]>(() => [
+  {
+    label: "Атака",
+    base: base.power,
+    bonus: eq.value.power,
+    fmt: (v) => String(v),
+  },
+  {
+    label: "Здоровье",
+    base: base.maxHp,
+    bonus: eq.value.hp,
+    fmt: (v) => String(v),
+  },
+  {
+    label: "Скорость",
+    base: base.speed,
+    bonus: eq.value.speed,
+    fmt: (v) => String(v),
+  },
+  {
+    label: "Меткость",
+    base: 0,
+    bonus: eq.value.accuracy,
+    fmt: (v) => Math.round(v * 100) + "%",
+  },
+  {
+    label: "Крит",
+    base: base.chanceCrit,
+    bonus: eq.value.chanceCrit,
+    fmt: (v) => Math.round(v * 100) + "%",
+  },
+  {
+    label: "Броня",
+    base: base.armor,
+    bonus: eq.value.armor,
+    fmt: (v) => String(v),
+  },
+  {
+    label: "Уклонение",
+    base: base.evasion,
+    bonus: eq.value.evasion,
+    fmt: (v) => Math.round(v * 100) + "%",
+  },
+]);
+
 const getMaxHp = () => {
   const bonusHp = (level.value - 1) * 20;
   return PLAYER_CHARACTER.stats.maxHp + bonusHp + characterStore.equipmentStats.hp;
@@ -102,37 +157,19 @@ const currentAvatarSrc = computed(() => selectedSrc());
     </div>
 
     <div class="hero-stats__content">
-      <div class="hero-stats__row">
-        <span>Атака:</span>
-        <span class="hero-stats__value">+{{ characterStore.equipmentStats.power }}</span>
-      </div>
-      <div class="hero-stats__row">
-        <span>Скорость:</span>
-        <span class="hero-stats__value">+{{ characterStore.equipmentStats.speed }}</span>
-      </div>
-      <div class="hero-stats__row">
-        <span>Меткость:</span>
-        <span class="hero-stats__value">
-          +{{ Math.round(characterStore.equipmentStats.accuracy * 100) }}%
+      <div
+        v-for="row in statRows"
+        :key="row.label"
+        class="hero-stats__row"
+      >
+        <span class="hero-stats__row-label">{{ row.label }}:</span>
+        <span class="hero-stats__row-values">
+          <span class="hero-stats__val hero-stats__val--base">{{ row.fmt(row.base) }}</span>
+          <span v-if="row.bonus !== 0" class="hero-stats__val hero-stats__val--bonus">
+            +{{ row.fmt(row.bonus) }}
+          </span>
+          <span class="hero-stats__val hero-stats__val--total">{{ row.fmt(row.base + row.bonus) }}</span>
         </span>
-      </div>
-      <div class="hero-stats__row">
-        <span>Крит:</span>
-        <span class="hero-stats__value">
-          +{{ Math.round(characterStore.equipmentStats.chanceCrit * 100) }}%
-        </span>
-      </div>
-      <div class="hero-stats__row">
-        <span>Здоровье:</span>
-        <span class="hero-stats__value">+{{ characterStore.equipmentStats.hp }}</span>
-      </div>
-      <div class="hero-stats__row">
-        <span>Броня:</span>
-        <span class="hero-stats__value">+{{ characterStore.equipmentStats.armor }}</span>
-      </div>
-      <div class="hero-stats__row">
-        <span>Уклонение:</span>
-        <span class="hero-stats__value">+{{ characterStore.equipmentStats.evasion }}</span>
       </div>
     </div>
   </section>

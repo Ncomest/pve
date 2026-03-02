@@ -47,6 +47,27 @@
     flex-wrap: wrap;
     gap: 8px;
   }
+
+  &__slot-wrap {
+    position: relative;
+
+    &--has-ability:hover .skill-panel__tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  &__tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s, visibility 0.15s;
+    pointer-events: none;
+    z-index: 50;
+  }
 }
 
 .ability-list {
@@ -68,55 +89,126 @@
   }
 
   &__grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+.ability-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  text-align: left;
+  color: rgba(255, 255, 255, 0.9);
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
   }
 
-  &__item {
+  &--damage {
+    border-left: 3px solid rgba(220, 38, 38, 0.7);
+  }
+
+  &--heal {
+    border-left: 3px solid rgba(22, 163, 74, 0.7);
+  }
+
+  &--buff {
+    border-left: 3px solid rgba(124, 58, 237, 0.7);
+  }
+
+  &--selected {
+    border-color: rgba(147, 197, 253, 0.55);
+    box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.2);
+  }
+
+  &__icon-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.85);
+
+    svg,
+    img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+
+    &:hover .ability-card__tooltip {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+  }
+
+  &__tooltip {
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(calc(-50% + 4px));
+    z-index: 100;
+    min-width: 180px;
+    padding: 0.6rem 0.75rem;
+    background: rgba(20, 20, 30, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.9);
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    gap: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s, transform 0.15s;
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    &--selected {
-      border-color: rgba(147, 197, 253, 0.6);
-      background: rgba(147, 197, 253, 0.12);
-      box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.25);
-    }
-
-    &--damage {
-      border-left: 3px solid rgba(220, 38, 38, 0.7);
-    }
-
-    &--heal {
-      border-left: 3px solid rgba(22, 163, 74, 0.7);
-    }
-
-    &--buff {
-      border-left: 3px solid rgba(124, 58, 237, 0.7);
+    &-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.95);
+      margin-bottom: 4px;
+      white-space: nowrap;
     }
   }
 
   &__name {
+    flex: 1;
+    font-size: 0.9rem;
     font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
   }
 
-  &__meta {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.5);
-    margin-top: 2px;
+  &__detail-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+
+  &__detail-label {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  &__detail-value {
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
   }
 }
