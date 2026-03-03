@@ -54,12 +54,41 @@ const {
   playerDamageNumbers,
   bossAttackCooldownLeft,
   bossAttackCooldownMax,
+  battleTimeFormatted,
+  currentBossAbility,
+  bossCastState,
+  bossCastTimeLeftMs,
+  bossCastTotalMs,
 } = useBattle(() => props.bossId);
 
 const powerBoostText = computed(() => {
   if (powerBoostLeftMs.value <= 0) return "";
   return `+${powerBoostValue.value} (${(powerBoostLeftMs.value / 1000).toFixed(1)}с)`;
 });
+
+const currentBossAbilityName = computed(() =>
+  bossCastState.value === "casting" && currentBossAbility.value
+    ? currentBossAbility.value.name
+    : undefined,
+);
+
+const currentBossAbilityIcon = computed(() =>
+  bossCastState.value === "casting" && currentBossAbility.value
+    ? currentBossAbility.value.icon
+    : undefined,
+);
+
+const currentBossAbilityCategory = computed(() =>
+  bossCastState.value === "casting" && currentBossAbility.value
+    ? currentBossAbility.value.category
+    : undefined,
+);
+
+const currentBossAbilityCanBeInterrupted = computed(() =>
+  bossCastState.value === "casting" && currentBossAbility.value
+    ? currentBossAbility.value.canBeInterrupted
+    : undefined,
+);
 
 const handleFlee = () => router.push({ name: "boss-select" });
 
@@ -103,6 +132,8 @@ onUnmounted(() => {
       </button>
     </header>
 
+    <div class="battle-page__timer">{{ battleTimeFormatted }}</div>
+
     <div class="battle-page__arena">
       <div class="battle-page__card-wrap">
         <CharacterCard
@@ -135,6 +166,12 @@ onUnmounted(() => {
           :debuffs="bossDebuffs"
           :attack-cooldown-left="bossAttackCooldownLeft"
           :attack-cooldown-max="bossAttackCooldownMax"
+          :current-ability-name="currentBossAbilityName"
+          :current-ability-icon="currentBossAbilityIcon"
+          :cast-time-left-ms="bossCastState === 'casting' ? bossCastTimeLeftMs : 0"
+          :cast-total-ms="bossCastState === 'casting' ? bossCastTotalMs : 0"
+          :cast-category="currentBossAbilityCategory"
+          :cast-can-be-interrupted="currentBossAbilityCanBeInterrupted"
         />
         <DamageNumbers :numbers="bossDamageNumbers" />
       </div>

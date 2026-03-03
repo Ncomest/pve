@@ -32,13 +32,13 @@
     "xpReward": 55,
     "loot": ["belt-leather"],
     "stats": {
-      "hp": 100,
-      "maxHp": 100,
+      "hp": 5000,
+      "maxHp": 5000,
       "power": 14,
-      "chanceCrit": 0.08,
-      "evasion": 0.04,
+      "chanceCrit": 0.12,
+      "evasion": 0.08,
       "speed": 2,
-      "armor": 2
+      "armor": 4
     },
     "buffs": [
       { "id": "charge", "name": "Натиск", "icon": "⚡", "description": "Увеличивает урон при рывке" },
@@ -46,7 +46,97 @@
     ],
     "debuffs": [
       { "id": "bleed", "name": "Кровотечение", "icon": "🩸", "description": "Наносит урон каждый ход" }
-    ]
+    ],
+    "bossAbilities": [
+      {
+        "id": "sharpen-tusks",
+        "name": "/images/bosses/icons/special/boarhead.png",
+        "type": "buff",
+        "icon": "🦷",
+        "cooldownMs": 25000,
+        "castTimeMs": 3000,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Босс усиливает свои клыки, удваивая силу атаки на 11 секунд",
+        "selfBuffType": "damage",
+        "selfBuffValue": 3.0,
+        "selfBuffDurationMs": 11000,
+        "dispellable": true
+      },
+      {
+        "id": "infected-bite",
+        "name": "Зараженный укус",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/bite.png",
+        "cooldownMs": 20000,
+        "castTimeMs": 3000,
+        "category": "persistent_debuff",
+        "canBeInterrupted": false,
+        "description": "Укус накладывает заразу, наносящую 5 урона каждые 2с в течение 8с. Снимается Cleanse",
+        "baseDamageX": 0.5,
+        "debuffRequiresCleanse": true,
+        "debuffType": "poison",
+        "dotDurationMs": 8000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 14
+      },
+      {
+        "id": "furious-charge",
+        "name": "Яростный рывок",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/boarhead.png",
+        "cooldownMs": 18000,
+        "castTimeMs": 3000,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "requiredDefensiveTag": "ice-wall",
+        "description": "Мощный рывок наносит большой урон. Блокируется только Стеной льда",
+        "baseDamageX": 7.0
+      },
+      {
+        "id": "snout-slam",
+        "name": "Бипнуть хрюнделем",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/nose.png",
+        "cooldownMs": 16000,
+        "castTimeMs": 3000,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "requiredDefensiveTag": "full-dodge",
+        "description": "Размашистый удар хрюнделем. Избежать можно только уворотом",
+        "baseDamageX": 6.5
+      },
+      {
+        "id": "hooves-between-eyes",
+        "name": "Копыта меж глаз",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/hooves.png",
+        "cooldownMs": 17000,
+        "castTimeMs": 3000,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "requiredDefensiveTag": "block",
+        "description": "Удар копытами в голову. Блокируется щитом",
+        "baseDamageX": 6.8
+      },
+      {
+        "id": "eat-apple",
+        "name": "Сожрать яблоко",
+        "type": "heal",
+        "icon": "/images/bosses/icons/special/apple.png",
+        "cooldownMs": 30000,
+        "castTimeMs": 3000,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Босс восстанавливает 500 HP. Прерывается способностью Rebuke",
+        "value": 500
+      }
+    ],
+    "abilityConfig": {
+      "startDelayMs": 10000,
+      "minAbilityIntervalMs": 15000,
+      "preventConsecutiveRepeat": true
+    }
   },
   {
     "id": "wolf",

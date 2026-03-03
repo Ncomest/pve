@@ -109,29 +109,6 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     defenseEvasionDurationMs: 8_000,
   },
   {
-    id: "dodge",
-    name: "Уворот",
-    type: "buff",
-    value: 0,
-    cooldownMs: 8_000,
-    icon: "/images/hero/ability/blur.png",
-    role: "defense",
-    classId: CLASS_ID,
-    defenseDodgeNext: true,
-    defenseDodgeExpireMs: 5_000,
-  },
-  {
-    id: "block",
-    name: "Блок",
-    type: "buff",
-    value: 0,
-    cooldownMs: 20_000,
-    icon: "/images/hero/ability/defend.png",
-    role: "defense",
-    classId: CLASS_ID,
-    defenseBlockSpecials: true,
-  },
-  {
     id: "shadow-cloak",
     name: "Плащ теней",
     type: "buff",
@@ -144,7 +121,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     defenseDamageReductionPercent: 0.2,
     defenseDamageReductionDurationMs: 10_000,
   },
-
+  
   // --- Контроль и мобильность ---
   {
     id: "lightning-flash",
@@ -158,15 +135,5 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     movementSpeedPercent: 0.15,
     movementSpeedDurationMs: 10_000,
   },
-  {
-    id: "rebuke",
-    name: "Пинок",
-    type: "damage",
-    value: 0,
-    cooldownMs: 15_000,
-    icon: "/images/hero/ability/kick.png",
-    role: "control",
-    classId: CLASS_ID,
-    interrupt: true,
-  },
+ 
 ];
