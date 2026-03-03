@@ -598,3 +598,215 @@ stateDiagram-v2
   - Сохранять узнаваемость паттернов для игрока.
   - Избегать разрастания уникальных «особых случаев» в логике боя.
 
+---
+
+## 8. Паттерн настройки боя с боссом
+
+Этот раздел — практический «рецепт», как спроектировать и настроить **полноценный бой с боссом** на основе уже реализованного дикого кабана `boar`. Цель — чтобы добавление нового босса сводилось к копированию и настройке понятного шаблона, без погружения во всю логику `useBattle`.
+
+Полноценный босс в проекте описывается:
+
+- **Объектом босса** в `[src/entities/boss/bosses.json](src/entities/boss/bosses.json)`:
+  - базовые статы (`stats`) и служебная информация (уровень, редкость, награда, лут);
+  - массив `bossAbilities` — активные способности босса (см. модель `BossAbility` в разделе 4);
+  - `abilityConfig` — настройки таймингов и частоты использования способностей.
+- **Логикой боя** в `[src/features/battle/model/useBattle.ts](src/features/battle/model/useBattle.ts)`:
+  - автоатака босса каждые ~3.6 секунды;
+  - планирование каста способностей босса;
+  - взаимодействие с способностями героя (Rebuke, Block, Dodge, Cleanse, Dispell и т.д.).
+
+Связь между данными и боевой логикой можно представить так:
+
+```mermaid
+flowchart LR
+  bossConfig["Boss (bosses.json)"] --> bossAbilities["bossAbilities"]
+  bossConfig --> abilityConfig["abilityConfig"]
+  bossAbilities --> useBattle["useBattle"]
+  useBattle --> bossCast["Каст босса"]
+  useBattle --> bossAutoAttack["Автоатака 3.6с"]
+  playerAbilities["Способности героя"] --> useBattle
+  playerAbilities --> counters["Rebuke / Block / Dodge / Cleanse / Dispell"]
+  counters --> bossCast
+```
+
+### 8.1. Шаблон объекта босса
+
+Базовый объект босса в `[src/entities/boss/bosses.json](src/entities/boss/bosses.json)` выглядит концептуально так:
+
+```ts
+{
+  "id": "boss-id",
+  "name": "Имя босса",
+  "image": "/images/bosses/placeholder.jpg",
+  "level": 5,
+  "rarity": "rare",
+  "xpReward": 150,
+  "loot": ["item-id"],
+  "stats": {
+    "hp": 5000,
+    "maxHp": 5000,
+    "power": 20,
+    "chanceCrit": 0.15,
+    "evasion": 0.08,
+    "speed": 2,
+    "armor": 4
+  },
+  "buffs": [],
+  "debuffs": [],
+  "bossAbilities": [
+    // 3–5 активных способностей босса (см. модель BossAbility и паттерны ниже)
+  ],
+  "abilityConfig": {
+    "startDelayMs": 10000,
+    "minAbilityIntervalMs": 15000,
+    "preventConsecutiveRepeat": true
+  }
+}
+```
+
+Ключевые поля:
+
+- **`stats`** — базовая сложность босса (живучесть, урон, крит, уклонение, броня).
+- **`bossAbilities`** — список объектов `BossAbility` (см. раздел 4), описывающих, *что* и *как* босс кастует.
+- **`abilityConfig`**:
+  - `startDelayMs` — сколько времени после начала боя пройдёт до первой попытки каста способности;
+  - `minAbilityIntervalMs` — минимальный интервал между кастами способностей (между собой и относительно автоатак);
+  - `preventConsecutiveRepeat` — если `true`, босс не будет кастовать одну и ту же способность два раза подряд.
+
+### 8.2. Бой с диким кабаном (`id: boar`) как эталон
+
+Босс `boar` в `[src/entities/boss/bosses.json](src/entities/boss/bosses.json)` — пример полностью настроенного боя:
+
+- Статы:
+  - `hp: 5000`, `power: 14`, `chanceCrit: 0.12`, `evasion: 0.08`, `armor: 4` — средний запас HP, умеренный урон, заметный крит и уклонение, лёгкая броня.
+- Конфигурация способностей:
+  - `abilityConfig.startDelayMs = 10000` — первые ~10 секунд игрок знакомится с автоатакой и успевает нажать базовые способности.
+  - `abilityConfig.minAbilityIntervalMs = 15000` — между активными способностями есть пауза, чтобы игрок не тонул в непрерывных кастах.
+  - `preventConsecutiveRepeat = true` — кабан не может заспамить одну и ту же механику.
+
+Активные способности кабана и их паттерны:
+
+- `sharpen-tusks`
+  - `category: "self_buff"`, `canBeInterrupted: true`, `selfBuffType: "damage"`, `selfBuffValue: 3.0`, `selfBuffDurationMs: 11000`, `dispellable: true`.
+  - Паттерн: **баф на боссе** (тип 6) → сильное усиление урона на время, которое можно **прервать** (Rebuke) или **снять** (Dispell).
+- `infected-bite`
+  - `category: "persistent_debuff"`, `canBeInterrupted: false`, `debuffRequiresCleanse: true`, `debuffType: "poison"`, `dotDurationMs`, `dotTickIntervalMs`, `dotDamagePerTick`.
+  - Паттерн: **дебафф до очистки** (тип 5) + DoT (тип 4) → яд, который тикает, пока игрок не нажмёт **Cleanse**.
+- `furious-charge`
+  - `category: "uninterruptible"`, `canBeInterrupted: false`, `requiredDefensiveTag: "ice-wall"`, высокий `baseDamageX`.
+  - Паттерн: **непрерываемый тяжёлый каст** (тип 3), контрится только защитой с тегом «стена/блок спецов» (Стена льда / Block).
+- `snout-slam`
+  - `category: "uninterruptible"`, `requiredDefensiveTag: "full-dodge"`, высокий `baseDamageX`.
+  - Паттерн: **непрерываемый удар под 100% уклонение** → контра через `dodge` / способности с гарантированным уклонением.
+- `hooves-between-eyes`
+  - `category: "uninterruptible"`, `requiredDefensiveTag: "block"`, высокий `baseDamageX`.
+  - Паттерн: **непрерываемый удар под блок** → контра через щит/Блок.
+- `eat-apple`
+  - `category: "interruptible"`, `canBeInterrupted: true`, `type: "heal"`, `value: 500`.
+  - Паттерн: **прерываемое лечение** (тип 2) → игрок обязан успеть нажать **Rebuke**.
+
+Связь «способность босса → чем контрится у игрока»:
+
+| Способность босса           | Категория / паттерн              | Основная контра героя                            |
+|----------------------------|-----------------------------------|--------------------------------------------------|
+| `sharpen-tusks`            | self_buff, dispellable           | `rebuke` (прервать каст), `dispell` (снять баф) |
+| `infected-bite`           | persistent_debuff + DoT (яд)     | `cleanse` (снять яд)                            |
+| `furious-charge`          | uninterruptible, requiredDefensiveTag: "ice-wall" | `ice-wall` / блок спец-атак                    |
+| `snout-slam`              | uninterruptible, requiredDefensiveTag: "full-dodge" | `dodge` / 100% уклонение                       |
+| `hooves-between-eyes`     | uninterruptible, requiredDefensiveTag: "block" | `block`                                         |
+| `eat-apple`               | interruptible heal               | `rebuke`                                         |
+
+Таким образом, бой с кабаном демонстрирует полный набор взаимодействий: прерывание, блок, уворот, очистку дебаффов и диспелл бафов.
+
+### 8.3. Рецепт создания нового босса
+
+Ниже — чеклист, по которому удобно идти при добавлении нового босса.
+
+1. **Фантазия и роль босса**
+   - Определить архетип: «толстый танк», «бурстовый убийца», «маг с DoT», «контрольный» и т.п.
+   - Выбрать примерный уровень и редкость (`level`, `rarity`, `xpReward`) по аналогии с существующими боссами.
+2. **Базовые статы**
+   - Подобрать `hp`, `power`, `chanceCrit`, `evasion`, `armor` на фоне уже существующих записей в `[src/entities/boss/bosses.json](src/entities/boss/bosses.json)`.
+   - Принципы:
+     - много HP + высокая броня → долгий «толстый» босс;
+     - мало HP + высокий урон/крит → стеклянная пушка;
+     - высокая `evasion` → много промахов, лучше не сочетать с чрезмерным уроном.
+3. **Набор активных способностей (паттерны)**
+   - Рекомендуемый минимум: **3–5 способностей**, каждая привязана к одному или нескольким паттернам из этого документа и `[docs/ability-patterns.md](docs/ability-patterns.md)`:
+     - 1 self-buff (тип 6) — усиление урона/брони, по возможности **диспеллимый** (`dispellable: true`).
+     - 1–2 `uninterruptible` удара (тип 3) под разные сейвы: блок, полный уворот, сильное снижение урона (`shadow-cloak`).
+     - 1 DoT / `persistent_debuff` (тип 4/5), завязанный на `Cleanse` или `Teleport` (через `debuffType`).
+     - 1 прерываемое действие (heal или очень сильный удар) под `rebuke`.
+   - Для каждой способности явно определить:
+     - `category` (`interruptible`, `uninterruptible`, `dot`, `persistent_debuff`, `self_buff`);
+     - возможность прерывания (`canBeInterrupted`);
+     - необходимость конкретного сейва (`requiredDefensiveTag`) и **какой скилл героя** отвечает этому тегу.
+4. **Тайминги и частота способностей**
+   - Для каждой способности настроить:
+     - `cooldownMs` — как часто босс может её использовать (отдельно от автоатаки);
+     - `castTimeMs` — длительность каста (не делать слишком коротких кастов для опасных умений).
+   - В `abilityConfig`:
+     - выставить `startDelayMs`, чтобы у игрока было 5–15 секунд на освоение боя до первой сложной механики;
+     - настроить `minAbilityIntervalMs`, чтобы способности не шли одна за другой без пауз;
+     - включить `preventConsecutiveRepeat`, если не хотите спама одной и той же кнопки.
+   - Эти поля используются логикой планирования кастов в `[src/features/battle/model/useBattle.ts](src/features/battle/model/useBattle.ts)` (`scheduleNextBossAbility`, `bossCastState` и др.).
+5. **Баланс и плейтест**
+   - Убедиться, что:
+     - у каждого опасного действия босса есть минимум один явный сейв/контра;
+     - длительность каста даёт игроку **окно реакции** (3+ секунды или явный телеграф);
+     - автоатака + способности в сумме не убивают героя через 2–3 глобальных кулдауна.
+   - Пройти бой несколько раз с разными билдами героя и отрегулировать `power`, `baseDamageX` и кулдауны по ощущениям.
+
+### 8.4. Шаблон и чеклист для копирования
+
+Минимальный шаблон записи босса, который удобно копировать при создании нового противника:
+
+```ts
+{
+  "id": "boss-id",
+  "name": "Имя босса",
+  "image": "/images/bosses/placeholder.jpg",
+  "level": 5,
+  "rarity": "rare",
+  "xpReward": 150,
+  "loot": ["item-id"],
+  "stats": {
+    "hp": 5000,
+    "maxHp": 5000,
+    "power": 20,
+    "chanceCrit": 0.15,
+    "evasion": 0.08,
+    "speed": 2,
+    "armor": 4
+  },
+  "bossAbilities": [
+    // 3–5 способностей по паттернам (self_buff, interruptible, uninterruptible, dot/persistent_debuff)
+  ],
+  "abilityConfig": {
+    "startDelayMs": 10000,
+    "minAbilityIntervalMs": 15000,
+    "preventConsecutiveRepeat": true
+  }
+}
+```
+
+При создании нового босса обязательно:
+
+- изменить `id`, `name`, `image`, `level`, `rarity`, `xpReward`, `loot`;
+- подобрать `stats` под ожидаемую сложность;
+- задать `bossAbilities` с осмысленными `category`, `canBeInterrupted`, `requiredDefensiveTag`, DoT/дебафф-частью и описанием контры;
+- при необходимости добавить `buffs`/`debuffs` (для лора и будущих механик);
+- настроить `abilityConfig` под желаемый ритм боя (частота кастов относительно автоатаки).
+
+### 8.5. Краткий чеклист перед коммитом
+
+Перед тем как закоммитить нового босса, быстро проверить:
+
+- `bosses.json` валиден, `id` босса уникален, нет опечаток в полях.
+- У каждой записи в `bossAbilities` понятный паттерн (interruptible / uninterruptible / dot / persistent_debuff / self_buff).
+- Для всех `requiredDefensiveTag` есть соответствующая защитная способность героя.
+- У опасных кастов есть контра (Rebuke, Block, Dodge, Cleanse, Dispell и т.п.) и достаточно времени на реакцию.
+- `abilityConfig` не даёт боссу спамить кастами без пауз и не конфликтует с автоатакой.
+- Бой с новым боссом пройден 2–3 раза и субъективно ощущается честным.
+
+
