@@ -3,8 +3,7 @@
  * Контекст передаётся из useBattle; каждый тип эффекта обрабатывается своим обработчиком.
  */
 import type { Stats } from "@/entities/boss/model";
-import type { ActiveEffect } from "@/shared/lib/effects/types";
-import type { AbilityEffect } from "@/shared/lib/effects/types";
+import type { ActiveEffect, AbilityEffect, DebuffType } from "@/shared/lib/effects/types";
 
 export interface BattleEffectContext {
   player: { stats: Stats };
@@ -17,6 +16,8 @@ export interface BattleEffectContext {
   gainCombo(n: number): void;
   spendCombo(): number;
   playerBuffs: { value: ActiveEffect[] };
+  playerDebuffs: { value: ActiveEffect[] };
+  bossBuffs: { value: ActiveEffect[] };
   bossDebuffs: { value: ActiveEffect[] };
   eviscerateStacks: { value: number };
   EVISERATE_STACKS_MAX: number;
@@ -69,6 +70,49 @@ function addBossDebuff(ctx: BattleEffectContext, effect: ActiveEffect) {
 
 function removeBossDebuff(ctx: BattleEffectContext, id: string) {
   ctx.bossDebuffs.value = ctx.bossDebuffs.value.filter((e) => e.id !== id);
+}
+
+function cleansePlayerDebuffs(
+  ctx: BattleEffectContext,
+  debuffTypes: DebuffType[] | undefined,
+) {
+  const before = ctx.playerDebuffs.value.length;
+  if (!before) return 0;
+
+  if (!debuffTypes || debuffTypes.length === 0) {
+    ctx.playerDebuffs.value = [];
+    return before;
+  }
+
+  const typeSet = new Set<DebuffType>(debuffTypes);
+  const kept: ActiveEffect[] = [];
+  let removed = 0;
+  for (const effect of ctx.playerDebuffs.value) {
+    const t = effect.debuffType;
+    if (t && typeSet.has(t)) {
+      removed += 1;
+      continue;
+    }
+    kept.push(effect);
+  }
+  ctx.playerDebuffs.value = kept;
+  return removed;
+}
+
+function dispelBossBuffs(ctx: BattleEffectContext) {
+  const before = ctx.bossBuffs.value.length;
+  if (!before) return 0;
+  const kept: ActiveEffect[] = [];
+  let removed = 0;
+  for (const effect of ctx.bossBuffs.value) {
+    if (effect.dispellable) {
+      removed += 1;
+      continue;
+    }
+    kept.push(effect);
+  }
+  ctx.bossBuffs.value = kept;
+  return removed;
 }
 
 function applyOneEffect(
@@ -394,6 +438,30 @@ function applyOneEffect(
       ctx.addTimeoutId(clearId);
       const comboNote = ctx.turnState.spentCombo != null ? ` (${n} комбо). Комбо сброшено` : "";
       ctx.pushLog(`${meta.name}: урон мгновенно + яд ${effect.durationMs / 1000}с${comboNote}.`);
+      break;
+    }
+
+    case "cleanse": {
+      const removed = cleansePlayerDebuffs(ctx, effect.debuffTypes);
+      if (removed > 0) {
+        const typeNote =
+          effect.debuffTypes && effect.debuffTypes.length > 0
+            ? ` (${effect.debuffTypes.join(", ")})`
+            : "";
+        ctx.pushLog(`${meta.name}: снято дебаффов с героя: ${removed}${typeNote}.`);
+      } else {
+        ctx.pushLog(`${meta.name}: на тебе нет подходящих дебаффов для снятия.`);
+      }
+      break;
+    }
+
+    case "dispel": {
+      const removed = dispelBossBuffs(ctx);
+      if (removed > 0) {
+        ctx.pushLog(`${meta.name}: с босса снято бафов: ${removed}.`);
+      } else {
+        ctx.pushLog(`${meta.name}: на боссе нет бафов, которые можно развеять.`);
+      }
       break;
     }
 

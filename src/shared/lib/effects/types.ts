@@ -1,6 +1,8 @@
 /**
  * Активный эффект в бою (бафф или дебафф) с оставшимся временем действия.
  */
+export type DebuffType = "ground" | "poison" | "curse" | "burn" | "other";
+
 export interface ActiveEffect {
   id: string;
   name: string;
@@ -13,6 +15,10 @@ export interface ActiveEffect {
   endTime?: number;
   /** Количество стаков (отображается числом под иконкой) */
   stacks?: number;
+  /** Тип дебаффа (для Cleanse / Teleport и механик боссов); для баффов обычно не задаётся */
+  debuffType?: DebuffType;
+  /** Можно ли снять этот бафф/дебафф эффектом Dispell (по умолчанию false) */
+  dispellable?: boolean;
 }
 
 /** Типы эффектов способностей (для композиции способности из списка эффектов). */
@@ -33,7 +39,9 @@ export type EffectKind =
   | "block_specials"
   | "damage_reduction"
   | "interrupt"
-  | "movement_speed";
+  | "movement_speed"
+  | "cleanse"
+  | "dispel";
 
 /** Эффект способности: один из атомарных эффектов с параметрами. */
 export type AbilityEffect =
@@ -74,4 +82,16 @@ export type AbilityEffect =
   | { kind: "block_specials"; durationMs: number }
   | { kind: "damage_reduction"; percent: number; durationMs: number }
   | { kind: "interrupt" }
-  | { kind: "movement_speed"; percent: number; durationMs: number };
+  | { kind: "movement_speed"; percent: number; durationMs: number }
+  | {
+      kind: "cleanse";
+      /** Кого чистим: пока всегда self, но оставляем поле на будущее */
+      target: "self";
+      /** Какие типы дебаффов снимаем; если не задано — снимаем все дебаффы */
+      debuffTypes?: DebuffType[];
+    }
+  | {
+      kind: "dispel";
+      /** Кого диспеллим: сейчас только босса */
+      target: "boss";
+    };

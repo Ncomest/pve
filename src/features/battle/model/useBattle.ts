@@ -130,7 +130,7 @@ export function useBattle(bossId: () => string | undefined) {
 
   /** Баффы на персонаже игрока */
   const playerBuffs = ref<ActiveEffect[]>([]);
-  /** Дебаффы на персонаже игрока */
+  /** Дебаффы на персонаже игрока (яд, проклятья, огненная земля и т.п.) */
   const playerDebuffs = ref<ActiveEffect[]>([]);
   /** Баффы на боссе (которые босс наложил на себя) */
   const bossBuffs = ref<ActiveEffect[]>([]);
@@ -412,6 +412,8 @@ export function useBattle(bossId: () => string | undefined) {
         gainCombo,
         spendCombo,
         playerBuffs,
+        playerDebuffs,
+        bossBuffs,
         bossDebuffs,
         eviscerateStacks,
         EVISERATE_STACKS_MAX,
