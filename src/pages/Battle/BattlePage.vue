@@ -52,6 +52,8 @@ const {
   comboPoints,
   bossDamageNumbers,
   playerDamageNumbers,
+  bossAttackCooldownLeft,
+  bossAttackCooldownMax,
 } = useBattle(() => props.bossId);
 
 const powerBoostText = computed(() => {
@@ -131,6 +133,8 @@ onUnmounted(() => {
           :image="boss.image"
           :buffs="bossBuffs"
           :debuffs="bossDebuffs"
+          :attack-cooldown-left="bossAttackCooldownLeft"
+          :attack-cooldown-max="bossAttackCooldownMax"
         />
         <DamageNumbers :numbers="bossDamageNumbers" />
       </div>

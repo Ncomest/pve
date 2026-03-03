@@ -862,6 +862,37 @@ export function useBattle(bossId: () => string | undefined) {
 
   let bossAttackTimer: number | null = null;
 
+  /** Единая скорость атаки босса: 3600мс (3.6с) */
+  const BOSS_ATTACK_INTERVAL_MS = 3600;
+
+  /** Кулдаун атаки босса для визуализации */
+  const bossAttackCooldownLeft = ref(0);
+  const bossAttackCooldownMax = BOSS_ATTACK_INTERVAL_MS;
+  let bossAttackCooldownTickerId: number | null = null;
+
+  const startBossAttackCooldownTicker = () => {
+    if (bossAttackCooldownTickerId !== null) return;
+    const startTime = Date.now();
+    bossAttackCooldownLeft.value = BOSS_ATTACK_INTERVAL_MS;
+
+    bossAttackCooldownTickerId = window.setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      bossAttackCooldownLeft.value = Math.max(0, BOSS_ATTACK_INTERVAL_MS - elapsed);
+      if (bossAttackCooldownLeft.value <= 0 && bossAttackCooldownTickerId !== null) {
+        window.clearInterval(bossAttackCooldownTickerId);
+        bossAttackCooldownTickerId = null;
+      }
+    }, 50);
+  };
+
+  const stopBossAttackCooldownTicker = () => {
+    if (bossAttackCooldownTickerId !== null) {
+      window.clearInterval(bossAttackCooldownTickerId);
+      bossAttackCooldownTickerId = null;
+    }
+    bossAttackCooldownLeft.value = 0;
+  };
+
   const stopBossAutoAttack = () => {
     if (bossAttackTimer === null) return;
     window.clearTimeout(bossAttackTimer);
@@ -871,10 +902,7 @@ export function useBattle(bossId: () => string | undefined) {
   const scheduleNextBossAttack = () => {
     stopBossAutoAttack();
     if (isBattleOver.value) return;
-    // speed 1 → ~4000мс, speed 5 → ~1500мс; случайный разброс ±500мс
-    const speed = boss.stats.speed ?? 2;
-    const baseDelay = Math.max(1500, 4500 - speed * 600);
-    const delay = baseDelay + Math.floor(rng() * 1000) - 500;
+    startBossAttackCooldownTicker();
     bossAttackTimer = window.setTimeout(() => {
       if (isBattleOver.value) return;
 
@@ -913,11 +941,12 @@ export function useBattle(bossId: () => string | undefined) {
       }
 
       scheduleNextBossAttack();
-    }, delay);
+    }, BOSS_ATTACK_INTERVAL_MS);
   };
 
   const resetBattle = () => {
     stopBossAutoAttack();
+    stopBossAttackCooldownTicker();
     stopPowerBoostTimer();
     effectTimeoutIds.value.forEach((id) => clearTimeout(id));
     effectTimeoutIds.value = [];
@@ -1026,6 +1055,7 @@ export function useBattle(bossId: () => string | undefined) {
 
   onUnmounted(() => {
     stopBossAutoAttack();
+    stopBossAttackCooldownTicker();
     stopPowerBoostTimer();
     stopEffectsTicker();
     if (sweepingCritTimerId !== null) clearTimeout(sweepingCritTimerId);
@@ -1070,5 +1100,7 @@ export function useBattle(bossId: () => string | undefined) {
     COMBO_POINTS_MAX,
     bossDamageNumbers,
     playerDamageNumbers,
+    bossAttackCooldownLeft,
+    bossAttackCooldownMax,
   };
 }
