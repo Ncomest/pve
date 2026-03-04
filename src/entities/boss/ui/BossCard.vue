@@ -167,12 +167,6 @@ const castCategoryClass = computed(() => {
                 Прерываемая
               </span>
               <span
-                v-else-if="castCategory === 'uninterruptible'"
-                class="boss-card__cast-tag boss-card__cast-tag--danger"
-              >
-                Не прерывается
-              </span>
-              <span
                 v-if="mechanicTagText"
                 class="boss-card__cast-tag boss-card__cast-tag--mechanic"
               >
