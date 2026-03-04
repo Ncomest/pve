@@ -33,7 +33,7 @@ export const useCharacterStore = defineStore("character", {
 
   getters: {
     equipmentStats(state) {
-      const stats = { hp: 3000, power: 0, chanceCrit: 0, evasion: 0, speed: 0, accuracy: 0, armor: 0 };
+      const stats = { hp: 0, power: 0, chanceCrit: 0, evasion: 0, speed: 0, accuracy: 0, armor: 0 };
       
       for (const item of Object.values(state.equipped)) {
         if (item?.stats) {
