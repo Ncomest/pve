@@ -90,6 +90,18 @@ const currentBossAbilityCanBeInterrupted = computed(() =>
     : undefined,
 );
 
+const currentBossAbilityRequiredTag = computed(() =>
+  bossCastState.value === "casting" && currentBossAbility.value
+    ? currentBossAbility.value.requiredDefensiveTag
+    : undefined,
+);
+
+const currentBossAbilityDebuffType = computed(() =>
+  bossCastState.value === "casting" && currentBossAbility.value
+    ? currentBossAbility.value.debuffType
+    : undefined,
+);
+
 const handleFlee = () => router.push({ name: "boss-select" });
 
 function onKeyDown(event: KeyboardEvent) {
@@ -172,6 +184,8 @@ onUnmounted(() => {
           :cast-total-ms="bossCastState === 'casting' ? bossCastTotalMs : 0"
           :cast-category="currentBossAbilityCategory"
           :cast-can-be-interrupted="currentBossAbilityCanBeInterrupted"
+          :cast-required-tag="currentBossAbilityRequiredTag"
+          :cast-debuff-type="currentBossAbilityDebuffType"
         />
         <DamageNumbers :numbers="bossDamageNumbers" />
       </div>

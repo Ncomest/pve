@@ -1051,8 +1051,9 @@ export function useBattle(bossId: () => string | undefined) {
   const applyBossAbilityHit = (ability: BossAbility): { hit: boolean } => {
     if (isBattleOver.value) return { hit: false };
 
-    // «Уворот»: гарантированный промах от следующей атаки
-    if (dodgeNextAttack.value) {
+    // «Уворот»: гарантированный промах только от особых атак,
+    // которые помечены requiredDefensiveTag: "full-dodge"
+    if (dodgeNextAttack.value && ability.requiredDefensiveTag === "full-dodge") {
       dodgeNextAttack.value = false;
       if (dodgeNextExpireTimerId !== null) {
         clearTimeout(dodgeNextExpireTimerId);
@@ -1281,19 +1282,6 @@ export function useBattle(bossId: () => string | undefined) {
       if (isBattleOver.value) return;
 
       const attacker: Stats = { ...boss.stats, power: getBossEffectivePower() };
-
-      // «Уворот»: гарантированный промах от следующей атаки
-      if (dodgeNextAttack.value) {
-        dodgeNextAttack.value = false;
-        if (dodgeNextExpireTimerId !== null) {
-          clearTimeout(dodgeNextExpireTimerId);
-          dodgeNextExpireTimerId = null;
-        }
-        playerBuffs.value = playerBuffs.value.filter((e) => e.id !== "dodge");
-        pushLog("Босс атаковал — ты увернулся (Уворот)!");
-        scheduleNextBossAttack();
-        return;
-      }
 
       // Считаем эффективное уклонение с бонусом от «Ускользания»
       const effectiveEvasion = Math.min(1, player.stats.evasion + playerEvasionBonus.value);

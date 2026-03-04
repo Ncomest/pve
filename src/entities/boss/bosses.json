@@ -50,9 +50,9 @@
     "bossAbilities": [
       {
         "id": "sharpen-tusks",
-        "name": "/images/bosses/icons/special/boarhead.png",
+        "name": "Заострить клыки",
         "type": "buff",
-        "icon": "🦷",
+        "icon": "/images/bosses/icons/special/tooth.png",
         "cooldownMs": 25000,
         "castTimeMs": 3000,
         "category": "self_buff",

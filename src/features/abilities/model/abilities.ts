@@ -6,10 +6,10 @@ export const ABILITIES: Ability[] = [
     id: "heal",
     name: "Лечение",
     type: "heal",
-    value: 40,
+    value: 400,
     cooldownMs: 12000,
     icon: "/images/hero/ability/heal_potion.png",
-    effects: [{ kind: "heal", value: 40 }],
+    effects: [{ kind: "heal", value: 400 }],
   },
   {
     id: "rebuke",

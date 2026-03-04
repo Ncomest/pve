@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import type { ActiveEffect } from "@/shared/lib/effects/types";
-import type { BossAbilityCategory } from "@/entities/boss/model";
+ import type { ActiveEffect } from "@/shared/lib/effects/types";
+ import type { BossAbilityCategory, BossDefensiveTag } from "@/entities/boss/model";
 import { EffectSlots } from "@/shared/ui/EffectSlots";
 import { HealthBar } from "@/shared/ui/HealthBar";
 import CooldownOverlay from "@/shared/ui/CooldownOverlay/CooldownOverlay.vue";
@@ -27,6 +27,8 @@ const props = defineProps<{
   castTotalMs?: number;
   castCategory?: BossAbilityCategory;
   castCanBeInterrupted?: boolean;
+  castRequiredTag?: BossDefensiveTag;
+  castDebuffType?: "poison" | "curse" | "burn" | "ground" | "other";
 }>();
 
 const attackCooldownProgress = computed(() => {
@@ -60,6 +62,26 @@ const castProgressPercent = computed(() => castProgress.value * 100);
 const castTimeText = computed(() => {
   if (!hasCast.value || props.castTimeLeftMs === undefined) return "";
   return `${(props.castTimeLeftMs / 1000).toFixed(1)}с`;
+});
+
+const mechanicTagText = computed(() => {
+  if (!hasCast.value) return "";
+
+  // Атаки, которых нужно избегать через «Телепорт» (войда / лужи под ногами)
+  if (props.castDebuffType === "ground") {
+    return "Войда";
+  }
+
+  switch (props.castRequiredTag) {
+    case "ice-wall":
+      return "Фронтальная";
+    case "block":
+      return "Блокируемая";
+    case "full-dodge":
+      return "Увернуться";
+    default:
+      return "";
+  }
 });
 
 const castCategoryClass = computed(() => {
@@ -149,6 +171,12 @@ const castCategoryClass = computed(() => {
                 class="boss-card__cast-tag boss-card__cast-tag--danger"
               >
                 Не прерывается
+              </span>
+              <span
+                v-if="mechanicTagText"
+                class="boss-card__cast-tag boss-card__cast-tag--mechanic"
+              >
+                {{ mechanicTagText }}
               </span>
             </div>
             <div class="boss-card__cast-bar-wrapper">
