@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { useSkillsStore } from "@/app/store/skills";
 import { ALL_ABILITIES } from "@/features/abilities/model/abilities";
-import type { Ability, AbilityRole } from "@/features/abilities/model/types";
+import type { Ability } from "@/features/abilities/model/types";
 import SkillBarSlot from "@/features/skills/ui/SkillBarSlot.vue";
 import { AbilityTooltip } from "@/shared/ui/AbilityTooltip";
 import * as Icons from "@/shared/ui/icons";
@@ -44,25 +44,6 @@ function abilityTypeLabel(type: Ability["type"]): string {
     control: "Контроль"
   };
   return map[type];
-}
-
-function abilityRoleLabel(role: AbilityRole | undefined): string {
-  if (!role) return "";
-  const map: Record<AbilityRole, string> = {
-    generator: "Генератор",
-    finisher: "Финишер",
-    defense: "Защита",
-    control: "Контроль",
-    mobility: "Мобильность",
-  };
-  return map[role];
-}
-
-function comboText(ability: Ability): string {
-  if (ability.comboGain !== undefined) return `+${ability.comboGain} комбо`;
-  if (ability.comboCostMin !== undefined && ability.comboCostMax !== undefined)
-    return `${ability.comboCostMin}–${ability.comboCostMax} комбо`;
-  return "";
 }
 </script>
 

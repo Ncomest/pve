@@ -136,11 +136,11 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     description: "Увеличивает скорость на 15% на 10 секунд. Скорость уменьшает глобальный кулдаун всех способностей.",
     type: "buff",
     value: 0,
-    cooldownMs: 30_000,
+    cooldownMs: 50_000,
     icon: "/images/hero/ability/slice.png",
     role: "mobility",
     classId: CLASS_ID,
-    speedPercent: 0.15,
+    speedPercent: 1.25,
     speedDurationMs: 10_000,
   },
  
