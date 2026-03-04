@@ -184,6 +184,10 @@ export function useBattle(bossId: () => string | undefined) {
   const cunningBuffActive = ref(false);
   let cunningBuffTimerId: ReturnType<typeof setTimeout> | null = null;
 
+  /** «Молниеносная вспышка»: бонус скорости в долях (0.15 = 15%) */
+  const speedBonus = ref(0);
+  let speedBonusTimerId: ReturnType<typeof setTimeout> | null = null;
+
   /** Таймеры, созданные системой эффектов (очищаются при сбросе боя) */
   const effectTimeoutIds = ref<number[]>([]);
   const effectIntervalIds = ref<number[]>([]);
@@ -263,8 +267,9 @@ export function useBattle(bossId: () => string | undefined) {
    * Минимум 0.3 (70% снижение при очень высокой скорости).
    */
   const speedFactor = computed(() => {
-    const speed = player.stats.speed ?? 2;
-    return Math.max(0.3, 1 - (speed - 2) * 0.1);
+    const baseSpeed = player.stats.speed ?? 2;
+    const effectiveSpeed = baseSpeed * (1 + speedBonus.value);
+    return Math.max(0.3, 1 - (effectiveSpeed - 2) * 0.1);
   });
 
   /** GCD с учётом скорости персонажа */
@@ -877,6 +882,32 @@ export function useBattle(bossId: () => string | undefined) {
         return;
       }
 
+      // --- Молниеносная вспышка: увеличение скорости ---
+      if (ability.role === "mobility" && ability.speedPercent !== undefined && ability.speedDurationMs !== undefined) {
+        if (speedBonusTimerId !== null) clearTimeout(speedBonusTimerId);
+        speedBonus.value = ability.speedPercent;
+
+        playerBuffs.value = playerBuffs.value.filter((e) => e.id !== ability.id);
+        const endTime = Date.now() + ability.speedDurationMs;
+        playerBuffs.value = [...playerBuffs.value, {
+          id: ability.id,
+          name: ability.name,
+          icon: ability.icon ?? "IconPowerBoost",
+          durationSeconds: ability.speedDurationMs / 1000,
+          endTime,
+        }];
+        pushLog(`${ability.name}: скорость +${Math.round(ability.speedPercent * 100)}% на ${ability.speedDurationMs / 1000}с.`);
+
+        speedBonusTimerId = setTimeout(() => {
+          speedBonus.value = 0;
+          playerBuffs.value = playerBuffs.value.filter((e) => e.id !== ability.id);
+          speedBonusTimerId = null;
+        }, ability.speedDurationMs);
+
+        triggerCooldowns(ability.id, ability.cooldownMs);
+        return;
+      }
+
       // --- Усиление атаки (стандартный бафф силы) ---
       const duration = ability.durationMs ?? 0;
       startPowerBoost(ability.value, duration);
@@ -1354,6 +1385,9 @@ export function useBattle(bossId: () => string | undefined) {
     damageReductionPercent.value = 0;
     if (damageReductionTimerId !== null) { clearTimeout(damageReductionTimerId); damageReductionTimerId = null; }
 
+    speedBonus.value = 0;
+    if (speedBonusTimerId !== null) { clearTimeout(speedBonusTimerId); speedBonusTimerId = null; }
+
     battleLog.value = [];
     loot.value = [];
     showLoot.value = false;
@@ -1447,6 +1481,7 @@ export function useBattle(bossId: () => string | undefined) {
     if (evasionBonusTimerId !== null) clearTimeout(evasionBonusTimerId);
     if (dodgeNextExpireTimerId !== null) clearTimeout(dodgeNextExpireTimerId);
     if (damageReductionTimerId !== null) clearTimeout(damageReductionTimerId);
+    if (speedBonusTimerId !== null) clearTimeout(speedBonusTimerId);
     if (poisonDotIntervalId !== null) clearInterval(poisonDotIntervalId);
     if (poisonDotEndTimeoutId !== null) clearTimeout(poisonDotEndTimeoutId);
     clearInfectedBitePoison();

@@ -1,6 +1,6 @@
 import type { AbilityEffect } from "@/shared/lib/effects/types";
 
-export type AbilityType = "damage" | "heal" | "buff";
+export type AbilityType = "damage" | "heal" | "buff" | "evidence" | "control";
 
 /** Роль способности в системе комбо (класс «Клинок и Яд» и др.) */
 export type AbilityRole =
@@ -13,6 +13,7 @@ export type AbilityRole =
 export interface Ability {
   id: string;
   name: string;
+  description?: string;
   type: AbilityType;
   value: number;
   cooldownMs: number;
@@ -90,10 +91,10 @@ export interface Ability {
   /** Длительность снижения урона, мс */
   defenseDamageReductionDurationMs?: number;
 
-  /** Мобильность: повышение скорости передвижения в процентах (0.15 = 15%) */
-  movementSpeedPercent?: number;
+  /** Мобильность: повышение скорости в процентах (0.15 = 15%). Скорость уменьшает глобальный кулдаун. */
+  speedPercent?: number;
   /** Длительность баффа скорости, мс */
-  movementSpeedDurationMs?: number;
+  speedDurationMs?: number;
 
   /** Контроль: прерывает применение способности цели */
   interrupt?: boolean;

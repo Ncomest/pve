@@ -165,7 +165,7 @@
     top: 50%;
     transform: translateY(calc(-50% + 4px));
     z-index: 100;
-    min-width: 180px;
+    min-width: 300px;
     padding: 0.6rem 0.75rem;
     background: rgba(20, 20, 30, 0.97);
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -201,6 +201,17 @@
     font-size: 0.78rem;
     line-height: 1.6;
     white-space: nowrap;
+
+    &--description {
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 0.25rem;
+      white-space: normal;
+
+      .ability-card__detail-value {
+        margin-left: 0;
+      }
+    }
   }
 
   &__detail-label {

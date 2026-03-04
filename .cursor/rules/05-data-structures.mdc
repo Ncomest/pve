@@ -45,7 +45,7 @@ interface Boss {
 - eviscerateStacksGain?, eviscerateStackBonusPercent?, eviscerateMaxStacks? — стаки «Потрошение»
 - DoT: dotDurationMs?, dotTickIntervalMs?, dotTickDamageMultiplier?, dotProcChance?, dotProcBuffId?, dotInstantDamageRatio?
 - Защита: defenseEvasionPercent?, defenseDodgeNext?, defenseBlockSpecials?, defenseDamageReductionPercent? и длительности
-- movementSpeedPercent?, movementSpeedDurationMs? — мобильность
+- speedPercent?, speedDurationMs? — мобильность (увеличение скорости, снижает кулдауны)
 - interrupt?: boolean — прерывание способности цели
 - chanceCrit? (0..1) — доп. шанс крита способности, складывается с шансом персонажа (для атакующих)
 - critMultiplier? (по умолчанию 1.5) — сила крита: множитель урона при крите (1.5 = 150%, удар 10 → крит 15)

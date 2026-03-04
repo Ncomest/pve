@@ -5,16 +5,18 @@ export const ABILITIES: Ability[] = [
   {
     id: "heal",
     name: "Лечение",
+    description: "Вы выпиваете эликсир и восстанавливаете 40 ед здоровья",
     type: "heal",
-    value: 400,
+    value: 40,
     cooldownMs: 12000,
     icon: "/images/hero/ability/heal_potion.png",
-    effects: [{ kind: "heal", value: 400 }],
+    effects: [{ kind: "heal", value: 40 }],
   },
   {
     id: "rebuke",
     name: "Укор",
-    type: "damage",
+    description: "Вы можете прервать способность босса",
+    type: "control",
     value: 0,
     cooldownMs: 15_000,
     icon: "/images/hero/ability/kick.png",
@@ -24,7 +26,8 @@ export const ABILITIES: Ability[] = [
   {
     id: "dodge",
     name: "Уворот",
-    type: "buff",
+    description: "Вы уворачиваетесь от мощной атаки босса",
+    type: "evidence",
     value: 0,
     cooldownMs: 8_000,
     icon: "/images/hero/ability/blur.png",
@@ -35,7 +38,8 @@ export const ABILITIES: Ability[] = [
   {
     id: "block",
     name: "Блок",
-    type: "buff",
+    description: "Вы можете заблокировать особую способность босса",
+    type: "evidence",
     value: 0,
     cooldownMs: 20_000,
     icon: "/images/hero/ability/defend.png",
@@ -45,7 +49,8 @@ export const ABILITIES: Ability[] = [
   {
     id: "ice-wall",
     name: "Стена льда",
-    type: "buff",
+    description: "Позволяет избежать фронтальной атаки",
+    type: "evidence",
     value: 0,
     cooldownMs: 10_000,
     durationMs: 3_000,
@@ -61,7 +66,8 @@ export const ABILITIES: Ability[] = [
   {
     id: "teleport",
     name: "Телепорт",
-    type: "buff",
+    description: "Позволяет избежать урон от войды",
+    type: "evidence",
     value: 0,
     cooldownMs: 10_000,
     icon: "/images/hero/ability/blink.png",
@@ -77,6 +83,7 @@ export const ABILITIES: Ability[] = [
   {
     id: "cleanse",
     name: "Очищение",
+    description: "Снимает с героя проклятие, яды, кровотечения",
     type: "buff",
     value: 0,
     cooldownMs: 15_000,
@@ -93,6 +100,7 @@ export const ABILITIES: Ability[] = [
   {
     id: "dispell",
     name: "Dispell",
+    description: "Снимает с врага усиление",
     type: "buff",
     value: 0,
     cooldownMs: 8_000,

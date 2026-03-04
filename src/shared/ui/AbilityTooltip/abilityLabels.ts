@@ -5,6 +5,8 @@ export function abilityTypeLabel(type: Ability["type"]): string {
     damage: "Урон",
     heal: "Лечение",
     buff: "Усиление",
+    evidence: "Избегание урона",
+    control: "Контроль",
   };
   return map[type];
 }

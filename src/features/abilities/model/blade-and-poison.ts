@@ -14,6 +14,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
   {
     id: "cunning-strike",
     name: "Коварный удар",
+    description: "Вы наносите небольшой урон и накапливаете 1 комбо-поинт",
     type: "damage",
     value: 0,
     cooldownMs: 0,
@@ -30,9 +31,10 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
   {
     id: "fierce-strike",
     name: "Свирепый удар",
+    description: "Вы наносите средний удар и получаете 4 комбо-поинта",
     type: "damage",
     value: 0,
-    cooldownMs: 35_000,
+    cooldownMs: 25_000,
     icon: "/images/hero/ability/backstab.png",
     role: "generator",
     classId: CLASS_ID,
@@ -44,6 +46,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
   {
     id: "sweeping-strike",
     name: "Размашистый удар",
+    description: "Вы наносите средний урон, увеличиваете свой крит на 10% на 3 сек. Так же вы получаете стак, который усиливает урон от потрошения на 15%, максимально 4 стака",
     type: "damage",
     value: 0,
     cooldownMs: 6_000,
@@ -63,6 +66,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
   {
     id: "eviscerate",
     name: "Потрошение",
+    description: "Вы наносите сильный урон. Сила урона зависит от количество используемых комбо-поинтов. Используется 2-4 комбо-поинта",
     type: "damage",
     value: 0,
     cooldownMs: 0,
@@ -77,6 +81,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
   {
     id: "poisonous-bite",
     name: "Ядовитый укус",
+    description: "Вы тратите 3-5 комбо-поинтов и наносите продолжительный урон ядом в течении 16 сек. Чем больше использовано комбо-понитов, тем больше урона нанесете. С вероятностью 15% вы можете усилить следующий 'Коварный удар' на 100%",
     type: "damage",
     value: 0,
     cooldownMs: 0,
@@ -99,6 +104,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
   {
     id: "evasion",
     name: "Ускользание",
+    description: "Увеличивает уклонение на +30% на 8 сек",
     type: "buff",
     value: 0,
     cooldownMs: 30_000,
@@ -111,6 +117,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
   {
     id: "shadow-cloak",
     name: "Плащ теней",
+    description: "Снижает получаемый урона на 20% на 10 сек",
     type: "buff",
     value: 0,
     cooldownMs: 45_000,
@@ -126,14 +133,15 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
   {
     id: "lightning-flash",
     name: "Молниеносная вспышка",
+    description: "Увеличивает скорость на 15% на 10 секунд. Скорость уменьшает глобальный кулдаун всех способностей.",
     type: "buff",
     value: 0,
     cooldownMs: 30_000,
     icon: "/images/hero/ability/slice.png",
     role: "mobility",
     classId: CLASS_ID,
-    movementSpeedPercent: 0.15,
-    movementSpeedDurationMs: 10_000,
+    speedPercent: 0.15,
+    speedDurationMs: 10_000,
   },
  
 ];

@@ -40,6 +40,8 @@ function abilityTypeLabel(type: Ability["type"]): string {
     damage: "Урон",
     heal: "Лечение",
     buff: "Усиление",
+    evidence: "Избегание урона",
+    control: "Контроль"
   };
   return map[type];
 }
@@ -128,84 +130,17 @@ function comboText(ability: Ability): string {
             />
             <span class="ability-card__tooltip">
               <span class="ability-card__tooltip-title">{{ ability.name }}</span>
-              <span v-if="ability.classId" class="ability-card__detail-row ability-card__detail-row--class">
-                <span class="ability-card__detail-value">Класс: Клинок и Яд</span>
+              <span v-if="ability.cooldownMs > 0" class="ability-card__detail-row">
+                <span class="ability-card__detail-label">Перезарядка:</span>
+                <span class="ability-card__detail-value">{{ (ability.cooldownMs / 1000).toFixed(0) }} сек</span>
               </span>
               <span class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Тип</span>
+                <span class="ability-card__detail-label">Роль:</span>
                 <span class="ability-card__detail-value">{{ abilityTypeLabel(ability.type) }}</span>
               </span>
-              <span v-if="ability.role" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Роль</span>
-                <span class="ability-card__detail-value">{{ abilityRoleLabel(ability.role) }}</span>
-              </span>
-              <span v-if="comboText(ability)" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Комбо</span>
-                <span class="ability-card__detail-value">{{ comboText(ability) }}</span>
-              </span>
-              <span class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Перезарядка</span>
-                <span class="ability-card__detail-value">{{ ability.cooldownMs === 0 ? "нет" : (ability.cooldownMs / 1000).toFixed(1) + " с" }}</span>
-              </span>
-              <span v-if="ability.value > 0" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Сила</span>
-                <span class="ability-card__detail-value">{{ ability.value }}</span>
-              </span>
-              <span v-if="ability.baseDamageX" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Урон</span>
-                <span class="ability-card__detail-value">X × Power{{ ability.comboCostMin != null ? " × N" : "" }}</span>
-              </span>
-              <span v-if="ability.durationMs" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Длительность</span>
-                <span class="ability-card__detail-value">{{ (ability.durationMs / 1000).toFixed(1) }} с</span>
-              </span>
-              <span v-if="ability.bleedDamage" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Кровотечение</span>
-                <span class="ability-card__detail-value">{{ ability.bleedDamage }} / {{ (ability.bleedTickIntervalMs! / 1000).toFixed(0) }} с</span>
-              </span>
-              <span v-if="ability.armorDebuff" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Срез брони</span>
-                <span class="ability-card__detail-value">{{ ability.armorDebuff }} на {{ (ability.armorDebuffDurationMs! / 1000).toFixed(0) }} с</span>
-              </span>
-              <span v-if="ability.armorDebuffPercent" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Снижение брони</span>
-                <span class="ability-card__detail-value">{{ (ability.armorDebuffPercent * 100).toFixed(0) }}% на {{ (ability.armorDebuffDurationMs! / 1000).toFixed(0) }} с</span>
-              </span>
-              <span v-if="ability.selfBuffCritPercent" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Шанс крита</span>
-                <span class="ability-card__detail-value">+{{ (ability.selfBuffCritPercent * 100).toFixed(0) }}% на {{ (ability.selfBuffCritDurationMs! / 1000).toFixed(0) }} с</span>
-              </span>
-              <span v-if="ability.eviscerateStacksGain" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Стаки Потрошение</span>
-                <span class="ability-card__detail-value">+{{ ability.eviscerateStacksGain }} (макс {{ ability.eviscerateMaxStacks }}, +{{ (ability.eviscerateStackBonusPercent! * 100).toFixed(0) }}% за стак)</span>
-              </span>
-              <span v-if="ability.defenseEvasionPercent" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Уклонение</span>
-                <span class="ability-card__detail-value">+{{ (ability.defenseEvasionPercent * 100).toFixed(0) }}% на {{ (ability.defenseEvasionDurationMs! / 1000).toFixed(0) }} с</span>
-              </span>
-              <span v-if="ability.defenseDodgeNext" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Эффект</span>
-                <span class="ability-card__detail-value">100% уклонение от следующей атаки ({{ (ability.defenseDodgeExpireMs! / 1000).toFixed(0) }} с)</span>
-              </span>
-              <span v-if="ability.defenseBlockSpecials" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Эффект</span>
-                <span class="ability-card__detail-value">Блок особых атак босса</span>
-              </span>
-              <span v-if="ability.defenseDamageReductionPercent" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Снижение урона</span>
-                <span class="ability-card__detail-value">{{ (ability.defenseDamageReductionPercent * 100).toFixed(0) }}% на {{ (ability.defenseDamageReductionDurationMs! / 1000).toFixed(0) }} с</span>
-              </span>
-              <span v-if="ability.movementSpeedPercent" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Скорость</span>
-                <span class="ability-card__detail-value">+{{ (ability.movementSpeedPercent * 100).toFixed(0) }}% на {{ (ability.movementSpeedDurationMs! / 1000).toFixed(0) }} с</span>
-              </span>
-              <span v-if="ability.interrupt" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Эффект</span>
-                <span class="ability-card__detail-value">Прерывание способности цели</span>
-              </span>
-              <span v-if="ability.dotDurationMs" class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Яд/DoT</span>
-                <span class="ability-card__detail-value">{{ (ability.dotDurationMs / 1000).toFixed(0) }} с, тик {{ (ability.dotTickIntervalMs! / 1000).toFixed(0) }} с{{ ability.dotProcChance ? ", " + (ability.dotProcChance * 100).toFixed(0) + "% шанс баффа" : "" }}</span>
+              <span v-if="ability.description" class="ability-card__detail-row ability-card__detail-row--description">
+                <span class="ability-card__detail-label">Описание:</span>
+                <span class="ability-card__detail-value">{{ ability.description }}</span>
               </span>
             </span>
           </span>

@@ -1,6 +1,6 @@
 .ability-tooltip {
-  min-width: 200px;
-  max-width: 280px;
+  min-width: 300px;
+  max-width: 360px;
   padding: 0.6rem 0.75rem;
   background: rgba(20, 20, 30, 0.97);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -28,8 +28,15 @@
     line-height: 1.6;
     white-space: nowrap;
 
-    &--class .ability-tooltip__value {
-      color: rgba(147, 197, 253, 0.9);
+    &--description {
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 0.25rem;
+      white-space: normal;
+
+      .ability-tooltip__value {
+        margin-left: 0;
+      }
     }
   }
 
