@@ -109,6 +109,26 @@ const hpBarStyle = computed(() => {
           <span>Торговец</span>
         </RouterLink>
 
+        <!-- Кнопка Крафт -->
+        <RouterLink to="/craft" class="nav-link nav-link--craft">
+          <svg
+            class="nav-link__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M4 20L10 14M7 7L10 4L20 14L17 17M4 10L7 7M14 20H20M17 17V20"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>Крафт</span>
+        </RouterLink>
+
         <!-- Кнопка Персонаж с иконкой -->
         <RouterLink to="/character" class="nav-link nav-link--character">
           <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -349,6 +369,20 @@ const hpBarStyle = computed(() => {
   color: #c4b5fd;
   border-color: rgba(196, 181, 253, 0.3);
   background: rgba(196, 181, 253, 0.06);
+}
+
+/* Крафт — бирюзовый акцент */
+.nav-link--craft:hover {
+  color: #5eead4;
+  border-color: rgba(45, 212, 191, 0.4);
+  background: rgba(45, 212, 191, 0.08);
+  box-shadow: 0 2px 14px rgba(45, 212, 191, 0.15);
+}
+
+.nav-link--craft.router-link-active {
+  color: #5eead4;
+  border-color: rgba(45, 212, 191, 0.35);
+  background: rgba(45, 212, 191, 0.07);
 }
 
 /* Торговец — золотой акцент */

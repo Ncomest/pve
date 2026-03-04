@@ -79,5 +79,93 @@
     "rarity": "rare",
     "description": "Надёжный меч из закалённого железа. Хорошо сбалансирован.",
     "stats": { "power": 12, "chanceCrit": 0.04 }
+  },
+  {
+    "id": "resource-fire-essence",
+    "name": "Эссенция огня",
+    "icon": "🔥",
+    "slot": "resource",
+    "rarity": "common",
+    "description": "Горячая эссенция элементаля огня. Используется в крафте."
+  },
+  {
+    "id": "resource-flame-crystal",
+    "name": "Пламенный кристалл",
+    "icon": "💎",
+    "slot": "resource",
+    "rarity": "rare",
+    "description": "Кристалл, наполненный силой пламени. Ценный крафтовый материал."
+  },
+  {
+    "id": "resource-water-essence",
+    "name": "Эссенция воды",
+    "icon": "💧",
+    "slot": "resource",
+    "rarity": "common",
+    "description": "Холодная эссенция элементаля воды. Используется в крафте."
+  },
+  {
+    "id": "resource-aqua-pearl",
+    "name": "Водная жемчужина",
+    "icon": "🔵",
+    "slot": "resource",
+    "rarity": "rare",
+    "description": "Жемчужина из глубин водной стихии. Ценный крафтовый материал."
+  },
+  {
+    "id": "resource-air-essence",
+    "name": "Эссенция воздуха",
+    "icon": "💨",
+    "slot": "resource",
+    "rarity": "common",
+    "description": "Лёгкая эссенция элементаля воздуха. Используется в крафте."
+  },
+  {
+    "id": "resource-storm-feather",
+    "name": "Грозовое перо",
+    "icon": "🪶",
+    "slot": "resource",
+    "rarity": "rare",
+    "description": "Перо, заряженное силой бури. Ценный крафтовый материал."
+  },
+  {
+    "id": "resource-earth-essence",
+    "name": "Эссенция земли",
+    "icon": "🪨",
+    "slot": "resource",
+    "rarity": "common",
+    "description": "Тяжёлая эссенция элементаля земли. Используется в крафте."
+  },
+  {
+    "id": "resource-stone-shard",
+    "name": "Каменный осколок",
+    "icon": "◆",
+    "slot": "resource",
+    "rarity": "rare",
+    "description": "Осколок магического камня. Ценный крафтовый материал."
+  },
+  {
+    "id": "resource-golem-core",
+    "name": "Ядро голема",
+    "icon": "⚙",
+    "slot": "resource",
+    "rarity": "epic",
+    "description": "Сердце голема, пульсирующее магической энергией. Редкий крафтовый материал."
+  },
+  {
+    "id": "resource-ethereal-dust",
+    "name": "Эфирная пыль",
+    "icon": "✨",
+    "slot": "resource",
+    "rarity": "epic",
+    "description": "Мерцающая пыль из эфирного плана. Очень редкий крафтовый материал."
+  },
+  {
+    "id": "resource-essence-pure",
+    "name": "Чистая эссенция",
+    "icon": "⭐",
+    "slot": "resource",
+    "rarity": "epic",
+    "description": "Кристаллизованная чистая магия. Крайне редкий и ценный материал."
   }
 ]

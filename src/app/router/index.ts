@@ -4,6 +4,7 @@ import BattlePage from "@/pages/Battle/BattlePage.vue";
 import CharacterPage from "@/pages/Character/CharacterPage.vue";
 import MerchantPage from "@/pages/Merchant/MerchantPage.vue";
 import SkillsPage from "@/pages/Skills/SkillsPage.vue";
+import CraftPage from "@/pages/Craft/CraftPage.vue";
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -31,6 +32,11 @@ export const routes: RouteRecordRaw[] = [
     path: "/skills",
     name: "skills",
     component: SkillsPage,
+  },
+  {
+    path: "/craft",
+    name: "craft",
+    component: CraftPage,
   },
 ];
 

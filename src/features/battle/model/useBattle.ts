@@ -7,6 +7,7 @@ import type {
 } from "@/entities/boss/model";
 import type { ActiveEffect } from "@/shared/lib/effects/types";
 import bossesData from "@/entities/boss/bosses.json";
+import resourcesData from "@/entities/boss/resources.json";
 import { PLAYER_CHARACTER } from "@/entities/character/model";
 import { ABILITIES, ALL_ABILITIES } from "@/features/abilities/model/abilities";
 import type { Ability } from "@/features/abilities/model/types";
@@ -60,7 +61,7 @@ const formatCooldown = (ms: number) => {
 };
 
 export function useBattle(bossId: () => string | undefined) {
-  const bosses = bossesData as Boss[];
+  const allBosses = [...(bossesData as Boss[]), ...(resourcesData as Boss[])];
   const playerProgress = usePlayerProgress();
   const characterStore = useCharacterStore();
   const playerHp = usePlayerHp();
@@ -93,7 +94,7 @@ export function useBattle(bossId: () => string | undefined) {
 
   const selectedBoss = computed(() => {
     const id = bossId();
-    return bosses.find((b) => b.id === id) ?? bosses[0];
+    return allBosses.find((b) => b.id === id) ?? allBosses[0];
   });
 
   const initialStats = buildPlayerStatsForLevel(playerProgress.level.value);

@@ -16,6 +16,36 @@
     color: rgba(255, 255, 255, 0.78);
   }
 
+  &__tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0;
+  }
+
+  &__tab {
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    position: relative;
+    bottom: -1px;
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    &--active {
+      color: rgba(96, 165, 250, 0.95);
+      border-bottom-color: rgb(96, 165, 250);
+    }
+  }
+
   &__list {
     display: flex;
     flex-direction: column;

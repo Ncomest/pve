@@ -1,0 +1,361 @@
+[
+  {
+    "id": "fire-elemental",
+    "name": "Элементаль огня",
+    "image": "/images/bosses/fire_elemental.png",
+    "level": 3,
+    "rarity": "common",
+    "xpReward": 50,
+    "loot": ["resource-fire-essence", "resource-flame-crystal"],
+    "stats": {
+      "hp": 500,
+      "maxHp": 500,
+      "power": 18,
+      "chanceCrit": 0.15,
+      "evasion": 0.20,
+      "speed": 3,
+      "armor": 2
+    },
+    "buffs": [
+      { "id": "fire-aura", "name": "Огненная аура", "icon": "🔥", "description": "Наносит урон ближним атакующим" },
+      { "id": "burn-immune", "name": "Иммунитет к огню", "icon": "🛡", "description": "Не получает урон от огня" }
+    ],
+    "debuffs": [
+      { "id": "burn", "name": "Горение", "icon": "🔥", "description": "Поджигает противника" },
+      { "id": "water-weak", "name": "Уязвимость к воде", "icon": "💧", "description": "Получает больше урона от воды" }
+    ],
+    "bossAbilities": [],
+    "abilityConfig": {
+      "startDelayMs": 5000,
+      "minAbilityIntervalMs": 8000,
+      "preventConsecutiveRepeat": false
+    }
+  },
+  {
+    "id": "water-elemental",
+    "name": "Элементаль воды",
+    "image": "/images/bosses/water_elemental.jpg",
+    "level": 3,
+    "rarity": "common",
+    "xpReward": 50,
+    "loot": ["resource-water-essence", "resource-aqua-pearl"],
+    "stats": {
+      "hp": 3000,
+      "maxHp": 3000,
+      "power": 14,
+      "chanceCrit": 0.10,
+      "evasion": 0.25,
+      "speed": 2,
+      "armor": 1
+    },
+    "buffs": [
+      { "id": "water-shield", "name": "Водный щит", "icon": "💧", "description": "Поглощает часть урона" },
+      { "id": "regen", "name": "Регенерация", "icon": "♻", "description": "Восстанавливает HP каждый ход" },
+      { "id": "freeze-immune", "name": "Иммунитет к холоду", "icon": "❄", "description": "Не получает урон от льда" }
+    ],
+    "debuffs": [
+      { "id": "slow", "name": "Замедление", "icon": "❄", "description": "Замораживает цель" },
+      { "id": "fire-weak", "name": "Уязвимость к огню", "icon": "🔥", "description": "Получает больше урона от огня" }
+    ],
+    "bossAbilities": [],
+    "abilityConfig": {
+      "startDelayMs": 5000,
+      "minAbilityIntervalMs": 8000,
+      "preventConsecutiveRepeat": false
+    }
+  },
+  {
+    "id": "air-elemental",
+    "name": "Элементаль воздуха",
+    "image": "/images/bosses/air_elemental.webp",
+    "level": 3,
+    "rarity": "common",
+    "xpReward": 50,
+    "loot": ["resource-air-essence", "resource-storm-feather"],
+    "stats": {
+      "hp": 2200,
+      "maxHp": 2200,
+      "power": 16,
+      "chanceCrit": 0.20,
+      "evasion": 0.35,
+      "speed": 5,
+      "armor": 0
+    },
+    "buffs": [
+      { "id": "swift", "name": "Стремительность", "icon": "💨", "description": "Высокий шанс уклонения" },
+      { "id": "flight", "name": "Полёт", "icon": "🦅", "description": "Уклоняется от части атак" }
+    ],
+    "debuffs": [
+      { "id": "lightning", "name": "Молния", "icon": "⚡", "description": "Поражает противника разрядом" },
+      { "id": "earth-weak", "name": "Уязвимость к земле", "icon": "🪨", "description": "Получает больше урона от земли" }
+    ],
+    "bossAbilities": [],
+    "abilityConfig": {
+      "startDelayMs": 5000,
+      "minAbilityIntervalMs": 8000,
+      "preventConsecutiveRepeat": false
+    }
+  },
+  {
+    "id": "earth-elemental",
+    "name": "Элементаль земли",
+    "image": "/images/bosses/earth_elemental.webp",
+    "level": 3,
+    "rarity": "common",
+    "xpReward": 50,
+    "loot": ["resource-earth-essence", "resource-stone-shard"],
+    "stats": {
+      "hp": 3500,
+      "maxHp": 3500,
+      "power": 20,
+      "chanceCrit": 0.08,
+      "evasion": 0.05,
+      "speed": 1,
+      "armor": 10
+    },
+    "buffs": [
+      { "id": "stone-skin", "name": "Каменная кожа", "icon": "🪨", "description": "+10 к броне" },
+      { "id": "immovable", "name": "Несокрушимость", "icon": "⚓", "description": "Высокая защита" }
+    ],
+    "debuffs": [
+      { "id": "stun", "name": "Оглушение", "icon": "⭐", "description": "Удар землёй оглушает" },
+      { "id": "air-weak", "name": "Уязвимость к воздуху", "icon": "💨", "description": "Получает больше урона от воздуха" }
+    ],
+    "bossAbilities": [],
+    "abilityConfig": {
+      "startDelayMs": 5000,
+      "minAbilityIntervalMs": 8000,
+      "preventConsecutiveRepeat": false
+    }
+  },
+  {
+    "id": "earth-golem",
+    "name": "Земляной голем",
+    "image": "/images/bosses/earth_golem.jpg",
+    "level": 5,
+    "rarity": "rare",
+    "xpReward": 100,
+    "loot": ["resource-earth-essence", "resource-stone-shard", "resource-golem-core"],
+    "stats": {
+      "hp": 4500,
+      "maxHp": 4500,
+      "power": 25,
+      "chanceCrit": 0.05,
+      "evasion": 0.02,
+      "speed": 1,
+      "armor": 15
+    },
+    "buffs": [
+      { "id": "stone-skin", "name": "Каменная кожа", "icon": "🪨", "description": "+15 к броне" },
+      { "id": "tough", "name": "Монолит", "icon": "🛡", "description": "Очень высокая защита" },
+      { "id": "regen", "name": "Восстановление", "icon": "♻", "description": "Медленно восстанавливает HP" }
+    ],
+    "debuffs": [
+      { "id": "slow", "name": "Тяжеловесность", "icon": "❄", "description": "Очень медленный" }
+    ],
+    "bossAbilities": [],
+    "abilityConfig": {
+      "startDelayMs": 5000,
+      "minAbilityIntervalMs": 10000,
+      "preventConsecutiveRepeat": false
+    }
+  },
+  {
+    "id": "fire-golem",
+    "name": "Огненный голем",
+    "image": "/images/bosses/fire_golem.jpg",
+    "level": 5,
+    "rarity": "rare",
+    "xpReward": 100,
+    "loot": ["resource-fire-essence", "resource-flame-crystal", "resource-golem-core"],
+    "stats": {
+      "hp": 4000,
+      "maxHp": 4000,
+      "power": 30,
+      "chanceCrit": 0.15,
+      "evasion": 0.05,
+      "speed": 2,
+      "armor": 8
+    },
+    "buffs": [
+      { "id": "fire-aura", "name": "Огненная аура", "icon": "🔥", "description": "Наносит урон ближним атакующим" },
+      { "id": "burn-immune", "name": "Иммунитет к огню", "icon": "🛡", "description": "Не получает урон от огня" },
+      { "id": "molten", "name": "Раскалённое тело", "icon": "🌋", "description": "Увеличивает урон атак" }
+    ],
+    "debuffs": [
+      { "id": "burn", "name": "Горение", "icon": "🔥", "description": "Сильно поджигает противника" },
+      { "id": "water-weak", "name": "Уязвимость к воде", "icon": "💧", "description": "Получает больше урона от воды" }
+    ],
+    "bossAbilities": [],
+    "abilityConfig": {
+      "startDelayMs": 5000,
+      "minAbilityIntervalMs": 10000,
+      "preventConsecutiveRepeat": false
+    }
+  },
+  {
+    "id": "water-golem",
+    "name": "Водный голем",
+    "image": "/images/bosses/water_golem.jpg",
+    "level": 5,
+    "rarity": "rare",
+    "xpReward": 100,
+    "loot": ["resource-water-essence", "resource-aqua-pearl", "resource-golem-core"],
+    "stats": {
+      "hp": 5000,
+      "maxHp": 5000,
+      "power": 20,
+      "chanceCrit": 0.08,
+      "evasion": 0.15,
+      "speed": 2,
+      "armor": 5
+    },
+    "buffs": [
+      { "id": "water-shield", "name": "Водный щит", "icon": "💧", "description": "Сильное поглощение урона" },
+      { "id": "regen", "name": "Регенерация", "icon": "♻", "description": "Быстро восстанавливает HP" },
+      { "id": "freeze-immune", "name": "Иммунитет к холоду", "icon": "❄", "description": "Не получает урон от льда" }
+    ],
+    "debuffs": [
+      { "id": "slow", "name": "Замедление", "icon": "❄", "description": "Сильно замораживает цель" },
+      { "id": "fire-weak", "name": "Уязвимость к огню", "icon": "🔥", "description": "Получает больше урона от огня" }
+    ],
+    "bossAbilities": [],
+    "abilityConfig": {
+      "startDelayMs": 5000,
+      "minAbilityIntervalMs": 10000,
+      "preventConsecutiveRepeat": false
+    }
+  },
+  {
+    "id": "earth-ethereal",
+    "name": "Эфириал земли",
+    "image": "/images/bosses/earth_ethereal.webp",
+    "level": 7,
+    "rarity": "epic",
+    "xpReward": 180,
+    "loot": ["resource-earth-essence", "resource-stone-shard", "resource-ethereal-dust", "resource-essence-pure"],
+    "stats": {
+      "hp": 3800,
+      "maxHp": 3800,
+      "power": 28,
+      "chanceCrit": 0.12,
+      "evasion": 0.25,
+      "speed": 3,
+      "armor": 12
+    },
+    "buffs": [
+      { "id": "ethereal", "name": "Эфирная форма", "icon": "👻", "description": "Частично нематериален" },
+      { "id": "stone-skin", "name": "Каменная кожа", "icon": "🪨", "description": "+12 к броне" },
+      { "id": "phase", "name": "Фазовый сдвиг", "icon": "✨", "description": "Может игнорировать атаки" }
+    ],
+    "debuffs": [
+      { "id": "curse", "name": "Проклятие земли", "icon": "💀", "description": "Снижает защиту цели" },
+      { "id": "slow", "name": "Каменные оковы", "icon": "⛓", "description": "Замедляет противника" }
+    ],
+    "bossAbilities": [],
+    "abilityConfig": {
+      "startDelayMs": 5000,
+      "minAbilityIntervalMs": 12000,
+      "preventConsecutiveRepeat": false
+    }
+  },
+  {
+    "id": "fire-ethereal",
+    "name": "Эфириал огня",
+    "image": "/images/bosses/fire_ethereal.jpeg",
+    "level": 7,
+    "rarity": "epic",
+    "xpReward": 180,
+    "loot": ["resource-fire-essence", "resource-flame-crystal", "resource-ethereal-dust", "resource-essence-pure"],
+    "stats": {
+      "hp": 3500,
+      "maxHp": 3500,
+      "power": 35,
+      "chanceCrit": 0.25,
+      "evasion": 0.30,
+      "speed": 4,
+      "armor": 6
+    },
+    "buffs": [
+      { "id": "ethereal", "name": "Эфирная форма", "icon": "👻", "description": "Частично нематериален" },
+      { "id": "fire-aura", "name": "Пламенная аура", "icon": "🔥", "description": "Мощная огненная аура" },
+      { "id": "immolation", "name": "Самосожжение", "icon": "🌋", "description": "Огромный урон при низком HP" }
+    ],
+    "debuffs": [
+      { "id": "burn", "name": "Адское пламя", "icon": "🔥", "description": "Сильнейшее горение" },
+      { "id": "curse", "name": "Огненное проклятие", "icon": "💀", "description": "Снижает сопротивление огню" }
+    ],
+    "bossAbilities": [],
+    "abilityConfig": {
+      "startDelayMs": 5000,
+      "minAbilityIntervalMs": 12000,
+      "preventConsecutiveRepeat": false
+    }
+  },
+  {
+    "id": "air-ethereal",
+    "name": "Эфириал воздуха",
+    "image": "/images/bosses/air_ethereal.webp",
+    "level": 7,
+    "rarity": "epic",
+    "xpReward": 180,
+    "loot": ["resource-air-essence", "resource-storm-feather", "resource-ethereal-dust", "resource-essence-pure"],
+    "stats": {
+      "hp": 3200,
+      "maxHp": 3200,
+      "power": 30,
+      "chanceCrit": 0.30,
+      "evasion": 0.45,
+      "speed": 6,
+      "armor": 3
+    },
+    "buffs": [
+      { "id": "ethereal", "name": "Эфирная форма", "icon": "👻", "description": "Частично нематериален" },
+      { "id": "swift", "name": "Скорость ветра", "icon": "💨", "description": "Невероятная скорость" },
+      { "id": "flight", "name": "Полёт", "icon": "🦅", "description": "Почти невозможно попасть" }
+    ],
+    "debuffs": [
+      { "id": "lightning", "name": "Цепная молния", "icon": "⚡", "description": "Мощные разряды молний" },
+      { "id": "silence", "name": "Порыв ветра", "icon": "🌪", "description": "Сбивает концентрацию" }
+    ],
+    "bossAbilities": [],
+    "abilityConfig": {
+      "startDelayMs": 5000,
+      "minAbilityIntervalMs": 12000,
+      "preventConsecutiveRepeat": false
+    }
+  },
+  {
+    "id": "water-ethereal",
+    "name": "Эфириал воды",
+    "image": "/images/bosses/water_ethereal.jpg",
+    "level": 7,
+    "rarity": "epic",
+    "xpReward": 180,
+    "loot": ["resource-water-essence", "resource-aqua-pearl", "resource-ethereal-dust", "resource-essence-pure"],
+    "stats": {
+      "hp": 4200,
+      "maxHp": 4200,
+      "power": 25,
+      "chanceCrit": 0.15,
+      "evasion": 0.35,
+      "speed": 3,
+      "armor": 8
+    },
+    "buffs": [
+      { "id": "ethereal", "name": "Эфирная форма", "icon": "👻", "description": "Частично нематериален" },
+      { "id": "water-shield", "name": "Водный барьер", "icon": "💧", "description": "Мощное поглощение урона" },
+      { "id": "regen", "name": "Потоковое восстановление", "icon": "♻", "description": "Очень быстрая регенерация" }
+    ],
+    "debuffs": [
+      { "id": "freeze", "name": "Ледяная тюрьма", "icon": "❄", "description": "Заключает в лёд" },
+      { "id": "curse", "name": "Водное проклятие", "icon": "💀", "description": "Снижает сопротивления" }
+    ],
+    "bossAbilities": [],
+    "abilityConfig": {
+      "startDelayMs": 5000,
+      "minAbilityIntervalMs": 12000,
+      "preventConsecutiveRepeat": false
+    }
+  }
+]
