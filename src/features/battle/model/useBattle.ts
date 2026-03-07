@@ -90,9 +90,9 @@ export function useBattle(bossId: () => string | undefined) {
       maxHp: basePlayerStats.maxHp + bonusHp + equipStats.hp,
       power: basePlayerStats.power + bonusPower + equipStats.power,
       chanceCrit: Math.min(1, (basePlayerStats.chanceCrit + equipStats.chanceCrit) * 0.3),
-      evasion: Math.min(1, basePlayerStats.evasion + equipStats.evasion),
+      evasion: Math.min(1, basePlayerStats.evasion + equipStats.evasion * 0.7),
       speed: (basePlayerStats.speed ?? 2) + (equipStats.speed ?? 0),
-      armor: (basePlayerStats.armor ?? 0) + (equipStats.armor ?? 0),
+      armor: (basePlayerStats.armor ?? 0) + (equipStats.armor ?? 0) * 0.12,
     };
   };
 
