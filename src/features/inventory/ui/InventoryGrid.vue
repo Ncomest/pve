@@ -1,23 +1,31 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import type { Item, EquipmentSlot } from "@/entities/item/model";
+import { ref, computed } from "vue";
+import type { ItemInstance, EquipmentSlot } from "@/entities/item/model";
+import { getDisplayItem } from "@/entities/item/model";
+import { getTemplate } from "@/entities/item/items-db";
 import { rarityColor } from "@/entities/item/lib/rarityColor";
 import { useCharacterStore } from "@/app/store/character";
 import "./InventoryGrid.scss";
 
 interface InventoryEntry {
-  item: Item | null;
+  item: ItemInstance | null;
   index: number;
 }
 
-defineProps<{
+const props = defineProps<{
   items: InventoryEntry[];
   selectedIndex: number | null;
 }>();
 
 const emit = defineEmits<{
-  select: [item: Item | null, index: number];
+  select: [item: ItemInstance | null, index: number];
 }>();
+
+const displayByIndex = computed(() =>
+  props.items.map((entry) =>
+    entry.item ? getDisplayItem(entry.item, getTemplate) : null
+  )
+);
 
 const characterStore = useCharacterStore();
 
@@ -137,8 +145,7 @@ function onDragEnd() {
   dragOverIndex.value = null;
 }
 
-function handleClick(item: Item | null, index: number) {
-  // Клик не срабатывает если только что завершили перетаскивание
+function handleClick(item: ItemInstance | null, index: number) {
   if (dragFromIndex.value !== null) return;
   emit("select", item, index);
 }
@@ -159,7 +166,7 @@ function handleClick(item: Item | null, index: number) {
         'inventory-grid__slot--dragging': dragFromIndex === index,
         'inventory-grid__slot--drag-over': dragOverIndex === index,
       }"
-      :style="item ? { '--rarity-color': rarityColor(item.rarity) } : {}"
+      :style="displayByIndex[index] ? { '--rarity-color': rarityColor(displayByIndex[index]!.rarity) } : {}"
       @click="handleClick(item, index)"
       @dragstart="onDragStart($event, index)"
       @dragenter.prevent="onDragEnter(index)"
@@ -168,21 +175,25 @@ function handleClick(item: Item | null, index: number) {
       @drop.prevent="onDrop(index)"
       @dragend="onDragEnd"
     >
-      <!-- Предмет: иконка по типу слота с цветом редкости -->
-      <svg
-        v-if="item"
-        viewBox="0 0 32 32"
-        xmlns="http://www.w3.org/2000/svg"
-        class="inventory-grid__icon"
-        :style="{ color: rarityColor(item.rarity) }"
-      >
-        <component
-          :is="el.tag"
-          v-for="(el, i) in SLOT_ICONS[item.slot]"
-          :key="i"
-          v-bind="el.attrs"
-        />
-      </svg>
+      <!-- Предмет: иконка по типу слота с цветом редкости и уровнем -->
+      <template v-if="displayByIndex[index]">
+        <svg
+          viewBox="0 0 32 32"
+          xmlns="http://www.w3.org/2000/svg"
+          class="inventory-grid__icon"
+          :style="{ color: rarityColor(displayByIndex[index]!.rarity) }"
+        >
+          <component
+            :is="el.tag"
+            v-for="(el, i) in SLOT_ICONS[displayByIndex[index]!.slot]"
+            :key="i"
+            v-bind="el.attrs"
+          />
+        </svg>
+        <span v-if="displayByIndex[index]?.itemLevel != null" class="inventory-grid__level">
+          {{ displayByIndex[index]!.itemLevel }}
+        </span>
+      </template>
 
       <!-- Пустой слот: приглушённый квадрат-заглушка -->
       <svg v-else viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" class="inventory-grid__icon inventory-grid__icon--empty">

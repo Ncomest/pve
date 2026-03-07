@@ -19,11 +19,23 @@
     font-weight: 600;
   }
 
-  &__slot {
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
     font-size: 12px;
-    opacity: 0.75;
+    opacity: 0.85;
+  }
+
+  &__slot {
     text-transform: uppercase;
     letter-spacing: 0.08em;
+  }
+
+  &__level {
+    color: rgba(251, 191, 36, 0.9);
+    font-weight: 500;
   }
 
   &__stats {

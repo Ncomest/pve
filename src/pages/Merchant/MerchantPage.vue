@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
+import { ref, computed } from "vue";
 import { useCharacterStore } from "@/app/store/character";
 import { getItemSellPrice } from "@/shared/lib/merchant/getItemSellPrice";
 import {
@@ -7,7 +7,8 @@ import {
   getMerchantItem,
   type MerchantOffer,
 } from "@/entities/merchant/model/merchant-stock";
-import type { Item } from "@/entities/item/model";
+import { getDisplayItem } from "@/entities/item/model";
+import { getTemplate } from "@/entities/item/items-db";
 import { rarityColor } from "@/entities/item/lib/rarityColor";
 import { SLOT_NAMES } from "@/entities/item/model";
 import InventoryGrid from "@/features/inventory/ui/InventoryGrid.vue";
@@ -18,10 +19,6 @@ const selectedIndex = ref<number | null>(null);
 const message = ref<string | null>(null);
 let messageTimer: ReturnType<typeof setTimeout> | null = null;
 
-onMounted(() => {
-  characterStore.init();
-});
-
 const gold = computed(() => characterStore.gold ?? 0);
 const inventoryItems = computed(() => characterStore.inventoryItems);
 const selectedItem = computed(() => {
@@ -30,8 +27,11 @@ const selectedItem = computed(() => {
   const entry = characterStore.inventoryItems[idx];
   return entry?.item ?? null;
 });
+const selectedDisplayItem = computed(() =>
+  selectedItem.value ? getDisplayItem(selectedItem.value, getTemplate) : null
+);
 const selectedSellPrice = computed(() =>
-  selectedItem.value ? getItemSellPrice(selectedItem.value) : 0
+  selectedDisplayItem.value ? getItemSellPrice(selectedDisplayItem.value) : 0
 );
 
 function showMessage(text: string) {
@@ -43,7 +43,7 @@ function showMessage(text: string) {
   }, 2500);
 }
 
-function selectSlot(_item: Item | null, index: number) {
+function selectSlot(_item: import("@/entities/item/model").ItemInstance | null, index: number) {
   selectedIndex.value = selectedIndex.value === index ? null : index;
 }
 
@@ -111,14 +111,17 @@ function getSlotPath(slot: string) {
             :selected-index="selectedIndex"
             @select="selectSlot"
           />
-          <div v-if="selectedItem" class="merchant-page__sell-card">
+          <div v-if="selectedDisplayItem" class="merchant-page__sell-card">
             <h3
               class="merchant-page__item-name"
-              :style="{ color: rarityColor(selectedItem.rarity) }"
+              :style="{ color: rarityColor(selectedDisplayItem.rarity) }"
             >
-              {{ selectedItem.name }}
+              {{ selectedDisplayItem.name }}
             </h3>
-            <div class="merchant-page__item-slot">{{ SLOT_NAMES[selectedItem.slot] }}</div>
+            <div class="merchant-page__item-slot">{{ SLOT_NAMES[selectedDisplayItem.slot] }}</div>
+            <div v-if="selectedDisplayItem.itemLevel != null" class="merchant-page__item-level">
+              Ур. вещи: {{ selectedDisplayItem.itemLevel }}
+            </div>
             <div class="merchant-page__sell-price">
               <svg class="merchant-page__coin" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>

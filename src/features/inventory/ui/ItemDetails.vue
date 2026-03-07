@@ -26,7 +26,12 @@ const emit = defineEmits<{
       >
         {{ item.name }}
       </h3>
-      <div class="item-details__slot">{{ SLOT_NAMES[item.slot] }}</div>
+      <div class="item-details__meta">
+        <span class="item-details__slot">{{ SLOT_NAMES[item.slot] }}</span>
+        <span v-if="item.itemLevel != null" class="item-details__level">
+          Ур. вещи: {{ item.itemLevel }}
+        </span>
+      </div>
     </div>
 
     <div class="item-details__stats">
@@ -51,12 +56,6 @@ const emit = defineEmits<{
       </div>
       <div v-if="item.stats.speed" class="item-details__stat">
         Скорость: <span class="item-details__stat-value">+{{ item.stats.speed }}</span>
-      </div>
-      <div v-if="item.stats.accuracy" class="item-details__stat">
-        Меткость:
-        <span class="item-details__stat-value">
-          +{{ Math.round(item.stats.accuracy * 100) }}%
-        </span>
       </div>
       <div v-if="item.stats.armor" class="item-details__stat">
         Броня: <span class="item-details__stat-value">+{{ item.stats.armor }}</span>

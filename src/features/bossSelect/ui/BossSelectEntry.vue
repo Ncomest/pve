@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Boss, Buff, Debuff, LootItem } from "@/entities/boss/model";
+import type { Boss, Buff, Debuff } from "@/entities/boss/model";
 import { rarityLabel } from "@/shared/lib/labels";
+import { getBossDropItemLevel } from "@/features/bossSelect/lib/getBossLoot";
 
 defineProps<{
   boss: Boss;
-  lootItems: LootItem[];
   isInfoOpen: boolean;
   buffRows: (boss: Boss) => Buff[][];
   debuffRows: (boss: Boss) => Debuff[][];
@@ -13,9 +13,6 @@ defineProps<{
 const emit = defineEmits<{
   select: [boss: Boss];
   toggleInfo: [boss: Boss];
-  lootEnter: [item: LootItem, e: MouseEvent];
-  lootMove: [e: MouseEvent];
-  lootLeave: [];
 }>();
 </script>
 
@@ -73,18 +70,8 @@ const emit = defineEmits<{
               </div>
             </div>
           </div>
-          <div v-if="lootItems.length > 0" class="boss-select-entry__loot-row">
-            <div
-              v-for="item in lootItems"
-              :key="item.id"
-              class="boss-select-entry__loot-cell"
-              :class="`boss-select-entry__loot-cell--${item.rarity}`"
-              @mouseenter="emit('lootEnter', item, $event)"
-              @mousemove="emit('lootMove', $event)"
-              @mouseleave="emit('lootLeave')"
-            >
-              {{ item.icon }}
-            </div>
+          <div class="boss-select-entry__loot-desc">
+            2 случайные вещи (ур. {{ getBossDropItemLevel(boss.level) }})
           </div>
         </div>
       </div>

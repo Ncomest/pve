@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
 import { useCharacterStore } from "@/app/store/character";
 import { useInventory } from "@/features/inventory/model/useInventory";
 import HeroStats from "@/features/inventory/ui/HeroStats.vue";
@@ -9,15 +8,13 @@ import "./CharacterPage.scss";
 
 const characterStore = useCharacterStore();
 
-onMounted(() => {
-  characterStore.init();
-});
-
 const {
   equipmentSlots,
   selectedEquippedSlot,
   selectedItem,
   selectedEquippedItem,
+  selectedDisplayItem,
+  selectedEquippedDisplayItem,
   inventoryFullWarning,
   isItemEquipped,
   selectItem,
@@ -50,6 +47,8 @@ const {
       :items="characterStore.inventoryItems"
       :selected-item="selectedItem"
       :selected-equipped-item="selectedEquippedItem"
+      :selected-display-item="selectedDisplayItem"
+      :selected-equipped-display-item="selectedEquippedDisplayItem"
       :inventory-full-warning="inventoryFullWarning"
       :is-item-equipped="isItemEquipped"
       @select="selectItem"

@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useBossSelect } from "@/features/bossSelect/model/useBossSelect";
-import { useBossLoot } from "@/features/bossSelect/model/useBossLoot";
-import { useLootTooltip } from "@/features/bossSelect/model/useLootTooltip";
-import { getBossLootItems } from "@/features/bossSelect/lib/getBossLoot";
-import { BossSelectEntry, LootTooltipPopup } from "@/features/bossSelect/ui";
+import { BossSelectEntry } from "@/features/bossSelect/ui";
 import type { Boss } from "@/entities/boss/model";
 import bossesData from "@/entities/boss/bosses.json";
 import resourcesData from "@/entities/boss/resources.json";
@@ -29,8 +26,6 @@ const bosses = computed(() => {
   return activeTab.value === "bosses" ? allBosses : allResources;
 });
 
-const { lootMap } = useBossLoot();
-const { hoveredLoot, showLootTooltip, moveLootTooltip, hideLootTooltip } = useLootTooltip();
 </script>
 
 <template>
@@ -62,25 +57,13 @@ const { hoveredLoot, showLootTooltip, moveLootTooltip, hideLootTooltip } = useLo
         v-for="boss in bosses"
         :key="boss.id"
         :boss="boss"
-        :loot-items="getBossLootItems(boss, lootMap)"
         :is-info-open="selectedInfo?.id === boss.id"
         :buff-rows="buffRows"
         :debuff-rows="debuffRows"
         @select="handleSelectBoss"
         @toggle-info="openInfo"
-        @loot-enter="(item, e) => showLootTooltip(e, item)"
-        @loot-move="moveLootTooltip"
-        @loot-leave="hideLootTooltip"
       />
     </div>
 
-    <Teleport to="body">
-      <LootTooltipPopup
-        v-if="hoveredLoot"
-        :item="hoveredLoot.item"
-        :x="hoveredLoot.x"
-        :y="hoveredLoot.y"
-      />
-    </Teleport>
   </div>
 </template>

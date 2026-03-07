@@ -40,12 +40,6 @@ const statRows = computed<StatRow[]>(() => [
     fmt: (v) => String(v),
   },
   {
-    label: "Меткость",
-    base: 0,
-    bonus: eq.value.accuracy,
-    fmt: (v) => Math.round(v * 100) + "%",
-  },
-  {
     label: "Крит",
     base: base.chanceCrit,
     bonus: eq.value.chanceCrit,

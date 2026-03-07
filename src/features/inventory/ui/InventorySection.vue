@@ -1,24 +1,26 @@
 <script setup lang="ts">
-import type { Item } from "@/entities/item/model";
+import type { Item, ItemInstance } from "@/entities/item/model";
 import InventoryGrid from "@/features/inventory/ui/InventoryGrid.vue";
 import ItemDetails from "@/features/inventory/ui/ItemDetails.vue";
 import "./InventorySection.scss";
 
 interface InventoryEntry {
-  item: Item | null;
+  item: ItemInstance | null;
   index: number;
 }
 
 const props = defineProps<{
   items: InventoryEntry[];
-  selectedItem: { item: Item; index: number } | null;
-  selectedEquippedItem: Item | null;
+  selectedItem: { item: ItemInstance; index: number } | null;
+  selectedEquippedItem: ItemInstance | null;
+  selectedDisplayItem: Item | null;
+  selectedEquippedDisplayItem: Item | null;
   inventoryFullWarning: boolean;
   isItemEquipped: boolean;
 }>();
 
 const emit = defineEmits<{
-  select: [item: Item | null, index: number];
+  select: [item: ItemInstance | null, index: number];
   equip: [];
   unequipSelected: [];
   delete: [];
@@ -35,17 +37,17 @@ const emit = defineEmits<{
         :selected-index="props.selectedItem?.index ?? null"
         @select="(item, index) => emit('select', item, index)"
       />
-      <div v-if="props.selectedEquippedItem" class="inventory-section__item-details">
+      <div v-if="props.selectedEquippedDisplayItem" class="inventory-section__item-details">
         <ItemDetails
-          :item="props.selectedEquippedItem"
+          :item="props.selectedEquippedDisplayItem"
           :is-equipped="true"
           :is-equipped-slot="true"
           @unequip="emit('unequipSelected')"
         />
       </div>
-      <div v-else-if="props.selectedItem" class="inventory-section__item-details">
+      <div v-else-if="props.selectedDisplayItem" class="inventory-section__item-details">
         <ItemDetails
-          :item="props.selectedItem.item"
+          :item="props.selectedDisplayItem"
           :is-equipped="props.isItemEquipped"
           @equip="emit('equip')"
           @delete="emit('delete')"

@@ -18,8 +18,10 @@ import { expGainedFromMonster } from "@/shared/lib/experience/experience";
 import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
 import { usePlayerHp } from "@/features/character/model/usePlayerHp";
 import { useCharacterStore } from "@/app/store/character";
-import { getItem } from "@/entities/item/items-db";
-import type { Item } from "@/entities/item/model";
+import { ALL_TEMPLATE_IDS, getTemplate } from "@/entities/item/items-db";
+import { getDisplayItem } from "@/entities/item/model";
+import { createItemInstance } from "@/entities/item/lib/createInstance";
+import type { ItemInstance } from "@/entities/item/model";
 import { useDamageNumbers } from "@/shared/ui/DamageNumbers/useDamageNumbers";
 
 const rng = () => Math.random();
@@ -226,7 +228,7 @@ export function useBattle(bossId: () => string | undefined) {
     }
   };
 
-  const loot = ref<Item[]>([]);
+  const loot = ref<ItemInstance[]>([]);
   const showLoot = ref(false);
 
   const isBattleOver = computed(
@@ -1409,11 +1411,12 @@ export function useBattle(bossId: () => string | undefined) {
     }
   };
 
-  const takeLootItem = (item: Item) => {
-    const success = characterStore.addItemToInventory(item);
+  const takeLootItem = (instance: ItemInstance) => {
+    const success = characterStore.addItemToInventory(instance);
     if (success) {
-      loot.value = loot.value.filter((i) => i.id !== item.id);
-      pushLog(`Получен предмет: ${item.name}`);
+      loot.value = loot.value.filter((i) => i.instanceId !== instance.instanceId);
+      const display = getDisplayItem(instance, getTemplate);
+      pushLog(`Получен предмет: ${display?.name ?? "?"}`);
     }
   };
 
@@ -1442,10 +1445,16 @@ export function useBattle(bossId: () => string | undefined) {
           pushLog(`Ты получаешь ${xp} опыта.`);
         }
 
-        const bossLoot = selectedBoss.value?.loot ?? [];
-        loot.value = bossLoot
-          .map((itemId) => getItem(itemId))
-          .filter((item): item is Item => item !== null);
+        const bossLevel = selectedBoss.value?.level ?? 1;
+        const itemLevel = 1 + bossLevel * 3;
+        const pool = [...ALL_TEMPLATE_IDS];
+        const chosen: string[] = [];
+        for (let i = 0; i < 2 && pool.length > 0; i++) {
+          const idx = Math.floor(rng() * pool.length);
+          chosen.push(pool[idx]!);
+          pool.splice(idx, 1);
+        }
+        loot.value = chosen.map((templateId) => createItemInstance(templateId, itemLevel));
 
         if (loot.value.length > 0) {
           showLoot.value = true;

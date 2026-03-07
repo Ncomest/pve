@@ -8,6 +8,7 @@ import { PLAYER_CHARACTER } from "@/entities/character/model";
 
 const { level, xp, xpToNext, percentToNext } = usePlayerProgress();
 const characterStore = useCharacterStore();
+characterStore.init();
 
 const getMaxHp = () => {
   const bonusHp = (level.value - 1) * 20;

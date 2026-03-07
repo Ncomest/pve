@@ -57,6 +57,12 @@
     letter-spacing: 0.08em;
   }
 
+  &__item-level {
+    font-size: 12px;
+    color: rgba(251, 191, 36, 0.9);
+    font-weight: 500;
+  }
+
   &__take-btn {
     padding: 6px 12px;
     font-size: 13px;

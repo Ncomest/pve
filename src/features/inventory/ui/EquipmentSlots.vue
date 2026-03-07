@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import type { EquipmentSlot } from "@/entities/item/model";
+import type { EquipmentSlot, ItemInstance } from "@/entities/item/model";
+import { getDisplayItem } from "@/entities/item/model";
+import { getTemplate } from "@/entities/item/items-db";
 import { rarityColor } from "@/entities/item/lib/rarityColor";
 import { useHeroAvatar } from "@/features/inventory/model/useHeroAvatar";
 import "./EquipmentSlots.scss";
@@ -8,7 +10,7 @@ import "./EquipmentSlots.scss";
 interface SlotEntry {
   slot: EquipmentSlot;
   label: string;
-  item: import("@/entities/item/model").Item | null;
+  item: ItemInstance | null;
 }
 
 const props = defineProps<{
@@ -34,6 +36,10 @@ const rightSlots = computed(() =>
 
 const { selectedSrc } = useHeroAvatar();
 const avatarSrc = computed(() => selectedSrc());
+
+function getDisplay(inst: ItemInstance | null) {
+  return inst ? getDisplayItem(inst, getTemplate) : null;
+}
 </script>
 
 <template>
@@ -101,9 +107,17 @@ const avatarSrc = computed(() => selectedSrc());
                 Снять
               </button>
             </div>
-            <div v-if="item" class="equipment-slots__item-name" :style="{ color: rarityColor(item.rarity) }">
-              {{ item.name }}
-            </div>
+            <template v-if="item">
+              <div
+                class="equipment-slots__item-name"
+                :style="getDisplay(item) ? { color: rarityColor(getDisplay(item)!.rarity) } : {}"
+              >
+                {{ getDisplay(item)?.name }}
+              </div>
+              <div v-if="getDisplay(item)?.itemLevel != null" class="equipment-slots__item-level">
+                Ур. {{ getDisplay(item)!.itemLevel }}
+              </div>
+            </template>
             <div v-else class="equipment-slots__empty">Свободно</div>
           </div>
         </div>
@@ -210,9 +224,17 @@ const avatarSrc = computed(() => selectedSrc());
                 Снять
               </button>
             </div>
-            <div v-if="item" class="equipment-slots__item-name" :style="{ color: rarityColor(item.rarity) }">
-              {{ item.name }}
-            </div>
+            <template v-if="item">
+              <div
+                class="equipment-slots__item-name"
+                :style="getDisplay(item) ? { color: rarityColor(getDisplay(item)!.rarity) } : {}"
+              >
+                {{ getDisplay(item)?.name }}
+              </div>
+              <div v-if="getDisplay(item)?.itemLevel != null" class="equipment-slots__item-level">
+                Ур. {{ getDisplay(item)!.itemLevel }}
+              </div>
+            </template>
             <div v-else class="equipment-slots__empty">Свободно</div>
           </div>
         </div>

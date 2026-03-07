@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed, ref } from "vue";
+import { computed, ref } from "vue";
 import { useCharacterStore } from "@/app/store/character";
 import { useInventory } from "@/features/inventory/model/useInventory";
 import InventorySection from "@/features/inventory/ui/InventorySection.vue";
@@ -20,13 +20,11 @@ interface LootEntry {
 const characterStore = useCharacterStore();
 const expandedRecipeId = ref<string | null>(null);
 
-onMounted(() => {
-  characterStore.init();
-});
-
 const {
   selectedItem,
   selectedEquippedItem,
+  selectedDisplayItem,
+  selectedEquippedDisplayItem,
   inventoryFullWarning,
   isItemEquipped,
   selectItem,
@@ -75,6 +73,8 @@ function isRecipeExpanded(recipeId: string): boolean {
         :items="inventoryItems"
         :selected-item="selectedItem"
         :selected-equipped-item="selectedEquippedItem"
+        :selected-display-item="selectedDisplayItem"
+        :selected-equipped-display-item="selectedEquippedDisplayItem"
         :inventory-full-warning="inventoryFullWarning"
         :is-item-equipped="isItemEquipped"
         @select="selectItem"

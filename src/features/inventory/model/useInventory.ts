@@ -1,16 +1,17 @@
 import { computed, ref } from "vue";
 import { useCharacterStore } from "@/app/store/character";
-import type { EquipmentSlot, Item } from "@/entities/item/model";
-import { SLOT_NAMES } from "@/entities/item/model";
+import type { EquipmentSlot, Item, ItemInstance } from "@/entities/item/model";
+import { SLOT_NAMES, getDisplayItem } from "@/entities/item/model";
+import { getTemplate } from "@/entities/item/items-db";
 
 export function useInventory() {
   const characterStore = useCharacterStore();
 
-  const selectedItem = ref<{ item: Item; index: number } | null>(null);
+  const selectedItem = ref<{ item: ItemInstance; index: number } | null>(null);
   const selectedEquippedSlot = ref<EquipmentSlot | null>(null);
   const inventoryFullWarning = ref(false);
 
-  const selectItem = (item: Item | null, index: number) => {
+  const selectItem = (item: ItemInstance | null, index: number) => {
     selectedItem.value = item ? { item, index } : null;
     selectedEquippedSlot.value = null;
   };
@@ -61,9 +62,19 @@ export function useInventory() {
   // даже если такой же предмет надет (дубликат по id/ссылке). Иначе дубликаты ошибочно отображались бы как надетые.
   const isItemEquipped = computed(() => false);
 
-  const selectedEquippedItem = computed<Item | null>(() => {
+  const selectedEquippedItem = computed<ItemInstance | null>(() => {
     if (!selectedEquippedSlot.value) return null;
     return characterStore.equipped[selectedEquippedSlot.value] ?? null;
+  });
+
+  const selectedDisplayItem = computed<Item | null>(() => {
+    if (!selectedItem.value) return null;
+    return getDisplayItem(selectedItem.value.item, getTemplate);
+  });
+
+  const selectedEquippedDisplayItem = computed<Item | null>(() => {
+    const inst = selectedEquippedItem.value;
+    return inst ? getDisplayItem(inst, getTemplate) : null;
   });
 
   const equipmentSlots = computed(() =>
@@ -79,6 +90,8 @@ export function useInventory() {
     selectedItem,
     selectedEquippedSlot,
     selectedEquippedItem,
+    selectedDisplayItem,
+    selectedEquippedDisplayItem,
     inventoryFullWarning,
     selectItem,
     selectEquippedItem,

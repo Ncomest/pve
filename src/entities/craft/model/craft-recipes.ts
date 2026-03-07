@@ -1,5 +1,7 @@
 import type { Item } from "@/entities/item/model";
-import { ITEMS_DB } from "@/entities/item/items-db";
+import { getTemplate } from "@/entities/item/items-db";
+import { getDisplayItem } from "@/entities/item/model";
+import { createItemInstance } from "@/entities/item/lib/createInstance";
 
 export interface CraftRequirement {
   resourceId: string;
@@ -9,7 +11,7 @@ export interface CraftRequirement {
 export interface CraftRecipe {
   /** Уникальный id рецепта */
   id: string;
-  /** Id предмета-результата из ITEMS_DB */
+  /** Id шаблона предмета-результата (templateId из items-db). */
   resultItemId: string;
   /** Отображаемое имя рецепта (может отличаться от имени предмета) */
   name: string;
@@ -25,7 +27,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   // Оружие
   {
     id: "craft-iron-sword",
-    resultItemId: "weapon-iron-sword",
+    resultItemId: "weapon-2",
     name: "Железный меч",
     description: "Базовое улучшение оружия для начала охоты на элементалей.",
     difficulty: "easy",
@@ -36,7 +38,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   },
   {
     id: "craft-legendary-blade",
-    resultItemId: "weapon-legendary-blade",
+    resultItemId: "weapon-10",
     name: "Легендарный клинок",
     description: "Мощное оружие с высоким шансом крита для опытных воинов.",
     difficulty: "hard",
@@ -50,7 +52,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   // Щиты
   {
     id: "craft-iron-shield",
-    resultItemId: "shield-iron",
+    resultItemId: "shield-2",
     name: "Железный щит",
     description: "Надёжная защита с хорошим балансом здоровья и уклонения.",
     difficulty: "easy",
@@ -61,7 +63,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   },
   {
     id: "craft-dragon-shield",
-    resultItemId: "shield-dragon",
+    resultItemId: "shield-10",
     name: "Драконий щит",
     description: "Эпический щит из драконьей чешуи с мощной защитой.",
     difficulty: "normal",
@@ -75,7 +77,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   // Шлемы
   {
     id: "craft-iron-helmet",
-    resultItemId: "helmet-iron",
+    resultItemId: "helmet-2",
     name: "Железный шлем",
     description: "Прочный шлем, увеличивающий запас здоровья.",
     difficulty: "easy",
@@ -86,7 +88,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   },
   {
     id: "craft-royal-helmet",
-    resultItemId: "helmet-royal",
+    resultItemId: "helmet-9",
     name: "Королевский шлем",
     description: "Роскошный шлем с усилением силы и защиты.",
     difficulty: "normal",
@@ -99,7 +101,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   // Нагрудники
   {
     id: "craft-iron-chest",
-    resultItemId: "chest-iron",
+    resultItemId: "chest-2",
     name: "Железная кираса",
     description: "Крепкая броня, обеспечивающая хорошую защиту корпуса.",
     difficulty: "easy",
@@ -110,7 +112,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   },
   {
     id: "craft-dragon-chest",
-    resultItemId: "chest-dragon",
+    resultItemId: "chest-10",
     name: "Драконья броня",
     description: "Легендарная броня с огромным запасом здоровья и силой.",
     difficulty: "hard",
@@ -124,7 +126,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   // Серьги
   {
     id: "craft-silver-earring",
-    resultItemId: "earring-silver",
+    resultItemId: "earring-2",
     name: "Серебряная серьга",
     description: "Элегантное украшение, повышающее шанс крита.",
     difficulty: "easy",
@@ -135,7 +137,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   },
   {
     id: "craft-emerald-earring",
-    resultItemId: "earring-emerald",
+    resultItemId: "earring-9",
     name: "Изумрудная серьга",
     description: "Изысканное украшение с мощным усилением крита и урона.",
     difficulty: "normal",
@@ -149,7 +151,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   // Кольца
   {
     id: "craft-silver-ring",
-    resultItemId: "ring-silver",
+    resultItemId: "ring-2",
     name: "Серебряное кольцо",
     description: "Кольцо с умеренным усилением здоровья и крита.",
     difficulty: "easy",
@@ -160,7 +162,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   },
   {
     id: "craft-mystic-ring",
-    resultItemId: "ring-mystic",
+    resultItemId: "ring-10",
     name: "Мистическое кольцо",
     description: "Легендарное кольцо с мощным усилением всех характеристик.",
     difficulty: "hard",
@@ -174,7 +176,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   // Пояса
   {
     id: "craft-iron-belt",
-    resultItemId: "belt-iron",
+    resultItemId: "belt-2",
     name: "Железный пояс",
     description: "Крепкий пояс с усилением брони и здоровья.",
     difficulty: "easy",
@@ -185,7 +187,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   },
   {
     id: "craft-dragonscale-belt",
-    resultItemId: "belt-dragonscale",
+    resultItemId: "belt-9",
     name: "Пояс из чешуи дракона",
     description: "Эпический пояс с мощной защитой и уклонением.",
     difficulty: "normal",
@@ -199,7 +201,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   // Штаны
   {
     id: "craft-chainmail-pants",
-    resultItemId: "pants-chainmail",
+    resultItemId: "pants-2",
     name: "Кольчужные штаны",
     description: "Прочные штаны с хорошей бронёй и здоровьем.",
     difficulty: "easy",
@@ -210,7 +212,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   },
   {
     id: "craft-shadow-pants",
-    resultItemId: "pants-shadow",
+    resultItemId: "pants-9",
     name: "Штаны тени",
     description: "Лёгкие штаны для скрытных бойцов, усиливающие скорость.",
     difficulty: "normal",
@@ -224,7 +226,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   // Ботинки
   {
     id: "craft-iron-boots",
-    resultItemId: "boots-iron",
+    resultItemId: "boots-2",
     name: "Железные сапоги",
     description: "Прочные сапоги с умеренной скоростью и бронёй.",
     difficulty: "easy",
@@ -235,7 +237,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   },
   {
     id: "craft-wind-boots",
-    resultItemId: "boots-wind",
+    resultItemId: "boots-10",
     name: "Сапоги ветра",
     description: "Легендарные сапоги с огромной скоростью и уклонением.",
     difficulty: "hard",
@@ -249,7 +251,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   // Ожерелья
   {
     id: "craft-silver-necklace",
-    resultItemId: "necklace-silver",
+    resultItemId: "necklace-2",
     name: "Серебряная цепочка",
     description: "Изящное ожерелье, улучшающее точность атак.",
     difficulty: "easy",
@@ -260,7 +262,7 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   },
   {
     id: "craft-amulet",
-    resultItemId: "necklace-amulet",
+    resultItemId: "necklace-10",
     name: "Амулет мудреца",
     description: "Легендарный амулет с мощным усилением всех боевых качеств.",
     difficulty: "hard",
@@ -272,6 +274,11 @@ export const CRAFT_RECIPES: CraftRecipe[] = [
   },
 ];
 
-export const getCraftResultItem = (recipe: CraftRecipe): Item | null =>
-  ITEMS_DB[recipe.resultItemId] ?? null;
+/** Возвращает отображаемый вид предмета крафта (уровень 1). */
+export const getCraftResultItem = (recipe: CraftRecipe): Item | null => {
+  const template = getTemplate(recipe.resultItemId);
+  if (!template) return null;
+  const instance = createItemInstance(recipe.resultItemId, 1);
+  return getDisplayItem(instance, getTemplate);
+};
 

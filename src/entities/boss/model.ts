@@ -82,7 +82,6 @@ export interface Boss {
   level: number;
   rarity: BossRarity;
   xpReward: number;
-  loot: string[];
   stats: Stats;
   buffs?: Buff[];
   debuffs?: Debuff[];
@@ -92,23 +91,3 @@ export interface Boss {
   abilityConfig?: BossAbilityConfig;
 }
 
-export type ItemRarity = "common" | "rare" | "epic";
-export type ItemSlot =
-  | "weapon"
-  | "helmet"
-  | "chest"
-  | "pants"
-  | "boots"
-  | "belt"
-  | "ring"
-  | "necklace";
-
-export interface LootItem {
-  id: string;
-  name: string;
-  icon: string;
-  slot: ItemSlot;
-  rarity: ItemRarity;
-  description: string;
-  stats: Partial<Record<"armor" | "power" | "chanceCrit" | "evasion" | "maxHp" | "speed", number>>;
-}
