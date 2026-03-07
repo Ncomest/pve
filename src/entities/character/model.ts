@@ -17,10 +17,10 @@ export const PLAYER_CHARACTER: Character = {
     hp: 250,
     maxHp: 250,
     power: 20,
-    chanceCrit: 0.25,
-    evasion: 0.15,
+    chanceCrit: 0.05,
+    evasion: 0.05,
     speed: 2,
-    armor: 0,
+    armor: 5,
   },
 };
 
