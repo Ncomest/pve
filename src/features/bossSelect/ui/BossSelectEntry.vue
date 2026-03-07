@@ -2,7 +2,6 @@
 import { ref } from "vue";
 import type { Boss, BossAbility } from "@/entities/boss/model";
 import { rarityLabel } from "@/shared/lib/labels";
-import { getBossDropItemLevel } from "@/features/bossSelect/lib/getBossLoot";
 
 defineProps<{
   boss: Boss;
