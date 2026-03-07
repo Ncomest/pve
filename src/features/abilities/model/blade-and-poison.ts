@@ -140,7 +140,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     icon: "/images/hero/ability/slice.png",
     role: "mobility",
     classId: CLASS_ID,
-    speedPercent: 1.25,
+    speedPercent: 0.15,
     speedDurationMs: 10_000,
   },
  
