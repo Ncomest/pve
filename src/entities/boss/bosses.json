@@ -30,7 +30,53 @@
         "icon": "❄",
         "description": "Снижает скорость атаки"
       }
-    ]
+    ],
+    "bossAbilities": [
+      {
+        "id": "slime-jump",
+        "name": "Прыжок",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 18000,
+        "castTimeMs": 2500,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Слизь подпрыгивает и обрушивается на цель",
+        "baseDamageX": 1.2
+      },
+      {
+        "id": "sticky-slime",
+        "name": "Липкая слизь",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 22000,
+        "castTimeMs": 3000,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Обдаёт слизью, нанося урон и замедляя цель на 6 секунд",
+        "baseDamageX": 0.8,
+        "dotDurationMs": 6000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 3
+      },
+      {
+        "id": "slime-regen",
+        "name": "Регенерация",
+        "type": "heal",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 28000,
+        "castTimeMs": 3000,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Слизь восстанавливает часть здоровья",
+        "value": 40
+      }
+    ],
+    "abilityConfig": {
+      "startDelayMs": 8000,
+      "minAbilityIntervalMs": 10000,
+      "preventConsecutiveRepeat": true
+    }
   },
   {
     "id": "boar",
@@ -182,7 +228,57 @@
         "icon": "😱",
         "description": "Снижает точность противника"
       }
-    ]
+    ],
+    "bossAbilities": [
+      {
+        "id": "pack-bite",
+        "name": "Укус стаи",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 15000,
+        "castTimeMs": 2500,
+        "category": "persistent_debuff",
+        "canBeInterrupted": true,
+        "description": "Укус наносит урон и вызывает кровотечение на 6 секунд",
+        "baseDamageX": 0.8,
+        "dotDurationMs": 6000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 6
+      },
+      {
+        "id": "wolf-rush",
+        "name": "Рывок",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 20000,
+        "castTimeMs": 3000,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "requiredDefensiveTag": "full-dodge",
+        "description": "Мощный рывок. Избежать можно только уворотом",
+        "baseDamageX": 2.5
+      },
+      {
+        "id": "howl",
+        "name": "Воющий клич",
+        "type": "buff",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 25000,
+        "castTimeMs": 3000,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Волк воет, усиливая свою атаку на 8 секунд",
+        "selfBuffType": "damage",
+        "selfBuffValue": 0.5,
+        "selfBuffDurationMs": 8000,
+        "dispellable": true
+      }
+    ],
+    "abilityConfig": {
+      "startDelayMs": 8000,
+      "minAbilityIntervalMs": 11000,
+      "preventConsecutiveRepeat": true
+    }
   },
   {
     "id": "goblin",
@@ -221,7 +317,55 @@
         "icon": "❄",
         "description": "Снижает скорость атаки"
       }
-    ]
+    ],
+    "bossAbilities": [
+      {
+        "id": "backstab",
+        "name": "Удар в спину",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 14000,
+        "castTimeMs": 2500,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Коварный удар с повышенным шансом крита",
+        "baseDamageX": 1.4
+      },
+      {
+        "id": "poison-blade",
+        "name": "Ядовитый клинок",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 20000,
+        "castTimeMs": 3000,
+        "category": "persistent_debuff",
+        "canBeInterrupted": false,
+        "description": "Наносит урон и отравляет цель. Снимается Cleanse",
+        "baseDamageX": 0.6,
+        "debuffRequiresCleanse": true,
+        "debuffType": "poison",
+        "dotDurationMs": 8000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 5
+      },
+      {
+        "id": "dirty-trick",
+        "name": "Грязный трюк",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 18000,
+        "castTimeMs": 2500,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Бросает песок в глаза, нанося урон и снижая точность",
+        "baseDamageX": 0.7
+      }
+    ],
+    "abilityConfig": {
+      "startDelayMs": 9000,
+      "minAbilityIntervalMs": 12000,
+      "preventConsecutiveRepeat": true
+    }
   },
   {
     "id": "goblin-crossbowman",
@@ -272,7 +416,70 @@
         "icon": "❄",
         "description": "Тяжёлые болты замедляют цель"
       }
-    ]
+    ],
+    "bossAbilities": [
+      {
+        "id": "fire-bolt",
+        "name": "Огненный болт",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 16000,
+        "castTimeMs": 3000,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Выстрел поджигающим болтом. Урон и горение на 6 секунд",
+        "baseDamageX": 1.2,
+        "dotDurationMs": 6000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 8,
+        "debuffType": "burn"
+      },
+      {
+        "id": "trap",
+        "name": "Капкан",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 22000,
+        "castTimeMs": 3000,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "description": "Ставит капкан — при срабатывании наносит урон и замедляет",
+        "baseDamageX": 1.5
+      },
+      {
+        "id": "precision-shot",
+        "name": "Точный выстрел",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 20000,
+        "castTimeMs": 3000,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "requiredDefensiveTag": "block",
+        "description": "Прицельный выстрел в голову. Блокируется щитом",
+        "baseDamageX": 2.8
+      },
+      {
+        "id": "rapid-reload",
+        "name": "Быстрая перезарядка",
+        "type": "buff",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 28000,
+        "castTimeMs": 2500,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Увеличивает силу следующих выстрелов на 10 секунд",
+        "selfBuffType": "damage",
+        "selfBuffValue": 0.3,
+        "selfBuffDurationMs": 10000,
+        "dispellable": true
+      }
+    ],
+    "abilityConfig": {
+      "startDelayMs": 9000,
+      "minAbilityIntervalMs": 12000,
+      "preventConsecutiveRepeat": true
+    }
   },
   {
     "id": "goblin-mage",
@@ -323,7 +530,72 @@
         "icon": "💀",
         "description": "Снижает все статы на 10%"
       }
-    ]
+    ],
+    "bossAbilities": [
+      {
+        "id": "fireball",
+        "name": "Огненный шар",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 14000,
+        "castTimeMs": 3000,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Метает огненный шар. Урон и горение на 6 секунд",
+        "baseDamageX": 1.3,
+        "dotDurationMs": 6000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 10,
+        "debuffType": "burn"
+      },
+      {
+        "id": "arcane-bomb",
+        "name": "Тайная бомба",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 20000,
+        "castTimeMs": 3000,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "requiredDefensiveTag": "full-dodge",
+        "description": "Взрыв тайной энергии. Избежать можно только уворотом",
+        "baseDamageX": 2.5
+      },
+      {
+        "id": "hex-curse",
+        "name": "Проклятье мага",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 22000,
+        "castTimeMs": 3000,
+        "category": "persistent_debuff",
+        "canBeInterrupted": true,
+        "debuffRequiresCleanse": true,
+        "debuffType": "curse",
+        "description": "Накладывает проклятие, снижающее силу. Снимается Cleanse",
+        "baseDamageX": 0.5
+      },
+      {
+        "id": "arcane-shield",
+        "name": "Тайный барьер",
+        "type": "buff",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 26000,
+        "castTimeMs": 3000,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Призывает барьер, повышающий броню на 8 секунд",
+        "selfBuffType": "armor",
+        "selfBuffValue": 0.5,
+        "selfBuffDurationMs": 8000,
+        "dispellable": true
+      }
+    ],
+    "abilityConfig": {
+      "startDelayMs": 10000,
+      "minAbilityIntervalMs": 13000,
+      "preventConsecutiveRepeat": true
+    }
   },
   {
     "id": "bear",
@@ -368,7 +640,69 @@
         "icon": "🩸",
         "description": "Удар когтями вызывает сильное кровотечение"
       }
-    ]
+    ],
+    "bossAbilities": [
+      {
+        "id": "bear-hug",
+        "name": "Медвежья хватка",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 18000,
+        "castTimeMs": 3000,
+        "category": "persistent_debuff",
+        "canBeInterrupted": true,
+        "description": "Схватка когтями наносит урон и вызывает кровотечение на 8 секунд",
+        "baseDamageX": 1.2,
+        "dotDurationMs": 8000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 12
+      },
+      {
+        "id": "roar",
+        "name": "Рёв",
+        "type": "buff",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 25000,
+        "castTimeMs": 3000,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Медведь ревёт, усиливая урон на 10 секунд",
+        "selfBuffType": "damage",
+        "selfBuffValue": 0.4,
+        "selfBuffDurationMs": 10000,
+        "dispellable": true
+      },
+      {
+        "id": "paw-slam",
+        "name": "Удар лапой",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 20000,
+        "castTimeMs": 3000,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "requiredDefensiveTag": "block",
+        "description": "Мощный удар лапой. Блокируется щитом",
+        "baseDamageX": 2.8
+      },
+      {
+        "id": "honey-lick",
+        "name": "Полизать мёд",
+        "type": "heal",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 32000,
+        "castTimeMs": 3000,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Медведь восстанавливает здоровье. Прерывается Rebuke",
+        "value": 80
+      }
+    ],
+    "abilityConfig": {
+      "startDelayMs": 10000,
+      "minAbilityIntervalMs": 13000,
+      "preventConsecutiveRepeat": true
+    }
   },
   {
     "id": "goblin-chief",
@@ -431,7 +765,74 @@
         "icon": "🩸",
         "description": "Удар ятаганом вызывает кровотечение"
       }
-    ]
+    ],
+    "bossAbilities": [
+      {
+        "id": "warcry",
+        "name": "Боевой клич",
+        "type": "buff",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 22000,
+        "castTimeMs": 3000,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Вождь кричит, усиливая свой урон на 12 секунд",
+        "selfBuffType": "damage",
+        "selfBuffValue": 0.5,
+        "selfBuffDurationMs": 12000,
+        "dispellable": true
+      },
+      {
+        "id": "yatagan-strike",
+        "name": "Удар ятаганом",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 16000,
+        "castTimeMs": 3000,
+        "category": "persistent_debuff",
+        "canBeInterrupted": false,
+        "description": "Размашистый удар, вызывающий кровотечение на 8 секунд",
+        "baseDamageX": 1.4,
+        "dotDurationMs": 8000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 15
+      },
+      {
+        "id": "shield-bash",
+        "name": "Удар щитом",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 20000,
+        "castTimeMs": 3000,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "requiredDefensiveTag": "block",
+        "description": "Оглушающий удар щитом. Блокируется щитом героя",
+        "baseDamageX": 2.2
+      },
+      {
+        "id": "poison-flask",
+        "name": "Ядовитая колба",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 24000,
+        "castTimeMs": 3000,
+        "category": "persistent_debuff",
+        "canBeInterrupted": true,
+        "description": "Швыряет яд. Урон и отравление. Снимается Cleanse",
+        "baseDamageX": 0.6,
+        "debuffRequiresCleanse": true,
+        "debuffType": "poison",
+        "dotDurationMs": 10000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 12
+      }
+    ],
+    "abilityConfig": {
+      "startDelayMs": 10000,
+      "minAbilityIntervalMs": 14000,
+      "preventConsecutiveRepeat": true
+    }
   },
   {
     "id": "golem",
@@ -494,7 +895,67 @@
         "icon": "⭐",
         "description": "При критическом уроне может быть оглушён"
       }
-    ]
+    ],
+    "bossAbilities": [
+      {
+        "id": "earthquake",
+        "name": "Землетрясение",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 22000,
+        "castTimeMs": 3500,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "description": "Бьёт по земле, нанося большой урон. Блокируется щитом",
+        "baseDamageX": 2.8,
+        "requiredDefensiveTag": "block"
+      },
+      {
+        "id": "stone-fist",
+        "name": "Каменный кулак",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 18000,
+        "castTimeMs": 3000,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "requiredDefensiveTag": "block",
+        "description": "Мощный удар каменным кулаком. Блокируется щитом",
+        "baseDamageX": 2.2
+      },
+      {
+        "id": "stone-skin-buff",
+        "name": "Каменная кожа",
+        "type": "buff",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 28000,
+        "castTimeMs": 3000,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Укрепляет каменную оболочку, повышая броню на 10 секунд",
+        "selfBuffType": "armor",
+        "selfBuffValue": 0.6,
+        "selfBuffDurationMs": 10000,
+        "dispellable": true
+      },
+      {
+        "id": "golem-repair",
+        "name": "Самовосстановление",
+        "type": "heal",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 35000,
+        "castTimeMs": 4000,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Голем восстанавливает часть здоровья. Прерывается Rebuke",
+        "value": 60
+      }
+    ],
+    "abilityConfig": {
+      "startDelayMs": 12000,
+      "minAbilityIntervalMs": 15000,
+      "preventConsecutiveRepeat": true
+    }
   },
   {
     "id": "dragon",
@@ -575,6 +1036,84 @@
         "icon": "❄",
         "description": "Жар замедляет движения"
       }
-    ]
+    ],
+    "bossAbilities": [
+      {
+        "id": "fire-breath",
+        "name": "Огненное дыхание",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 18000,
+        "castTimeMs": 3500,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Дыхание огнём. Урон и горение на 8 секунд",
+        "baseDamageX": 1.5,
+        "dotDurationMs": 8000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 18,
+        "debuffType": "burn"
+      },
+      {
+        "id": "tail-swipe",
+        "name": "Удар хвостом",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 22000,
+        "castTimeMs": 3000,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "requiredDefensiveTag": "block",
+        "description": "Размашистый удар хвостом. Блокируется щитом",
+        "baseDamageX": 3.2
+      },
+      {
+        "id": "ancient-curse",
+        "name": "Древнее проклятие",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 28000,
+        "castTimeMs": 3500,
+        "category": "persistent_debuff",
+        "canBeInterrupted": true,
+        "debuffRequiresCleanse": true,
+        "debuffType": "curse",
+        "description": "Накладывает древнее проклятие, ослабляющее героя. Снимается Cleanse",
+        "baseDamageX": 0.8
+      },
+      {
+        "id": "scale-armor",
+        "name": "Чешуйчатая броня",
+        "type": "buff",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 30000,
+        "castTimeMs": 3000,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Чешуя твердеет, повышая броню на 12 секунд",
+        "selfBuffType": "armor",
+        "selfBuffValue": 0.5,
+        "selfBuffDurationMs": 12000,
+        "dispellable": true
+      },
+      {
+        "id": "claw-rake",
+        "name": "Удар когтями",
+        "type": "damage",
+        "icon": "/images/bosses/icons/placeholder.svg",
+        "cooldownMs": 16000,
+        "castTimeMs": 3000,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "requiredDefensiveTag": "full-dodge",
+        "description": "Серия ударов когтями. Избежать можно только уворотом",
+        "baseDamageX": 2.2
+      }
+    ],
+    "abilityConfig": {
+      "startDelayMs": 12000,
+      "minAbilityIntervalMs": 15000,
+      "preventConsecutiveRepeat": true
+    }
   }
 ]

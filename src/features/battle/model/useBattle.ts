@@ -422,13 +422,18 @@ export function useBattle(bossId: () => string | undefined) {
     if (isBattleOver.value) return;
     if (!isAbilityReady(ability.id)) return;
 
-    // Прерывание текущего каста босса способностями с флагом interrupt (например, Rebuke)
+    // Прерывание текущего каста босса способностями с флагом interrupt (например, Укор)
     if (
       ability.interrupt &&
       bossCastState.value === "casting" &&
       currentBossAbility.value?.canBeInterrupted
     ) {
       interruptBossCast(ability.name);
+    }
+    // Укор и другие способности только с interrupt — всегда ставим кулдаун и выходим
+    if (ability.interrupt && !ability.effects?.length && ability.role === "control") {
+      triggerCooldowns(ability.id, ability.cooldownMs);
+      return;
     }
 
     // --- Способности с композицией эффектов ---
@@ -781,7 +786,8 @@ export function useBattle(bossId: () => string | undefined) {
       return;
     }
 
-    if (ability.type === "buff") {
+    // Защита, мобильность и контроль: по role, не только type "buff" (Уворот/Блок — type "evidence", Укор — "control")
+    if (ability.type === "buff" || ability.type === "evidence" || ability.type === "control") {
       // --- Ускользание: +evasion на время ---
       if (ability.role === "defense" && ability.defenseEvasionPercent !== undefined && ability.defenseEvasionDurationMs !== undefined) {
         if (evasionBonusTimerId !== null) clearTimeout(evasionBonusTimerId);
