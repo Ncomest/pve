@@ -48,28 +48,6 @@
       "speed": 2,
       "armor": 4
     },
-    "buffs": [
-      {
-        "id": "charge",
-        "name": "Натиск",
-        "icon": "⚡",
-        "description": "Увеличивает урон при рывке"
-      },
-      {
-        "id": "tough",
-        "name": "Толстокожесть",
-        "icon": "🛡",
-        "description": "+2 к броне"
-      }
-    ],
-    "debuffs": [
-      {
-        "id": "bleed",
-        "name": "Кровотечение",
-        "icon": "🩸",
-        "description": "Наносит урон каждый ход"
-      }
-    ],
     "bossAbilities": [
       {
         "id": "sharpen-tusks",
@@ -157,7 +135,7 @@
     ],
     "abilityConfig": {
       "startDelayMs": 10000,
-      "minAbilityIntervalMs": 15000,
+      "minAbilityIntervalMs": 12000,
       "preventConsecutiveRepeat": true
     }
   },
@@ -210,7 +188,7 @@
     "id": "goblin",
     "name": "Гоблин",
     "image": "/images/bosses/goblin.jpg",
-    "level": 3,
+    "level": 4,
     "rarity": "common",
     "xpReward": 75,
     "stats": {
@@ -249,7 +227,7 @@
     "id": "goblin-crossbowman",
     "name": "Гоблин-арбалетчик",
     "image": "/images/bosses/goblin_crossbower.jpg",
-    "level": 4,
+    "level": 5,
     "rarity": "rare",
     "xpReward": 120,
     "stats": {
@@ -300,7 +278,7 @@
     "id": "goblin-mage",
     "name": "Гоблин-маг",
     "image": "/images/bosses/goblin_mage.jpg",
-    "level": 5,
+    "level": 6,
     "rarity": "rare",
     "xpReward": 160,
     "stats": {
@@ -351,7 +329,7 @@
     "id": "bear",
     "name": "Бурый Медведь",
     "image": "/images/bosses/bear.jpg",
-    "level": 5,
+    "level": 7,
     "rarity": "rare",
     "xpReward": 180,
     "stats": {
@@ -396,7 +374,7 @@
     "id": "goblin-chief",
     "name": "Вождь Гоблинов",
     "image": "/images/bosses/goblin_king.jpg",
-    "level": 7,
+    "level": 8,
     "rarity": "epic",
     "xpReward": 300,
     "stats": {
@@ -459,7 +437,7 @@
     "id": "golem",
     "name": "Каменный Голем",
     "image": "/images/bosses/golem.jpg",
-    "level": 6,
+    "level": 9,
     "rarity": "rare",
     "xpReward": 220,
     "stats": {

@@ -18,8 +18,6 @@ const {
   selectedInfo,
   handleSelectBoss,
   openInfo,
-  buffRows,
-  debuffRows,
 } = useBossSelect();
 
 const bosses = computed(() => {
@@ -58,8 +56,6 @@ const bosses = computed(() => {
         :key="boss.id"
         :boss="boss"
         :is-info-open="selectedInfo?.id === boss.id"
-        :buff-rows="buffRows"
-        :debuff-rows="debuffRows"
         @select="handleSelectBoss"
         @toggle-info="openInfo"
       />

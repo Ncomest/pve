@@ -1,19 +1,45 @@
 <script setup lang="ts">
-import type { Boss, Buff, Debuff } from "@/entities/boss/model";
+import { ref } from "vue";
+import type { Boss, BossAbility } from "@/entities/boss/model";
 import { rarityLabel } from "@/shared/lib/labels";
 import { getBossDropItemLevel } from "@/features/bossSelect/lib/getBossLoot";
 
 defineProps<{
   boss: Boss;
   isInfoOpen: boolean;
-  buffRows: (boss: Boss) => Buff[][];
-  debuffRows: (boss: Boss) => Debuff[][];
 }>();
 
 const emit = defineEmits<{
   select: [boss: Boss];
   toggleInfo: [boss: Boss];
 }>();
+
+const tooltip = ref<{ ability: BossAbility; x: number; y: number } | null>(null);
+
+function showTooltip(e: MouseEvent, ability: BossAbility) {
+  tooltip.value = { ability, x: e.clientX, y: e.clientY };
+}
+
+function moveTooltip(e: MouseEvent) {
+  if (tooltip.value) {
+    tooltip.value.x = e.clientX;
+    tooltip.value.y = e.clientY;
+  }
+}
+
+function hideTooltip() {
+  tooltip.value = null;
+}
+
+const typeLabel: Record<string, string> = {
+  damage: "Урон",
+  heal: "Лечение",
+  buff: "Бафф",
+};
+
+function formatMs(ms: number): string {
+  return (ms / 1000).toFixed(1).replace(/\.0$/, "") + "с";
+}
 </script>
 
 <template>
@@ -45,35 +71,61 @@ const emit = defineEmits<{
 
       <div class="boss-select-entry__info">
         <div class="boss-select-entry__name">{{ boss.name }}</div>
-        <div class="boss-select-entry__effects-row">
-          <div v-if="(boss.buffs?.length ?? 0) > 0" class="boss-select-entry__effect-rows boss-select-entry__effect-rows--buff">
-            <div v-for="(row, ri) in buffRows(boss)" :key="ri" class="boss-select-entry__effect-row">
-              <div
-                v-for="buff in row"
-                :key="buff.id"
-                class="boss-select-entry__effect-cell boss-select-entry__effect-cell--buff"
-                :title="`${buff.name}: ${buff.description ?? ''}`"
-              >
-                {{ buff.icon }}
-              </div>
-            </div>
-          </div>
-          <div v-if="(boss.debuffs?.length ?? 0) > 0" class="boss-select-entry__effect-rows boss-select-entry__effect-rows--debuff">
-            <div v-for="(row, ri) in debuffRows(boss)" :key="ri" class="boss-select-entry__effect-row">
-              <div
-                v-for="debuff in row"
-                :key="debuff.id"
-                class="boss-select-entry__effect-cell boss-select-entry__effect-cell--debuff"
-                :title="`${debuff.name}: ${debuff.description ?? ''}`"
-              >
-                {{ debuff.icon }}
-              </div>
-            </div>
-          </div>
-          <div class="boss-select-entry__loot-desc">
-            2 случайные вещи (ур. {{ getBossDropItemLevel(boss.level) }})
+        <div v-if="(boss.bossAbilities?.length ?? 0) > 0" class="boss-select-entry__abilities-row">
+          <div
+            v-for="ability in boss.bossAbilities"
+            :key="ability.id"
+            class="boss-select-entry__ability-cell"
+            @mouseenter="showTooltip($event, ability)"
+            @mousemove="moveTooltip($event)"
+            @mouseleave="hideTooltip"
+          >
+            <img
+              v-if="ability.icon"
+              :src="ability.icon"
+              :alt="ability.name"
+              class="boss-select-entry__ability-icon"
+            />
+            <span v-else class="boss-select-entry__ability-icon-fallback">?</span>
           </div>
         </div>
+
+        <Teleport to="body">
+          <div
+            v-if="tooltip"
+            class="boss-ability-tooltip"
+            :style="{ left: tooltip.x + 14 + 'px', top: tooltip.y + 14 + 'px' }"
+          >
+            <div class="boss-ability-tooltip__name">{{ tooltip.ability.name }}</div>
+            <div class="boss-ability-tooltip__row">
+              <span class="boss-ability-tooltip__label">Тип:</span>
+              <span>{{ typeLabel[tooltip.ability.type] ?? tooltip.ability.type }}</span>
+            </div>
+            <div v-if="tooltip.ability.baseDamageX != null" class="boss-ability-tooltip__row">
+              <span class="boss-ability-tooltip__label">Множитель урона:</span>
+              <span>×{{ tooltip.ability.baseDamageX }}</span>
+            </div>
+            <div v-if="tooltip.ability.dotDurationMs != null" class="boss-ability-tooltip__row">
+              <span class="boss-ability-tooltip__label">Длительность DoT:</span>
+              <span>{{ formatMs(tooltip.ability.dotDurationMs) }}</span>
+            </div>
+            <div v-if="tooltip.ability.dotTickIntervalMs != null" class="boss-ability-tooltip__row">
+              <span class="boss-ability-tooltip__label">Интервал тика:</span>
+              <span>{{ formatMs(tooltip.ability.dotTickIntervalMs) }}</span>
+            </div>
+            <div v-if="tooltip.ability.dotDamagePerTick != null" class="boss-ability-tooltip__row">
+              <span class="boss-ability-tooltip__label">Урон за тик:</span>
+              <span>{{ tooltip.ability.dotDamagePerTick }}</span>
+            </div>
+            <div v-if="tooltip.ability.description" class="boss-ability-tooltip__description">
+              {{ tooltip.ability.description }}
+            </div>
+            <div v-if="tooltip.ability.requiredDefensiveTag" class="boss-ability-tooltip__row boss-ability-tooltip__row--tag">
+              <span class="boss-ability-tooltip__label">Требует защиту:</span>
+              <span>{{ tooltip.ability.requiredDefensiveTag }}</span>
+            </div>
+          </div>
+        </Teleport>
       </div>
 
       <div class="boss-select-entry__rarity">{{ rarityLabel(boss.rarity) }}</div>
