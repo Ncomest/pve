@@ -2,13 +2,16 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  /* Фиксированная высота под 2 ряда баффов/дебаффов — верстка не прыгает при появлении эффектов */
+  min-height: 76px;
 
   &__row {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
     align-items: center;
-    min-height: 28px;
+    /* Высота под иконку + длительность + отступы, чтобы ряд не рос при появлении первого дебаффа */
+    min-height: 48px;
   }
 
   &__empty {

@@ -1,5 +1,6 @@
 .character-card {
   flex: 1;
+  min-height: 100%;
   background: rgba(15, 23, 42, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
@@ -30,9 +31,18 @@
   &__body {
     flex: 1;
     min-width: 0;
+    min-height: 0;
+    align-self: stretch;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    /* Резерв под слоты эффектов — высота не меняется при появлении баффов/дебаффов */
+  }
+
+  &__effects-wrap {
+    flex-shrink: 0;
+    min-height: 60px;
+    margin-top: auto;
   }
 
   &__title {

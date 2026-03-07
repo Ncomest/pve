@@ -16,7 +16,7 @@ defineProps<{
     <span v-if="ability.cooldownMs > 0" class="ability-tooltip__row">
       <span class="ability-tooltip__label">Перезарядка:</span>
       <span class="ability-tooltip__value">
-        {{ cooldownText ?? (ability.cooldownMs / 1000).toFixed(0) + " сек" }}
+        {{ cooldownText || (ability.cooldownMs / 1000).toFixed(0) + " сек" }}
       </span>
     </span>
     <span class="ability-tooltip__row">

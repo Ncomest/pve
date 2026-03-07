@@ -60,11 +60,13 @@ const avatarSrc = computed(() => selectedSrc());
           :class="{ 'character-card__combo-dot--filled': i <= comboFilled() }"
         />
       </div>
-      <EffectSlots
-        :buffs="buffs ?? []"
-        :debuffs="debuffs ?? []"
-        class="character-card__effects"
-      />
+      <div class="character-card__effects-wrap">
+        <EffectSlots
+          :buffs="buffs ?? []"
+          :debuffs="debuffs ?? []"
+          class="character-card__effects"
+        />
+      </div>
     </div>
   </div>
 </template>

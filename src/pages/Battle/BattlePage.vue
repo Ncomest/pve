@@ -42,6 +42,11 @@ const {
   powerBoostLeftMs,
   powerBoostValue,
   playerPower,
+  playerEffectiveCrit,
+  playerEffectiveEvasion,
+  playerEffectiveSpeed,
+  playerArmor,
+  bossEffectiveArmor,
   loot,
   showLoot,
   takeLootItem,
@@ -138,13 +143,13 @@ onUnmounted(() => {
   <div class="battle-page">
     <header class="battle-page__header">
       <h1 class="battle-page__title">Битва</h1>
+      <div class="battle-page__timer">{{ battleTimeFormatted }}</div>
       <button type="button" class="battle-page__flee-btn" title="Сбежать с боя" @click="handleFlee">
         <IconFlee class="battle-page__flee-icon" />
         <span>Побег</span>
       </button>
     </header>
 
-    <div class="battle-page__timer">{{ battleTimeFormatted }}</div>
 
     <div class="battle-page__arena">
       <div class="battle-page__card-wrap">
@@ -154,8 +159,8 @@ onUnmounted(() => {
           :max-hp="player.stats.maxHp"
           :hp-percent="playerHpPercent"
           :power="playerPower"
-          :chance-crit="player.stats.chanceCrit"
-          :evasion="player.stats.evasion"
+          :chance-crit="playerEffectiveCrit"
+          :evasion="playerEffectiveEvasion"
           :power-boost-text="powerBoostText"
           :buffs="playerBuffs"
           :debuffs="playerDebuffs"
@@ -191,16 +196,78 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <BattleAbilityBars
-      :panels="skillsStore.panels"
-      :is-battle-over="isBattleOver"
-      :is-ability-ready="isAbilityReady"
-      :ability-cooldown-text="abilityCooldownText"
-      :cooldown-left-ms="cooldownLeftMs"
-      :own-cooldown-left-ms="ownCooldownLeftMs"
-      :effective-max-cooldown-ms="effectiveMaxCooldownMs"
-      @use-ability="handleAbility"
-    />
+    <div class="battle-page__abilities-row">
+      <div class="battle-page__stats-panel battle-page__stats-panel--character">
+        <h3 class="battle-page__stats-title">Герой</h3>
+        <dl class="battle-page__stats-list">
+          <div class="battle-page__stats-row">
+            <dt>Сила</dt>
+            <dd>{{ playerPower }}</dd>
+          </div>
+          <div class="battle-page__stats-row">
+            <dt>Крит</dt>
+            <dd>{{ (playerEffectiveCrit * 100).toFixed(0) }}%</dd>
+          </div>
+          <div class="battle-page__stats-row">
+            <dt>Уклонение</dt>
+            <dd>{{ (playerEffectiveEvasion * 100).toFixed(0) }}%</dd>
+          </div>
+          <div class="battle-page__stats-row">
+            <dt>Скорость</dt>
+            <dd>{{ playerEffectiveSpeed.toFixed(1) }}</dd>
+          </div>
+          <div class="battle-page__stats-row">
+            <dt>Броня</dt>
+            <dd>{{ playerArmor }}</dd>
+          </div>
+          <div class="battle-page__stats-row">
+            <dt>Здоровье</dt>
+            <dd>{{ player.stats.hp }} / {{ player.stats.maxHp }}</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="battle-page__abilities-center">
+        <BattleAbilityBars
+          :panels="skillsStore.panels"
+          :is-battle-over="isBattleOver"
+          :is-ability-ready="isAbilityReady"
+          :ability-cooldown-text="abilityCooldownText"
+          :cooldown-left-ms="cooldownLeftMs"
+          :own-cooldown-left-ms="ownCooldownLeftMs"
+          :effective-max-cooldown-ms="effectiveMaxCooldownMs"
+          @use-ability="handleAbility"
+        />
+      </div>
+      <div class="battle-page__stats-panel battle-page__stats-panel--boss">
+        <h3 class="battle-page__stats-title">{{ boss.name }}</h3>
+        <dl class="battle-page__stats-list">
+          <div class="battle-page__stats-row">
+            <dt>Сила</dt>
+            <dd>{{ boss.stats.power }}</dd>
+          </div>
+          <div class="battle-page__stats-row">
+            <dt>Крит</dt>
+            <dd>{{ (boss.stats.chanceCrit * 100).toFixed(0) }}%</dd>
+          </div>
+          <div class="battle-page__stats-row">
+            <dt>Уклонение</dt>
+            <dd>{{ (boss.stats.evasion * 100).toFixed(0) }}%</dd>
+          </div>
+          <div class="battle-page__stats-row">
+            <dt>Скорость</dt>
+            <dd>{{ (boss.stats.speed ?? 2).toFixed(1) }}</dd>
+          </div>
+          <div class="battle-page__stats-row">
+            <dt>Броня</dt>
+            <dd>{{ bossEffectiveArmor }}</dd>
+          </div>
+          <div class="battle-page__stats-row">
+            <dt>Здоровье</dt>
+            <dd>{{ boss.stats.hp }} / {{ boss.stats.maxHp }}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
 
     <BattleResult
       v-if="isBattleOver"

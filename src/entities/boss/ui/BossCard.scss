@@ -1,9 +1,10 @@
 .boss-card {
   flex: 1;
+  min-height: 100%;
   background: rgba(15, 23, 42, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 16px 14px;
+  padding: 8px;
   display: flex;
   flex-direction: row;
   align-items: flex-start;
@@ -57,7 +58,14 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
+    min-height: 0;
+  }
+
+  /* Всегда резервируем место под блок каста — верстка не прыгает при применении способности боссом */
+  &__cast-slot {
+    min-height: 58px;
+    flex-shrink: 0;
   }
 
   &__title {
@@ -80,6 +88,12 @@
     gap: 6px 12px;
     font-size: 13px;
     opacity: 0.9;
+  }
+
+  &__effects-wrap {
+    flex-shrink: 0;
+    /* Резервируем место под два ряда эффектов (36px + 4px + 36px) — верстка не прыгает при появлении дебаффов */
+    min-height: 76px;
   }
 
   &__effects {

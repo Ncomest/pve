@@ -653,6 +653,7 @@
         "canBeInterrupted": true,
         "description": "Схватка когтями наносит урон и вызывает кровотечение на 8 секунд",
         "baseDamageX": 1.2,
+        "debuffType": "bleed",
         "dotDurationMs": 8000,
         "dotTickIntervalMs": 2000,
         "dotDamagePerTick": 12
@@ -695,7 +696,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Медведь восстанавливает здоровье. Прерывается Rebuke",
-        "value": 80
+        "value": 800
       }
     ],
     "abilityConfig": {

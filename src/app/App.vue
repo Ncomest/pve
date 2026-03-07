@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RouterView, RouterLink } from "vue-router";
+import { RouterView, RouterLink, useRoute } from "vue-router";
 import { computed } from "vue";
 import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
 import { usePlayerHp } from "@/features/character/model/usePlayerHp";
@@ -49,11 +49,14 @@ const hpBarStyle = computed(() => {
     background: color,
   };
 });
+
+const route = useRoute();
+const isBattlePage = computed(() => route.name === "battle");
 </script>
 
 <template>
   <div class="app-root">
-    <header class="app-header">
+    <header v-if="!isBattlePage" class="app-header">
       <!-- Статус персонажа вместо логотипа -->
       <div class="char-status">
         <div class="char-status__level">

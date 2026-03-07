@@ -24,6 +24,13 @@ import { createItemInstance } from "@/entities/item/lib/createInstance";
 import type { ItemInstance } from "@/entities/item/model";
 import { useDamageNumbers } from "@/shared/ui/DamageNumbers/useDamageNumbers";
 
+/** Тип записи лога боя для цветовой подсветки */
+export type BattleLogEntryType = "player-damage" | "boss-damage" | "player-dodge" | "boss-dodge" | "other";
+export interface BattleLogEntry {
+  text: string;
+  type: BattleLogEntryType;
+}
+
 const rng = () => Math.random();
 
 const cloneStats = (stats: Stats): Stats => ({
@@ -130,7 +137,7 @@ export function useBattle(bossId: () => string | undefined) {
     applySelectedBoss();
   });
 
-  const battleLog = ref<string[]>([]);
+  const battleLog = ref<BattleLogEntry[]>([]);
 
   /** Комбо-поинты (0–6) для класса «Клинок и Яд» и др. */
   const comboPoints = ref(0);
@@ -158,8 +165,13 @@ export function useBattle(bossId: () => string | undefined) {
   /** Яд от способности босса «Зараженный укус» по игроку */
   let infectedBiteIntervalId: ReturnType<typeof setInterval> | null = null;
   let infectedBiteEndTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** Кровотечение от способности босса «Медвежья хватка» по игроку */
+  let bearHugIntervalId: ReturnType<typeof setInterval> | null = null;
+  let bearHugEndTimeoutId: ReturnType<typeof setTimeout> | null = null;
   /** Баф босса от «Заострить клыки» (таймер жизни бафа) */
   let sharpenTusksTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** Баф босса от «Рёв» (усиление урона на время) */
+  let roarTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   // --- Защитные баффы игрока ---
 
@@ -196,8 +208,8 @@ export function useBattle(bossId: () => string | undefined) {
   /** Состояние хода для applyEffects (spentCombo, cunningConsumed) */
   const effectTurnState = reactive<{ spentCombo?: number; cunningConsumed?: boolean }>({});
 
-  const pushLog = (line: string) => {
-    battleLog.value = [line, ...battleLog.value].slice(0, 12);
+  const pushLog = (line: string, type: BattleLogEntryType = "other") => {
+    battleLog.value = [{ text: line, type }, ...battleLog.value].slice(0, 12);
   };
 
   /** Общий тикер: обновляет durationSeconds всех активных эффектов */
@@ -330,6 +342,29 @@ export function useBattle(bossId: () => string | undefined) {
 
   const playerPower = computed(() => player.stats.power + powerBoostValue.value);
 
+  /** Эффективный крит героя (база + бафф «Размашистый удар» и т.п.) для отображения в UI */
+  const playerEffectiveCrit = computed(() =>
+    Math.min(1, player.stats.chanceCrit + sweepingCritBonus.value),
+  );
+  /** Эффективное уклонение героя (база + бафф «Ускользание») для отображения в UI */
+  const playerEffectiveEvasion = computed(() =>
+    Math.min(1, player.stats.evasion + playerEvasionBonus.value),
+  );
+  /** Эффективная скорость героя (база × (1 + бонус), напр. «Молниеносная вспышка») для отображения */
+  const playerEffectiveSpeed = computed(() => {
+    const base = player.stats.speed ?? 2;
+    return base * (1 + speedBonus.value);
+  });
+  /** Броня героя (пока без баффов) */
+  const playerArmor = computed(() => player.stats.armor ?? 0);
+  /** Эффективная броня босса с учётом дебаффа (срез брони) */
+  const bossEffectiveArmor = computed(() => {
+    const base = boss.stats.armor ?? 0;
+    const debuff = bossArmorDebuff.value;
+    if (!debuff) return base;
+    return Math.max(0, base - debuff.value);
+  });
+
   const stopPowerBoostTimer = () => {
     if (powerBoostTimer === null) return;
     window.clearInterval(powerBoostTimer);
@@ -398,12 +433,32 @@ export function useBattle(bossId: () => string | undefined) {
     playerDebuffs.value = playerDebuffs.value.filter((e) => e.id !== "infected-bite");
   };
 
+  const clearBearHugBleed = () => {
+    if (bearHugIntervalId !== null) {
+      clearInterval(bearHugIntervalId);
+      bearHugIntervalId = null;
+    }
+    if (bearHugEndTimeoutId !== null) {
+      clearTimeout(bearHugEndTimeoutId);
+      bearHugEndTimeoutId = null;
+    }
+    playerDebuffs.value = playerDebuffs.value.filter((e) => e.id !== "bear-hug");
+  };
+
   const clearSharpenTusksBuff = () => {
     if (sharpenTusksTimeoutId !== null) {
       clearTimeout(sharpenTusksTimeoutId);
       sharpenTusksTimeoutId = null;
     }
     bossBuffs.value = bossBuffs.value.filter((e) => e.id !== "sharpen-tusks");
+  };
+
+  const clearRoarBuff = () => {
+    if (roarTimeoutId !== null) {
+      clearTimeout(roarTimeoutId);
+      roarTimeoutId = null;
+    }
+    bossBuffs.value = bossBuffs.value.filter((e) => e.id !== "roar");
   };
 
   /** Добавляет комбо-поинты, не превышая максимума */
@@ -511,7 +566,7 @@ export function useBattle(bossId: () => string | undefined) {
       const { damage, isCrit, isDodged } = calcHit(attacker, defenderStats, ability.critMultiplier ?? DEFAULT_CRIT_MULTIPLIER);
 
       if (isDodged) {
-        pushLog(`${ability.name}: босс уклонился.`);
+        pushLog(`${ability.name}: босс уклонился.`, "boss-dodge");
       } else {
         // «Коварство»: Коварный удар наносит +100% урона
         let finalDamage = damage;
@@ -579,7 +634,7 @@ export function useBattle(bossId: () => string | undefined) {
           logParts.push(`+${Math.round(ability.selfBuffCritPercent * 100)}% крит на ${ability.selfBuffCritDurationMs / 1000}с`);
         }
 
-        pushLog(logParts.join(". "));
+        pushLog(logParts.join(". "), "player-damage");
       }
 
       triggerCooldowns(ability.id, ability.cooldownMs);
@@ -590,7 +645,7 @@ export function useBattle(bossId: () => string | undefined) {
     if (ability.role === "finisher" && ability.baseDamageX !== undefined) {
       const costMin = ability.comboCostMin ?? 1;
       if (comboPoints.value < costMin) {
-        pushLog(`${ability.name}: нужно минимум ${costMin} комбо-поинтов (сейчас ${comboPoints.value}).`);
+        pushLog(`${ability.name}: нужно минимум ${costMin} комбо-поинтов (сейчас ${comboPoints.value}).`, "other");
         return;
       }
 
@@ -655,9 +710,9 @@ export function useBattle(bossId: () => string | undefined) {
               cunningBuffTimerId = null;
             }, procBuffDurationMs);
 
-            pushLog(`Яд (${ability.name}): −${tickDmg} HP. Сработало «Коварство»!`);
+            pushLog(`Яд (${ability.name}): −${tickDmg} HP. Сработало «Коварство»!`, "player-damage");
           } else {
-            pushLog(`Яд (${ability.name}): −${tickDmg} HP у босса.`);
+            pushLog(`Яд (${ability.name}): −${tickDmg} HP у босса.`, "player-damage");
           }
         }, ability.dotTickIntervalMs);
 
@@ -670,7 +725,7 @@ export function useBattle(bossId: () => string | undefined) {
           bossDebuffs.value = bossDebuffs.value.filter((e) => e.id !== ability.id);
         }, ability.dotDurationMs);
 
-        pushLog(`${ability.name}: ${instantDmg} урона мгновенно + яд ${Math.round(ability.dotDurationMs / 1000)}с (${n} комбо). Комбо сброшено.`);
+        pushLog(`${ability.name}: ${instantDmg} урона мгновенно + яд ${Math.round(ability.dotDurationMs / 1000)}с (${n} комбо). Комбо сброшено.`, "player-damage");
         triggerCooldowns(ability.id, ability.cooldownMs);
         return;
       }
@@ -686,7 +741,7 @@ export function useBattle(bossId: () => string | undefined) {
       const stackNote = eviscerateStacks.value > 0
         ? ` (+${Math.round(stackBonus * 100)}% от ${eviscerateStacks.value} стак.)`
         : "";
-      pushLog(`${ability.name}: ${baseDmg} урона${stackNote} (${n} комбо). Комбо сброшено.`);
+      pushLog(`${ability.name}: ${baseDmg} урона${stackNote} (${n} комбо). Комбо сброшено.`, "player-damage");
 
       // Тратим все стаки «Потрошение»
       eviscerateStacks.value = 0;
@@ -708,7 +763,7 @@ export function useBattle(bossId: () => string | undefined) {
         boss.stats.hp -= dmg;
         clampHp(boss.stats);
         spawnBossDmg(dmg, "damage");
-        pushLog(`Ты нанёс ${dmg} урона и наложил кровотечение.`);
+        pushLog(`Ты нанёс ${dmg} урона и наложил кровотечение.`, "player-damage");
 
         clearBossBleed();
         const endTime = Date.now() + ability.bleedDurationMs;
@@ -727,7 +782,7 @@ export function useBattle(bossId: () => string | undefined) {
           boss.stats.hp -= tickDmg;
           clampHp(boss.stats);
           spawnBossDmg(tickDmg, "damage");
-          pushLog(`Кровотечение: −${tickDmg} HP у босса.`);
+          pushLog(`Кровотечение: −${tickDmg} HP у босса.`, "player-damage");
         }, ability.bleedTickIntervalMs);
         bleedEndTimeoutId = setTimeout(clearBossBleed, ability.bleedDurationMs);
         triggerCooldowns(ability.id, ability.cooldownMs);
@@ -740,7 +795,7 @@ export function useBattle(bossId: () => string | undefined) {
         boss.stats.hp -= dmg;
         clampHp(boss.stats);
         spawnBossDmg(dmg, "damage");
-        pushLog(`Ты нанёс ${dmg} урона и снизил броню босса на ${ability.armorDebuff}.`);
+        pushLog(`Ты нанёс ${dmg} урона и снизил броню босса на ${ability.armorDebuff}.`, "player-damage");
 
         clearBossArmorDebuff();
         const endTime = Date.now() + ability.armorDebuffDurationMs;
@@ -765,12 +820,12 @@ export function useBattle(bossId: () => string | undefined) {
       const { damage, isCrit, isDodged } = calcHit(attacker, defenderStats, ability.critMultiplier ?? DEFAULT_CRIT_MULTIPLIER);
       if (isDodged) {
         spawnBossDmg("Уклон", "dodge");
-        pushLog("Ты атаковал, но босс уклонился.");
+        pushLog("Ты атаковал, но босс уклонился.", "boss-dodge");
       } else {
         boss.stats.hp -= damage;
         clampHp(boss.stats);
         spawnBossDmg(damage, "damage", isCrit);
-        pushLog(`Ты нанёс ${damage} урона${isCrit ? " (крит)" : ""}.`);
+        pushLog(`Ты нанёс ${damage} урона${isCrit ? " (крит)" : ""}.`, "player-damage");
       }
       triggerCooldowns(ability.id, ability.cooldownMs);
       return;
@@ -987,6 +1042,9 @@ export function useBattle(bossId: () => string | undefined) {
   let bossCastTimerId: number | null = null;
 
   const lastBossAbilityId = ref<string | null>(null);
+  /** Хранит «ход» последнего использования способности (для чередования) */
+  let bossAbilityLastUsedTurn: Record<string, number> = {};
+  let bossAbilityTurnCounter = 0;
   let nextBossAbilityTimeoutId: number | null = null;
 
   const clearBossCastTimer = () => {
@@ -1016,8 +1074,12 @@ export function useBattle(bossId: () => string | undefined) {
     scheduleNextBossAbility();
   };
 
-  const getBossEffectivePower = () =>
-    boss.stats.power * (bossBuffs.value.some((e) => e.id === "sharpen-tusks") ? 2 : 1);
+  const getBossEffectivePower = () => {
+    let mult = 1;
+    if (bossBuffs.value.some((e) => e.id === "sharpen-tusks")) mult *= 2;
+    if (bossBuffs.value.some((e) => e.id === "roar")) mult *= 1.4; // selfBuffValue 0.4 = +40%
+    return boss.stats.power * mult;
+  };
 
   const scheduleNextBossAbility = (delayMs?: number) => {
     if (!bossAbilityConfig.value || bossAbilities.value.length === 0) return;
@@ -1031,14 +1093,20 @@ export function useBattle(bossId: () => string | undefined) {
       // Не кастуем, если уже идёт каст
       if (bossCastState.value === "casting") return;
 
-      const pool = bossAbilities.value.filter(
+      let pool = bossAbilities.value.filter(
         (a) => !bossAbilityConfig.value?.preventConsecutiveRepeat || a.id !== lastBossAbilityId.value,
       );
       if (!pool.length) {
-        // если всё отфильтровали — разрешаем повтор
-        pool.push(...bossAbilities.value);
+        pool = [...bossAbilities.value];
       }
-      const ability = pool[Math.floor(Math.random() * pool.length)];
+      // Выбираем способность, которую дольше всего не использовали (чередование)
+      const minTurn = Math.min(
+        ...pool.map((a) => bossAbilityLastUsedTurn[a.id] ?? -1),
+      );
+      const leastUsed = pool.filter(
+        (a) => (bossAbilityLastUsedTurn[a.id] ?? -1) === minTurn,
+      );
+      const ability = leastUsed[Math.floor(Math.random() * leastUsed.length)];
       if (!ability) return;
 
       // Старт каста: останавливаем автоатаку
@@ -1100,7 +1168,7 @@ export function useBattle(bossId: () => string | undefined) {
         dodgeNextExpireTimerId = null;
       }
       playerBuffs.value = playerBuffs.value.filter((e) => e.id !== "dodge");
-      pushLog(`Босс применяет ${ability.name}, но ты увернулся (Уворот)!`);
+      pushLog(`Босс применяет ${ability.name}, но ты увернулся (Уворот)!`, "player-dodge");
       return { hit: false };
     }
 
@@ -1117,7 +1185,7 @@ export function useBattle(bossId: () => string | undefined) {
 
     if (isDodged) {
       spawnPlayerDmg("Уклон", "dodge");
-      pushLog(`Босс применил ${ability.name}, но ты уклонился.`);
+      pushLog(`Босс применил ${ability.name}, но ты уклонился.`, "player-dodge");
       return { hit: false };
     }
 
@@ -1155,12 +1223,16 @@ export function useBattle(bossId: () => string | undefined) {
       `${ability.name}: босс нанёс ${finalDmg} урона${
         isCrit ? " (крит)" : ""
       }${defenseNote}${reductionNote}.`,
+      "boss-damage",
     );
     return { hit: true };
   };
 
   const applyBossAbilityEffects = (ability: BossAbility) => {
     if (isBattleOver.value) return;
+
+    bossAbilityTurnCounter += 1;
+    bossAbilityLastUsedTurn[ability.id] = bossAbilityTurnCounter;
 
     switch (ability.id) {
       case "sharpen-tusks": {
@@ -1188,6 +1260,37 @@ export function useBattle(bossId: () => string | undefined) {
           }, durationMs);
           pushLog(
             `${ability.name}: босс заостряет клыки — его урон увеличен в 2 раза на ${
+              durationMs / 1000
+            }с.`,
+          );
+        }
+        break;
+      }
+      case "roar": {
+        if (
+          ability.selfBuffType === "damage" &&
+          ability.selfBuffDurationMs &&
+          ability.selfBuffValue != null
+        ) {
+          clearRoarBuff();
+          const durationMs = ability.selfBuffDurationMs;
+          const endTime = Date.now() + durationMs;
+          bossBuffs.value = [
+            ...bossBuffs.value.filter((e) => e.id !== "roar"),
+            {
+              id: "roar",
+              name: ability.name,
+              icon: ability.icon ?? "IconPowerBoost",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              dispellable: ability.dispellable ?? true,
+            },
+          ];
+          roarTimeoutId = window.setTimeout(() => {
+            clearRoarBuff();
+          }, durationMs);
+          pushLog(
+            `${ability.name}: урон босса увеличен на ${Math.round((ability.selfBuffValue ?? 0) * 100)}% на ${
               durationMs / 1000
             }с.`,
           );
@@ -1236,7 +1339,7 @@ export function useBattle(bossId: () => string | undefined) {
             player.stats.hp -= damagePerTick;
             clampHp(player.stats);
             spawnPlayerDmg(damagePerTick, "player-damage");
-            pushLog(`Яд (${ability.name}): −${damagePerTick} HP у героя.`);
+            pushLog(`Яд (${ability.name}): −${damagePerTick} HP у героя.`, "boss-damage");
           }, tickMs);
 
           infectedBiteEndTimeoutId = window.setTimeout(() => {
@@ -1247,6 +1350,61 @@ export function useBattle(bossId: () => string | undefined) {
             `${ability.name}: яд будет наносить ${damagePerTick} урона каждые ${
               tickMs / 1000
             }с в течение ${durationMs / 1000}с. Снимайте Cleanse.`,
+          );
+        }
+        break;
+      }
+      case "bear-hug": {
+        const result = applyBossAbilityHit(ability);
+        if (!result.hit) return;
+
+        if (
+          ability.dotDurationMs &&
+          ability.dotTickIntervalMs &&
+          ability.dotDamagePerTick != null
+        ) {
+          clearBearHugBleed();
+          const durationMs = ability.dotDurationMs;
+          const tickMs = ability.dotTickIntervalMs;
+          const damagePerTick = ability.dotDamagePerTick;
+          const endTime = Date.now() + durationMs;
+
+          playerDebuffs.value = [
+            ...playerDebuffs.value.filter((e) => e.id !== "bear-hug"),
+            {
+              id: "bear-hug",
+              name: ability.name,
+              icon: ability.icon ?? "IconBleed",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              debuffType: ability.debuffType ?? "other",
+            },
+          ];
+
+          bearHugIntervalId = window.setInterval(() => {
+            if (isBattleOver.value) {
+              clearBearHugBleed();
+              return;
+            }
+            const debuffActive = playerDebuffs.value.some((e) => e.id === "bear-hug");
+            if (!debuffActive || Date.now() >= endTime) {
+              clearBearHugBleed();
+              return;
+            }
+            player.stats.hp -= damagePerTick;
+            clampHp(player.stats);
+            spawnPlayerDmg(damagePerTick, "player-damage");
+            pushLog(`Кровотечение (${ability.name}): −${damagePerTick} HP у героя.`, "boss-damage");
+          }, tickMs);
+
+          bearHugEndTimeoutId = window.setTimeout(() => {
+            clearBearHugBleed();
+          }, durationMs);
+
+          pushLog(
+            `${ability.name}: кровотечение наносит ${damagePerTick} урона каждые ${
+              tickMs / 1000
+            }с в течение ${durationMs / 1000}с.`,
           );
         }
         break;
@@ -1330,7 +1488,7 @@ export function useBattle(bossId: () => string | undefined) {
 
       if (isDodged) {
         spawnPlayerDmg("Уклон", "dodge");
-        pushLog("Босс атаковал, но ты уклонился.");
+        pushLog("Босс атаковал, но ты уклонился.", "player-dodge");
       } else {
         // «Плащ теней»: снижение получаемого урона
         const reduced = Math.round(damage * (1 - damageReductionPercent.value));
@@ -1339,7 +1497,7 @@ export function useBattle(bossId: () => string | undefined) {
         clampHp(player.stats);
         spawnPlayerDmg(finalDmg, "player-damage", isCrit);
         const reductionNote = damageReductionPercent.value > 0 ? ` (−${Math.round(damageReductionPercent.value * 100)}% Плащ)` : "";
-        pushLog(`Босс нанёс ${finalDmg} урона${isCrit ? " (крит)" : ""}${reductionNote}.`);
+        pushLog(`Босс нанёс ${finalDmg} урона${isCrit ? " (крит)" : ""}${reductionNote}.`, "boss-damage");
       }
 
       scheduleNextBossAttack();
@@ -1407,8 +1565,12 @@ export function useBattle(bossId: () => string | undefined) {
     clearBossArmorDebuff();
     clearPoisonDot("poisonous-bite");
     clearInfectedBitePoison();
+    clearBearHugBleed();
     clearSharpenTusksBuff();
+    clearRoarBuff();
 
+    bossAbilityLastUsedTurn = {};
+    bossAbilityTurnCounter = 0;
     battleTimeMs.value = 0;
     scheduleNextBossAttack();
     startBattleTimer();
@@ -1438,7 +1600,9 @@ export function useBattle(bossId: () => string | undefined) {
       clearBossArmorDebuff();
       clearPoisonDot("poisonous-bite");
       clearInfectedBitePoison();
+      clearBearHugBleed();
       clearSharpenTusksBuff();
+      clearRoarBuff();
       stopBattleTimer();
       // Сохраняем финальное HP сразу после окончания боя
       playerHp.saveHp();
@@ -1500,7 +1664,9 @@ export function useBattle(bossId: () => string | undefined) {
     if (poisonDotIntervalId !== null) clearInterval(poisonDotIntervalId);
     if (poisonDotEndTimeoutId !== null) clearTimeout(poisonDotEndTimeoutId);
     clearInfectedBitePoison();
+    clearBearHugBleed();
     clearSharpenTusksBuff();
+    clearRoarBuff();
     clearBossCastTimer();
     if (nextBossAbilityTimeoutId !== null) {
       window.clearTimeout(nextBossAbilityTimeoutId);
@@ -1529,6 +1695,11 @@ export function useBattle(bossId: () => string | undefined) {
     powerBoostLeftMs,
     powerBoostValue,
     playerPower,
+    playerEffectiveCrit,
+    playerEffectiveEvasion,
+    playerEffectiveSpeed,
+    playerArmor,
+    bossEffectiveArmor,
     loot,
     showLoot,
     takeLootItem,

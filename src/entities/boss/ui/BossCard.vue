@@ -131,7 +131,8 @@ const castCategoryClass = computed(() => {
         :max="maxHp"
         variant="boss"
       />
-      <div v-if="hasCast" class="boss-card__cast">
+      <div class="boss-card__cast-slot">
+        <div v-if="hasCast" class="boss-card__cast">
         <div class="boss-card__cast-header">
           <div class="boss-card__cast-icon">
             <img
@@ -187,12 +188,15 @@ const castCategoryClass = computed(() => {
             </div>
           </div>
         </div>
+        </div>
       </div>
-      <EffectSlots
-        :buffs="buffs ?? []"
-        :debuffs="debuffs ?? []"
-        class="boss-card__effects"
-      />
+      <div class="boss-card__effects-wrap">
+        <EffectSlots
+          :buffs="buffs ?? []"
+          :debuffs="debuffs ?? []"
+          class="boss-card__effects"
+        />
+      </div>
     </div>
   </div>
 </template>

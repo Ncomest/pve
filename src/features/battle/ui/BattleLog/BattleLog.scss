@@ -21,12 +21,58 @@
     flex-direction: column;
     gap: 6px;
     overflow-y: auto;
-    padding-right: 4px;
+    padding-right: 2px;
+
+    /* Стилизованная полоса прокрутки под общий стиль */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.5) rgba(15, 23, 42, 0.8);
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.5);
+      border-radius: 4px;
+
+      &:hover {
+        background: rgba(148, 163, 184, 0.7);
+      }
+
+      &:active {
+        background: rgba(148, 163, 184, 0.85);
+      }
+    }
   }
 
   &__line {
     font-size: 13px;
-    opacity: 0.9;
+    opacity: 0.95;
     word-break: break-word;
+
+    &--player-damage {
+      color: #facc15; /* жёлтый — твой урон по боссу */
+    }
+
+    &--boss-damage {
+      color: #ef4444; /* красный — урон босса по тебе */
+    }
+
+    &--player-dodge {
+      color: #a855f7; /* фиолетовый — ты увернулся */
+    }
+
+    &--boss-dodge {
+      color: #ec4899; /* розовый — босс уклонился */
+    }
+
+    &--other {
+      color: rgba(255, 255, 255, 0.88);
+    }
   }
 }

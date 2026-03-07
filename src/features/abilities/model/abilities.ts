@@ -7,10 +7,10 @@ export const ABILITIES: Ability[] = [
     name: "Лечение",
     description: "Вы выпиваете эликсир и восстанавливаете 40 ед здоровья",
     type: "heal",
-    value: 40,
+    value: 2000,
     cooldownMs: 12000,
     icon: "/images/hero/ability/heal_potion.png",
-    effects: [{ kind: "heal", value: 40 }],
+    effects: [{ kind: "heal", value: 2000 }],
   },
   {
     id: "rebuke",
@@ -93,7 +93,7 @@ export const ABILITIES: Ability[] = [
       {
         kind: "cleanse",
         target: "self",
-        debuffTypes: ["poison", "curse", "burn"],
+        debuffTypes: ["poison", "curse", "burn", "bleed"],
       },
     ],
   },

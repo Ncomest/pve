@@ -9,7 +9,7 @@ export interface Character {
 }
 
 export const PLAYER_CHARACTER: Character = {
-  name: "Герой Арены",
+  name: "Герой",
   level: 1,
   xp: 0,
   xpToNext: 100,
