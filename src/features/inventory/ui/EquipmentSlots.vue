@@ -5,7 +5,6 @@ import { getDisplayItem } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
 import { rarityColor } from "@/entities/item/lib/rarityColor";
 import { useHeroAvatar } from "@/features/inventory/model/useHeroAvatar";
-import "./EquipmentSlots.scss";
 
 interface SlotEntry {
   slot: EquipmentSlot;
@@ -243,3 +242,5 @@ function getDisplay(inst: ItemInstance | null) {
     </div>
   </section>
 </template>
+
+<style lang="scss" src="./EquipmentSlots.scss"></style>
