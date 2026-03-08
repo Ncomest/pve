@@ -3,6 +3,7 @@ import type { EquipmentSlot, ItemInstance } from "@/entities/item/model";
 import { getEffectiveStats } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
 import { getDisplayItem } from "@/entities/item/model";
+import { critPointsToFraction, evasionPointsToFraction } from "@/entities/item/lib/statPoints";
 import { getItemSellPrice } from "@/shared/lib/merchant/getItemSellPrice";
 import { MERCHANT_STOCK } from "@/entities/merchant/model/merchant-stock";
 import { generateInstanceId } from "@/entities/item/lib/createInstance";
@@ -16,17 +17,6 @@ interface CharacterState {
 
 const MAX_INVENTORY_SIZE = 30;
 const STARTING_GOLD = 100;
-
-/** Стартовые шаблоны для нового персонажа (все с itemLevel 1). */
-const STARTER_TEMPLATE_IDS = [
-  "weapon-1",
-  "shield-1",
-  "ring-1",
-  "belt-1",
-  "pants-1",
-  "boots-1",
-  "necklace-1",
-];
 
 /** Проверяет, что объект — старый формат вещи (Item с stats без templateId). */
 function isOldFormatItem(value: unknown): value is { id: string; stats?: unknown } {
@@ -67,6 +57,8 @@ export const useCharacterStore = defineStore("character", {
   getters: {
     equipmentStats(state) {
       const stats = { hp: 0, power: 0, chanceCrit: 0, evasion: 0, speed: 0, armor: 0 };
+      let critPoints = 0;
+      let evasionPoints = 0;
       for (const instance of Object.values(state.equipped)) {
         if (!instance) continue;
         const template = getTemplate(instance.templateId);
@@ -74,11 +66,13 @@ export const useCharacterStore = defineStore("character", {
         const effective = getEffectiveStats(template.baseStats, instance.itemLevel);
         stats.hp += effective.hp ?? 0;
         stats.power += effective.power ?? 0;
-        stats.chanceCrit += effective.chanceCrit ?? 0;
-        stats.evasion += effective.evasion ?? 0;
+        critPoints += effective.chanceCrit ?? 0;
+        evasionPoints += effective.evasion ?? 0;
         stats.speed += effective.speed ?? 0;
         stats.armor += effective.armor ?? 0;
       }
+      stats.chanceCrit = critPointsToFraction(critPoints);
+      stats.evasion = evasionPointsToFraction(evasionPoints);
       return stats;
     },
 
@@ -112,16 +106,6 @@ export const useCharacterStore = defineStore("character", {
       // Миграция экипировки
       for (const slot of Object.keys(this.equipped) as EquipmentSlot[]) {
         this.equipped[slot] = migrateSlot(this.equipped[slot]);
-      }
-
-      const hasItems = this.inventory.some((slot) => slot !== null);
-      if (hasItems) return;
-
-      for (let i = 0; i < STARTER_TEMPLATE_IDS.length; i++) {
-        const templateId = STARTER_TEMPLATE_IDS[i];
-        if (getTemplate(templateId)) {
-          this.inventory[i] = createItemInstance(templateId, 1);
-        }
       }
     },
 

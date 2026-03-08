@@ -1,11 +1,10 @@
 import type { ItemStats, ItemTemplate, ItemInstance, Item } from "@/entities/item/model";
 
-/** Максимум для долей (крит, уклонение), чтобы не перегружать баланс */
-const MAX_FRACTION = 0.5;
-
 /**
  * Множитель статов от уровня вещи.
+ * Менять коэффициент 0.1 здесь, если нужно усилить/ослабить рост статов от уровня.
  * Формула: 1 + (itemLevel - 1) * 0.1 (например itemLevel 5 → 1.4).
+ * См. docs/balance-items.md.
  */
 export function getStatMultiplier(itemLevel: number): number {
   return 1 + (itemLevel - 1) * 0.1;
@@ -13,7 +12,7 @@ export function getStatMultiplier(itemLevel: number): number {
 
 /**
  * Эффективные статы вещи: базовые статы шаблона × множитель уровня.
- * Для hp, power, speed, armor — округление. Для chanceCrit, evasion — умножение и ограничение сверху.
+ * Для hp, power, speed, armor — округление. Для chanceCrit, evasion — очки (округлённые), перевод в % делается в store при подсчёте статов персонажа.
  */
 export function getEffectiveStats(
   baseStats: ItemStats,
@@ -28,10 +27,10 @@ export function getEffectiveStats(
   if (baseStats.armor != null) result.armor = Math.round(baseStats.armor * mult);
 
   if (baseStats.chanceCrit != null) {
-    result.chanceCrit = Math.min(MAX_FRACTION, baseStats.chanceCrit * mult);
+    result.chanceCrit = Math.round(baseStats.chanceCrit * mult);
   }
   if (baseStats.evasion != null) {
-    result.evasion = Math.min(MAX_FRACTION, baseStats.evasion * mult);
+    result.evasion = Math.round(baseStats.evasion * mult);
   }
 
   return result;

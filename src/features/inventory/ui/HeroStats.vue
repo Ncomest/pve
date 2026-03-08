@@ -20,7 +20,10 @@ interface StatRow {
   fmt: (v: number) => string;
 }
 
-const statRows = computed<StatRow[]>(() => [
+const statRows = computed<StatRow[]>(() => {
+  const hpBonusFromLevel = (level.value - 1) * 20;
+  const hpBonusTotal = hpBonusFromLevel + eq.value.hp;
+  return [
   {
     label: "Атака",
     base: base.power,
@@ -30,7 +33,7 @@ const statRows = computed<StatRow[]>(() => [
   {
     label: "Здоровье",
     base: base.maxHp,
-    bonus: eq.value.hp,
+    bonus: hpBonusTotal,
     fmt: (v) => String(v),
   },
   {
@@ -43,7 +46,7 @@ const statRows = computed<StatRow[]>(() => [
     label: "Крит",
     base: base.chanceCrit,
     bonus: eq.value.chanceCrit,
-    fmt: (v) => Math.round(v * 100) + "%",
+    fmt: (v) => (v * 100).toFixed(2) + "%",
   },
   {
     label: "Броня",
@@ -55,9 +58,10 @@ const statRows = computed<StatRow[]>(() => [
     label: "Уклонение",
     base: base.evasion,
     bonus: eq.value.evasion,
-    fmt: (v) => Math.round(v * 100) + "%",
+    fmt: (v) => (v * 100).toFixed(2) + "%",
   },
-]);
+];
+});
 
 const getMaxHp = () => {
   const bonusHp = (level.value - 1) * 20;

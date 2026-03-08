@@ -1,5 +1,13 @@
 import type { ItemTemplate, EquipmentSlot } from "@/entities/item/model";
 
+/**
+ * База шаблонов вещей и их статов.
+ *
+ * Баланс: базовые значения статов меняются в константе BASE ниже.
+ * Вес крита/уклонения (очки → %) — в lib/statPoints.ts.
+ * Подробнее: см. docs/balance-items.md.
+ */
+
 type Rarity = ItemTemplate["rarity"];
 
 const SLOTS: EquipmentSlot[] = [
@@ -15,17 +23,17 @@ const SLOTS: EquipmentSlot[] = [
   "necklace",
 ];
 
-/** Базовые значения статов для шаблонов (3 стата на вещь). */
+/** Базовые статы для шаблонов (у каждой вещи 3 стата из STAT_COMBOS). hp/power/speed/armor — числа как есть; chanceCrit и evasion — в очках (перевод в % в lib/statPoints.ts). */
 const BASE = {
   hp: 5,
-  power: 2,
-  chanceCrit: 0.05,
-  evasion: 0.03,
-  speed: 2,
-  armor: 3,
+  power: 1,
+  chanceCrit: 50,
+  evasion: 25,
+  speed: 1,
+  armor: 1,
 } as const;
 
-/** 10 комбинаций из 3 статов (для разнообразия лута). */
+/** Комбинации из 3 статов на вещь (менять при добавлении статов в BASE). */
 const STAT_COMBOS: (keyof typeof BASE)[][] = [
   ["hp", "power", "chanceCrit"],
   ["hp", "power", "evasion"],
