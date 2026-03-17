@@ -11,7 +11,6 @@ import {
   BattleAbilityBars,
   BattleLog,
   BattleResult,
-  LootPanel,
 } from "@/features/battle/ui";
 import IconFlee from "@/shared/ui/icons/IconFlee.vue";
 import DamageNumbers from "@/shared/ui/DamageNumbers/DamageNumbers.vue";
