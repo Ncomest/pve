@@ -1,4 +1,5 @@
-import type { ItemInstance } from "@/entities/item/model";
+import type { ItemInstance, ItemStats } from "@/entities/item/model";
+import { getTemplate } from "@/entities/item/items-db";
 
 /** Генерирует уникальный id экземпляра вещи. */
 export function generateInstanceId(): string {
@@ -13,9 +14,38 @@ export function createItemInstance(
   itemLevel: number,
   instanceId?: string
 ): ItemInstance {
+  const rolls = rollStatsForTemplate(templateId);
   return {
     instanceId: instanceId ?? generateInstanceId(),
     templateId,
     itemLevel,
+    rolls,
   };
+}
+
+/** Диапазоны роллов (множители) для статов: min/max применяются к base * level. */
+const STAT_ROLL_RANGES: Partial<Record<keyof ItemStats, { min: number; max: number }>> = {
+  hp: { min: 0.8, max: 1.2 },
+  power: { min: 0.8, max: 1.2 },
+  speed: { min: 0.8, max: 1.2 },
+  armor: { min: 0.4, max: 1.2 }, // пример: при базе 50 это примерно 20–60
+  chanceCrit: { min: 0.8, max: 1.2 },
+  evasion: { min: 0.8, max: 1.2 },
+};
+
+function rollStatsForTemplate(templateId: string): ItemInstance["rolls"] | undefined {
+  const template = getTemplate(templateId);
+  if (!template) return undefined;
+
+  const rolls: ItemInstance["rolls"] = {};
+  const baseStats = template.baseStats;
+
+  for (const key of Object.keys(baseStats) as (keyof ItemStats)[]) {
+    const range = STAT_ROLL_RANGES[key];
+    if (!range) continue;
+    const factor = range.min + Math.random() * (range.max - range.min);
+    rolls[key] = factor;
+  }
+
+  return Object.keys(rolls).length > 0 ? rolls : undefined;
 }

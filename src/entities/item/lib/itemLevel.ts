@@ -11,26 +11,50 @@ export function getStatMultiplier(itemLevel: number): number {
 }
 
 /**
- * Эффективные статы вещи: базовые статы шаблона × множитель уровня.
- * Для hp, power, speed, armor — округление. Для chanceCrit, evasion — очки (округлённые), перевод в % делается в store при подсчёте статов персонажа.
+ * Эффективные статы вещи: базовые статы шаблона × множитель уровня × индивидуальный ролл.
+ * Для hp, power, speed, armor — округление. Для chanceCrit, evasion — очки (округлённые),
+ * перевод в % делается в store при подсчёте статов персонажа.
+ *
+ * rolls — объект с множителями (например, 0.8–1.2) для конкретного экземпляра вещи.
  */
 export function getEffectiveStats(
   baseStats: ItemStats,
-  itemLevel: number
+  itemLevel: number,
+  rolls?: ItemInstance["rolls"],
 ): ItemStats {
   const mult = getStatMultiplier(itemLevel);
   const result: ItemStats = {};
 
-  if (baseStats.hp != null) result.hp = Math.round(baseStats.hp * mult);
-  if (baseStats.power != null) result.power = Math.round(baseStats.power * mult);
-  if (baseStats.speed != null) result.speed = Math.round(baseStats.speed * mult);
-  if (baseStats.armor != null) result.armor = Math.round(baseStats.armor * mult);
+  if (baseStats.hp != null) {
+    const base = baseStats.hp * mult;
+    const factor = rolls?.hp ?? 1;
+    result.hp = Math.round(base * factor);
+  }
+  if (baseStats.power != null) {
+    const base = baseStats.power * mult;
+    const factor = rolls?.power ?? 1;
+    result.power = Math.round(base * factor);
+  }
+  if (baseStats.speed != null) {
+    const base = baseStats.speed * mult;
+    const factor = rolls?.speed ?? 1;
+    result.speed = Math.round(base * factor);
+  }
+  if (baseStats.armor != null) {
+    const base = baseStats.armor * mult;
+    const factor = rolls?.armor ?? 1;
+    result.armor = Math.round(base * factor);
+  }
 
   if (baseStats.chanceCrit != null) {
-    result.chanceCrit = Math.round(baseStats.chanceCrit * mult);
+    const base = baseStats.chanceCrit * mult;
+    const factor = rolls?.chanceCrit ?? 1;
+    result.chanceCrit = Math.round(base * factor);
   }
   if (baseStats.evasion != null) {
-    result.evasion = Math.round(baseStats.evasion * mult);
+    const base = baseStats.evasion * mult;
+    const factor = rolls?.evasion ?? 1;
+    result.evasion = Math.round(base * factor);
   }
 
   return result;
@@ -47,7 +71,7 @@ export function getDisplayItem(
   const template = getTemplate(instance.templateId);
   if (!template) return null;
 
-  const stats = getEffectiveStats(template.baseStats, instance.itemLevel);
+  const stats = getEffectiveStats(template.baseStats, instance.itemLevel, instance.rolls);
   return {
     id: instance.instanceId,
     name: template.name,

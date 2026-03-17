@@ -5,6 +5,7 @@ import { useCharacterStore } from "@/app/store/character";
 import { computed } from "vue";
 import { PLAYER_CHARACTER } from "@/entities/character/model";
 import { useHeroAvatar } from "@/features/inventory/model/useHeroAvatar";
+import { speedPointsToFraction, armorPointsToFraction } from "@/entities/item/lib/statPoints";
 import "./HeroStats.scss";
 
 const { level, xp, xpToNext, percentToNext } = usePlayerProgress();
@@ -24,43 +25,43 @@ const statRows = computed<StatRow[]>(() => {
   const hpBonusFromLevel = (level.value - 1) * 20;
   const hpBonusTotal = hpBonusFromLevel + eq.value.hp;
   return [
-  {
-    label: "Атака",
-    base: base.power,
-    bonus: eq.value.power,
-    fmt: (v) => String(v),
-  },
-  {
-    label: "Здоровье",
-    base: base.maxHp,
-    bonus: hpBonusTotal,
-    fmt: (v) => String(v),
-  },
-  {
-    label: "Скорость",
-    base: base.speed,
-    bonus: eq.value.speed,
-    fmt: (v) => String(v),
-  },
-  {
-    label: "Крит",
-    base: base.chanceCrit,
-    bonus: eq.value.chanceCrit,
-    fmt: (v) => (v * 100).toFixed(2) + "%",
-  },
-  {
-    label: "Броня",
-    base: base.armor,
-    bonus: eq.value.armor,
-    fmt: (v) => String(v),
-  },
-  {
-    label: "Уклонение",
-    base: base.evasion,
-    bonus: eq.value.evasion,
-    fmt: (v) => (v * 100).toFixed(2) + "%",
-  },
-];
+    {
+      label: "Атака",
+      base: base.power,
+      bonus: eq.value.power,
+      fmt: (v) => String(v),
+    },
+    {
+      label: "Здоровье",
+      base: base.maxHp,
+      bonus: hpBonusTotal,
+      fmt: (v) => String(v),
+    },
+    {
+      label: "Скорость",
+      base: base.speed,
+      bonus: eq.value.speed,
+      fmt: (v) => (speedPointsToFraction(v) * 100).toFixed(2) + "%",
+    },
+    {
+      label: "Крит",
+      base: base.chanceCrit,
+      bonus: eq.value.chanceCrit,
+      fmt: (v) => (v * 100).toFixed(2) + "%",
+    },
+    {
+      label: "Броня",
+      base: base.armor,
+      bonus: eq.value.armor,
+      fmt: (v) => (armorPointsToFraction(v) * 100).toFixed(2) + "%",
+    },
+    {
+      label: "Уклонение",
+      base: base.evasion,
+      bonus: eq.value.evasion,
+      fmt: (v) => (v * 100).toFixed(2) + "%",
+    },
+  ];
 });
 
 const getMaxHp = () => {

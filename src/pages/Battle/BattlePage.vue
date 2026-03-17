@@ -107,6 +107,10 @@ const currentBossAbilityDebuffType = computed(() =>
     : undefined,
 );
 
+const isVictory = computed(
+  () => isBattleOver.value && boss.stats.hp <= 0 && player.stats.hp > 0,
+);
+
 const handleFlee = () => router.push({ name: "boss-select" });
 
 function onKeyDown(event: KeyboardEvent) {
@@ -272,14 +276,13 @@ onUnmounted(() => {
     <BattleResult
       v-if="isBattleOver"
       :winner-text="winnerText"
+      :is-victory="isVictory"
+      :loot="loot"
+      :show-loot="showLoot"
+      @take-item="takeLootItem"
       @replay="resetBattle"
       @go-to-boss-select="handleFlee"
-    />
-
-    <LootPanel
-      v-if="showLoot && loot.length"
-      :items="loot"
-      @take-item="takeLootItem"
+      @continue="handleFlee"
     />
 
     <BattleLog :lines="battleLog" />

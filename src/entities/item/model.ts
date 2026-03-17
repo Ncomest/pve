@@ -33,6 +33,11 @@ export interface ItemInstance {
   instanceId: string;
   templateId: string;
   itemLevel: number;
+  /**
+   * Индивидуальные роллы статов для конкретного экземпляра вещи.
+   * Хранятся как множители (например, 0.8–1.2), которые применяются к baseStats * level.
+   */
+  rolls?: ItemStats;
 }
 
 /** Отображаемый вид вещи (для UI): id = instanceId, stats уже эффективные. */

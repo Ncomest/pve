@@ -85,10 +85,11 @@ const isBattlePage = computed(() => route.name === "battle");
       </div>
 
       <div class="app-header__gold">
-        <svg class="app-header__gold-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" fill="none"/>
-          <path d="M12 6v12M9 9h6M9 15h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
+        <img
+          src="/images/currencies/coin.png"
+          alt="Золото"
+          class="app-header__gold-icon"
+        />
         <span class="app-header__gold-value">{{ gold }}</span>
       </div>
 

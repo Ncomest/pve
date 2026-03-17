@@ -10,7 +10,7 @@ import {
 import { getDisplayItem } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
 import { rarityColor } from "@/entities/item/lib/rarityColor";
-import { SLOT_NAMES } from "@/entities/item/model";
+import { SLOT_NAMES, type EquipmentSlot } from "@/entities/item/model";
 import InventoryGrid from "@/features/inventory/ui/InventoryGrid.vue";
 import "./MerchantPage.scss";
 
@@ -68,16 +68,22 @@ function buyItem(offer: MerchantOffer) {
   else showMessage("Инвентарь заполнен.");
 }
 
-// Иконки слотов для витрины (упрощённый набор)
-const SLOT_ICONS: Record<string, string[]> = {
-  weapon: ["M8 27 L25 8 M23 6 L28 6 L28 11 L24 10"],
-  shield: ["M16 3 L27 8 L27 18 Q27 27 16 31 Q5 27 5 18 L5 8 Z"],
-  ring: ["M16 18 m-9 0 a9 9 0 1 1 18 0 a9 9 0 1 1 -18 0"],
-  belt: ["M4 12 h24 v8 h-24 z"],
-  earring: ["M16 4 Q21 9 21 14 Q21 20 16 23"],
+const SLOT_ICON_FILES: Record<EquipmentSlot, string> = {
+  helmet: "helmet",
+  chest: "chest",
+  belt: "belt",
+  pants: "pants",
+  boots: "boots",
+  necklace: "neck",
+  ring: "ring",
+  earring: "trinket",
+  weapon: "sword",
+  shield: "shield",
 };
-function getSlotPath(slot: string) {
-  return SLOT_ICONS[slot]?.[0] ?? "M8 8 L24 24 M24 8 L8 24";
+
+function getSlotIconSrc(slot: EquipmentSlot) {
+  const file = SLOT_ICON_FILES[slot];
+  return `/images/equipment/${file}.png`;
 }
 </script>
 
@@ -89,10 +95,11 @@ function getSlotPath(slot: string) {
     </p>
 
     <div class="merchant-page__gold">
-      <svg class="merchant-page__gold-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" fill="none"/>
-        <path d="M12 6v12M9 9h6M9 15h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
+      <img
+        src="/images/currencies/coin.png"
+        alt="Золото"
+        class="merchant-page__gold-icon"
+      />
       <span class="merchant-page__gold-value">{{ gold }}</span>
       <span class="merchant-page__gold-label">золотых</span>
     </div>
@@ -123,9 +130,11 @@ function getSlotPath(slot: string) {
               Ур. вещи: {{ selectedDisplayItem.itemLevel }}
             </div>
             <div class="merchant-page__sell-price">
-              <svg class="merchant-page__coin" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
-              </svg>
+              <img
+                src="/images/currencies/coin.png"
+                alt="Золото"
+                class="merchant-page__coin"
+              />
               {{ selectedSellPrice }} золотых
             </div>
             <button
@@ -152,15 +161,11 @@ function getSlotPath(slot: string) {
                 class="merchant-page__offer-icon"
                 :style="{ color: rarityColor(getMerchantItem(offer)!.rarity) }"
               >
-                <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    :d="getSlotPath(getMerchantItem(offer)!.slot)"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                </svg>
+                <img
+                  :src="getSlotIconSrc(getMerchantItem(offer)!.slot)"
+                  :alt="SLOT_NAMES[getMerchantItem(offer)!.slot]"
+                  class="merchant-page__offer-icon-img"
+                />
               </div>
               <div class="merchant-page__offer-info">
                 <span
@@ -170,9 +175,11 @@ function getSlotPath(slot: string) {
                   {{ getMerchantItem(offer)!.name }}
                 </span>
                 <span class="merchant-page__offer-price">
-                  <svg class="merchant-page__coin" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
-                  </svg>
+                  <img
+                    src="/images/currencies/coin.png"
+                    alt="Золото"
+                    class="merchant-page__coin"
+                  />
                   {{ offer.price }}
                 </span>
               </div>

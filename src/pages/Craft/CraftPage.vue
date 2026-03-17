@@ -6,6 +6,7 @@ import InventorySection from "@/features/inventory/ui/InventorySection.vue";
 import lootData from "@/entities/loot/loot.json";
 import { rarityColor } from "@/entities/item/lib/rarityColor";
 import { CRAFT_RECIPES, getCraftResultItem } from "@/entities/craft/model/craft-recipes";
+import type { EquipmentSlot } from "@/entities/item/model";
 import "./CraftPage.scss";
 
 interface LootEntry {
@@ -51,6 +52,24 @@ const recipesWithItems = computed(() =>
     resultItem: getCraftResultItem(recipe),
   })),
 );
+
+const SLOT_ICON_FILES: Record<EquipmentSlot, string> = {
+  helmet: "helmet",
+  chest: "chest",
+  belt: "belt",
+  pants: "pants",
+  boots: "boots",
+  necklace: "neck",
+  ring: "ring",
+  earring: "trinket",
+  weapon: "sword",
+  shield: "shield",
+};
+
+function getSlotIconSrc(slot: EquipmentSlot) {
+  const file = SLOT_ICON_FILES[slot];
+  return `/images/equipment/${file}.png`;
+}
 
 function toggleRecipe(recipeId: string) {
   expandedRecipeId.value = expandedRecipeId.value === recipeId ? null : recipeId;
@@ -102,14 +121,19 @@ function isRecipeExpanded(recipeId: string): boolean {
               class="craft-page__recipe-header"
               @click="toggleRecipe(entry.recipe.id)"
             >
-              <div
-                class="craft-page__recipe-icon"
-                :style="{ color: rarityColor(entry.resultItem?.rarity ?? 'common') }"
-              >
-                {{
-                  getResource(entry.recipe.requirements[0]?.resourceId)?.icon
-                    ?? "⚒"
-                }}
+              <div class="craft-page__recipe-icon">
+                <img
+                  v-if="entry.resultItem"
+                  :src="getSlotIconSrc(entry.resultItem.slot as EquipmentSlot)"
+                  :alt="entry.resultItem.name"
+                  class="craft-page__recipe-icon-img"
+                />
+                <span
+                  v-else
+                  class="craft-page__recipe-icon-placeholder"
+                >
+                  ⚒
+                </span>
               </div>
               <div class="craft-page__recipe-main">
                 <div

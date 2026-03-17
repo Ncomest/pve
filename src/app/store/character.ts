@@ -63,7 +63,7 @@ export const useCharacterStore = defineStore("character", {
         if (!instance) continue;
         const template = getTemplate(instance.templateId);
         if (!template) continue;
-        const effective = getEffectiveStats(template.baseStats, instance.itemLevel);
+        const effective = getEffectiveStats(template.baseStats, instance.itemLevel, instance.rolls);
         stats.hp += effective.hp ?? 0;
         stats.power += effective.power ?? 0;
         critPoints += effective.chanceCrit ?? 0;

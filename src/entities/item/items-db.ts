@@ -26,11 +26,11 @@ const SLOTS: EquipmentSlot[] = [
 /** Базовые статы для шаблонов (у каждой вещи 3 стата из STAT_COMBOS). hp/power/speed/armor — числа как есть; chanceCrit и evasion — в очках (перевод в % в lib/statPoints.ts). */
 const BASE = {
   hp: 5,
-  power: 1,
+  power: 2,
   chanceCrit: 50,
   evasion: 25,
-  speed: 1,
-  armor: 1,
+  speed: 50,
+  armor: 50,
 } as const;
 
 /** Комбинации из 3 статов на вещь (менять при добавлении статов в BASE). */

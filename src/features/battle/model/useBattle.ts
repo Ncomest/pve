@@ -23,6 +23,7 @@ import { getDisplayItem } from "@/entities/item/model";
 import { createItemInstance } from "@/entities/item/lib/createInstance";
 import type { ItemInstance } from "@/entities/item/model";
 import { useDamageNumbers } from "@/shared/ui/DamageNumbers/useDamageNumbers";
+import { armorPointsToFraction } from "@/entities/item/lib/statPoints";
 
 /** Тип записи лога боя для цветовой подсветки */
 export type BattleLogEntryType = "player-damage" | "boss-damage" | "player-dodge" | "boss-dodge" | "other";
@@ -58,9 +59,13 @@ const calcHit = (attacker: Stats, defender: Stats, critMultiplier: number = DEFA
 
   const isCrit = rng() < attacker.chanceCrit;
   const base = Math.floor(attacker.power * (0.9 + Math.random() * 0.2));
-  const raw = Math.round(base * (isCrit ? critMultiplier : 1));
-  // Броня снижает урон: каждая единица брони уменьшает урон на 1, минимум 1
-  const damage = Math.max(1, raw - (defender.armor ?? 0));
+  // Бонус от силы: каждые 25 ед. power дают +1 урона (плоско)
+  const flatFromPower = Math.floor((attacker.power ?? 0) / 25);
+  const raw = Math.round(base * (isCrit ? critMultiplier : 1)) + flatFromPower;
+  // Броня снижает урон в процентах: 50 брони = 1% снижения
+  const armor = defender.armor ?? 0;
+  const reduction = armorPointsToFraction(armor);
+  const damage = Math.max(1, Math.round(raw * (1 - reduction)));
   return { damage, isCrit, isDodged: false };
 };
 
@@ -168,10 +173,46 @@ export function useBattle(bossId: () => string | undefined) {
   /** Кровотечение от способности босса «Медвежья хватка» по игроку */
   let bearHugIntervalId: ReturnType<typeof setInterval> | null = null;
   let bearHugEndTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** DoT от способности «Укус стаи» (Волк) по игроку */
+  let packBiteIntervalId: ReturnType<typeof setInterval> | null = null;
+  let packBiteEndTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** DoT от способности «Ядовитый клинок» (Гоблин) по игроку */
+  let poisonBladeIntervalId: ReturnType<typeof setInterval> | null = null;
+  let poisonBladeEndTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** DoT от способности «Огненный болт» (Гоблин-арбалетчик) по игроку */
+  let fireBoltIntervalId: ReturnType<typeof setInterval> | null = null;
+  let fireBoltEndTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** DoT от способности «Огненный шар» (Гоблин-маг) по игроку */
+  let fireballIntervalId: ReturnType<typeof setInterval> | null = null;
+  let fireballEndTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** DoT от способности «Удар ятаганом» (Вождь гоблинов) по игроку */
+  let yataganStrikeIntervalId: ReturnType<typeof setInterval> | null = null;
+  let yataganStrikeEndTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** DoT от способности «Ядовитая колба» (Вождь гоблинов) по игроку */
+  let poisonFlaskIntervalId: ReturnType<typeof setInterval> | null = null;
+  let poisonFlaskEndTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** DoT от способности «Огненное дыхание» (Дракон) по игроку */
+  let fireBreathIntervalId: ReturnType<typeof setInterval> | null = null;
+  let fireBreathEndTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** DoT от способности «Липкая слизь» (Слизь) по игроку */
+  let stickySlimeIntervalId: ReturnType<typeof setInterval> | null = null;
+  let stickySlimeEndTimeoutId: ReturnType<typeof setTimeout> | null = null;
   /** Баф босса от «Заострить клыки» (таймер жизни бафа) */
   let sharpenTusksTimeoutId: ReturnType<typeof setTimeout> | null = null;
   /** Баф босса от «Рёв» (усиление урона на время) */
   let roarTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** Баф босса от «Воющий клич» (усиление урона Волка) */
+  let howlTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** Баф босса от «Быстрая перезарядка» (усиление урона арбалетчика) */
+  let rapidReloadTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** Баф босса от «Боевой клич» вождя гоблинов */
+  let warcryTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** Баф брони босса от «Тайный барьер» гоблина-мага */
+  let arcaneShieldTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** Баф брони босса от «Каменная кожа» голема */
+  let stoneSkinTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  /** Баф брони босса от «Чешуйчатая броня» дракона */
+  let scaleArmorTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   // --- Защитные баффы игрока ---
 
@@ -357,12 +398,28 @@ export function useBattle(bossId: () => string | undefined) {
   });
   /** Броня героя (пока без баффов) */
   const playerArmor = computed(() => player.stats.armor ?? 0);
-  /** Эффективная броня босса с учётом дебаффа (срез брони) */
+  /** Эффективная броня босса с учётом бафов/дебаффов брони */
   const bossEffectiveArmor = computed(() => {
     const base = boss.stats.armor ?? 0;
+
+    // Бафы брони от способностей босса
+    let armorBuffPercent = 0;
+    if (bossBuffs.value.some((e) => e.id === "arcane-shield")) {
+      armorBuffPercent += 0.5;
+    }
+    if (bossBuffs.value.some((e) => e.id === "stone-skin-buff")) {
+      armorBuffPercent += 0.6;
+    }
+    if (bossBuffs.value.some((e) => e.id === "scale-armor")) {
+      armorBuffPercent += 0.5;
+    }
+
+    let effective = Math.round(base * (1 + armorBuffPercent));
+
+    // Дебафф брони (срез брони от игрока)
     const debuff = bossArmorDebuff.value;
-    if (!debuff) return base;
-    return Math.max(0, base - debuff.value);
+    if (!debuff) return effective;
+    return Math.max(0, effective - debuff.value);
   });
 
   const stopPowerBoostTimer = () => {
@@ -445,6 +502,102 @@ export function useBattle(bossId: () => string | undefined) {
     playerDebuffs.value = playerDebuffs.value.filter((e) => e.id !== "bear-hug");
   };
 
+  const clearPackBiteBleed = () => {
+    if (packBiteIntervalId !== null) {
+      clearInterval(packBiteIntervalId);
+      packBiteIntervalId = null;
+    }
+    if (packBiteEndTimeoutId !== null) {
+      clearTimeout(packBiteEndTimeoutId);
+      packBiteEndTimeoutId = null;
+    }
+    playerDebuffs.value = playerDebuffs.value.filter((e) => e.id !== "pack-bite");
+  };
+
+  const clearPoisonBladePoison = () => {
+    if (poisonBladeIntervalId !== null) {
+      clearInterval(poisonBladeIntervalId);
+      poisonBladeIntervalId = null;
+    }
+    if (poisonBladeEndTimeoutId !== null) {
+      clearTimeout(poisonBladeEndTimeoutId);
+      poisonBladeEndTimeoutId = null;
+    }
+    playerDebuffs.value = playerDebuffs.value.filter((e) => e.id !== "poison-blade");
+  };
+
+  const clearFireBoltBurn = () => {
+    if (fireBoltIntervalId !== null) {
+      clearInterval(fireBoltIntervalId);
+      fireBoltIntervalId = null;
+    }
+    if (fireBoltEndTimeoutId !== null) {
+      clearTimeout(fireBoltEndTimeoutId);
+      fireBoltEndTimeoutId = null;
+    }
+    playerDebuffs.value = playerDebuffs.value.filter((e) => e.id !== "fire-bolt");
+  };
+
+  const clearFireballBurn = () => {
+    if (fireballIntervalId !== null) {
+      clearInterval(fireballIntervalId);
+      fireballIntervalId = null;
+    }
+    if (fireballEndTimeoutId !== null) {
+      clearTimeout(fireballEndTimeoutId);
+      fireballEndTimeoutId = null;
+    }
+    playerDebuffs.value = playerDebuffs.value.filter((e) => e.id !== "fireball");
+  };
+
+  const clearYataganStrikeBleed = () => {
+    if (yataganStrikeIntervalId !== null) {
+      clearInterval(yataganStrikeIntervalId);
+      yataganStrikeIntervalId = null;
+    }
+    if (yataganStrikeEndTimeoutId !== null) {
+      clearTimeout(yataganStrikeEndTimeoutId);
+      yataganStrikeEndTimeoutId = null;
+    }
+    playerDebuffs.value = playerDebuffs.value.filter((e) => e.id !== "yatagan-strike");
+  };
+
+  const clearPoisonFlaskPoison = () => {
+    if (poisonFlaskIntervalId !== null) {
+      clearInterval(poisonFlaskIntervalId);
+      poisonFlaskIntervalId = null;
+    }
+    if (poisonFlaskEndTimeoutId !== null) {
+      clearTimeout(poisonFlaskEndTimeoutId);
+      poisonFlaskEndTimeoutId = null;
+    }
+    playerDebuffs.value = playerDebuffs.value.filter((e) => e.id !== "poison-flask");
+  };
+
+  const clearFireBreathBurn = () => {
+    if (fireBreathIntervalId !== null) {
+      clearInterval(fireBreathIntervalId);
+      fireBreathIntervalId = null;
+    }
+    if (fireBreathEndTimeoutId !== null) {
+      clearTimeout(fireBreathEndTimeoutId);
+      fireBreathEndTimeoutId = null;
+    }
+    playerDebuffs.value = playerDebuffs.value.filter((e) => e.id !== "fire-breath");
+  };
+
+  const clearStickySlimeDot = () => {
+    if (stickySlimeIntervalId !== null) {
+      clearInterval(stickySlimeIntervalId);
+      stickySlimeIntervalId = null;
+    }
+    if (stickySlimeEndTimeoutId !== null) {
+      clearTimeout(stickySlimeEndTimeoutId);
+      stickySlimeEndTimeoutId = null;
+    }
+    playerDebuffs.value = playerDebuffs.value.filter((e) => e.id !== "sticky-slime");
+  };
+
   const clearSharpenTusksBuff = () => {
     if (sharpenTusksTimeoutId !== null) {
       clearTimeout(sharpenTusksTimeoutId);
@@ -459,6 +612,54 @@ export function useBattle(bossId: () => string | undefined) {
       roarTimeoutId = null;
     }
     bossBuffs.value = bossBuffs.value.filter((e) => e.id !== "roar");
+  };
+
+  const clearHowlBuff = () => {
+    if (howlTimeoutId !== null) {
+      clearTimeout(howlTimeoutId);
+      howlTimeoutId = null;
+    }
+    bossBuffs.value = bossBuffs.value.filter((e) => e.id !== "howl");
+  };
+
+  const clearRapidReloadBuff = () => {
+    if (rapidReloadTimeoutId !== null) {
+      clearTimeout(rapidReloadTimeoutId);
+      rapidReloadTimeoutId = null;
+    }
+    bossBuffs.value = bossBuffs.value.filter((e) => e.id !== "rapid-reload");
+  };
+
+  const clearWarcryBuff = () => {
+    if (warcryTimeoutId !== null) {
+      clearTimeout(warcryTimeoutId);
+      warcryTimeoutId = null;
+    }
+    bossBuffs.value = bossBuffs.value.filter((e) => e.id !== "warcry");
+  };
+
+  const clearArcaneShieldBuff = () => {
+    if (arcaneShieldTimeoutId !== null) {
+      clearTimeout(arcaneShieldTimeoutId);
+      arcaneShieldTimeoutId = null;
+    }
+    bossBuffs.value = bossBuffs.value.filter((e) => e.id !== "arcane-shield");
+  };
+
+  const clearStoneSkinBuff = () => {
+    if (stoneSkinTimeoutId !== null) {
+      clearTimeout(stoneSkinTimeoutId);
+      stoneSkinTimeoutId = null;
+    }
+    bossBuffs.value = bossBuffs.value.filter((e) => e.id !== "stone-skin-buff");
+  };
+
+  const clearScaleArmorBuff = () => {
+    if (scaleArmorTimeoutId !== null) {
+      clearTimeout(scaleArmorTimeoutId);
+      scaleArmorTimeoutId = null;
+    }
+    bossBuffs.value = bossBuffs.value.filter((e) => e.id !== "scale-armor");
   };
 
   /** Добавляет комбо-поинты, не превышая максимума */
@@ -1076,8 +1277,24 @@ export function useBattle(bossId: () => string | undefined) {
 
   const getBossEffectivePower = () => {
     let mult = 1;
-    if (bossBuffs.value.some((e) => e.id === "sharpen-tusks")) mult *= 2;
-    if (bossBuffs.value.some((e) => e.id === "roar")) mult *= 1.4; // selfBuffValue 0.4 = +40%
+
+    // Усиления урона от различных бафов босса.
+    if (bossBuffs.value.some((e) => e.id === "sharpen-tusks")) {
+      mult *= 2;
+    }
+    if (bossBuffs.value.some((e) => e.id === "roar")) {
+      mult *= 1.4;
+    }
+    if (bossBuffs.value.some((e) => e.id === "howl")) {
+      mult *= 1.5;
+    }
+    if (bossBuffs.value.some((e) => e.id === "rapid-reload")) {
+      mult *= 1.3;
+    }
+    if (bossBuffs.value.some((e) => e.id === "warcry")) {
+      mult *= 1.5;
+    }
+
     return boss.stats.power * mult;
   };
 
@@ -1290,9 +1507,102 @@ export function useBattle(bossId: () => string | undefined) {
             clearRoarBuff();
           }, durationMs);
           pushLog(
-            `${ability.name}: урон босса увеличен на ${Math.round((ability.selfBuffValue ?? 0) * 100)}% на ${
-              durationMs / 1000
-            }с.`,
+            `${ability.name}: урон босса увеличен на ${Math.round(
+              (ability.selfBuffValue ?? 0) * 100,
+            )}% на ${durationMs / 1000}с.`,
+          );
+        }
+        break;
+      }
+      case "howl": {
+        if (
+          ability.selfBuffType === "damage" &&
+          ability.selfBuffDurationMs &&
+          ability.selfBuffValue != null
+        ) {
+          clearHowlBuff();
+          const durationMs = ability.selfBuffDurationMs;
+          const endTime = Date.now() + durationMs;
+          bossBuffs.value = [
+            ...bossBuffs.value.filter((e) => e.id !== "howl"),
+            {
+              id: "howl",
+              name: ability.name,
+              icon: ability.icon ?? "IconPowerBoost",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              dispellable: ability.dispellable ?? true,
+            },
+          ];
+          howlTimeoutId = window.setTimeout(() => {
+            clearHowlBuff();
+          }, durationMs);
+          pushLog(
+            `${ability.name}: урон босса увеличен на ${Math.round(
+              (ability.selfBuffValue ?? 0) * 100,
+            )}% на ${durationMs / 1000}с.`,
+          );
+        }
+        break;
+      }
+      case "rapid-reload": {
+        if (
+          ability.selfBuffType === "damage" &&
+          ability.selfBuffDurationMs &&
+          ability.selfBuffValue != null
+        ) {
+          clearRapidReloadBuff();
+          const durationMs = ability.selfBuffDurationMs;
+          const endTime = Date.now() + durationMs;
+          bossBuffs.value = [
+            ...bossBuffs.value.filter((e) => e.id !== "rapid-reload"),
+            {
+              id: "rapid-reload",
+              name: ability.name,
+              icon: ability.icon ?? "IconPowerBoost",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              dispellable: ability.dispellable ?? true,
+            },
+          ];
+          rapidReloadTimeoutId = window.setTimeout(() => {
+            clearRapidReloadBuff();
+          }, durationMs);
+          pushLog(
+            `${ability.name}: урон босса увеличен на ${Math.round(
+              (ability.selfBuffValue ?? 0) * 100,
+            )}% на ${durationMs / 1000}с.`,
+          );
+        }
+        break;
+      }
+      case "warcry": {
+        if (
+          ability.selfBuffType === "damage" &&
+          ability.selfBuffDurationMs &&
+          ability.selfBuffValue != null
+        ) {
+          clearWarcryBuff();
+          const durationMs = ability.selfBuffDurationMs;
+          const endTime = Date.now() + durationMs;
+          bossBuffs.value = [
+            ...bossBuffs.value.filter((e) => e.id !== "warcry"),
+            {
+              id: "warcry",
+              name: ability.name,
+              icon: ability.icon ?? "IconPowerBoost",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              dispellable: ability.dispellable ?? true,
+            },
+          ];
+          warcryTimeoutId = window.setTimeout(() => {
+            clearWarcryBuff();
+          }, durationMs);
+          pushLog(
+            `${ability.name}: урон босса увеличен на ${Math.round(
+              (ability.selfBuffValue ?? 0) * 100,
+            )}% на ${durationMs / 1000}с.`,
           );
         }
         break;
@@ -1405,6 +1715,539 @@ export function useBattle(bossId: () => string | undefined) {
             `${ability.name}: кровотечение наносит ${damagePerTick} урона каждые ${
               tickMs / 1000
             }с в течение ${durationMs / 1000}с.`,
+          );
+        }
+        break;
+      }
+      case "pack-bite": {
+        const result = applyBossAbilityHit(ability);
+        if (!result.hit) return;
+
+        if (
+          ability.dotDurationMs &&
+          ability.dotTickIntervalMs &&
+          ability.dotDamagePerTick != null
+        ) {
+          clearPackBiteBleed();
+          const durationMs = ability.dotDurationMs;
+          const tickMs = ability.dotTickIntervalMs;
+          const damagePerTick = ability.dotDamagePerTick;
+          const endTime = Date.now() + durationMs;
+
+          playerDebuffs.value = [
+            ...playerDebuffs.value.filter((e) => e.id !== "pack-bite"),
+            {
+              id: "pack-bite",
+              name: ability.name,
+              icon: ability.icon ?? "IconBleed",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              debuffType: ability.debuffType ?? "bleed",
+            },
+          ];
+
+          packBiteIntervalId = window.setInterval(() => {
+            if (isBattleOver.value) {
+              clearPackBiteBleed();
+              return;
+            }
+            const debuffActive = playerDebuffs.value.some((e) => e.id === "pack-bite");
+            if (!debuffActive || Date.now() >= endTime) {
+              clearPackBiteBleed();
+              return;
+            }
+            player.stats.hp -= damagePerTick;
+            clampHp(player.stats);
+            spawnPlayerDmg(damagePerTick, "player-damage");
+            pushLog(`Кровотечение (${ability.name}): −${damagePerTick} HP у героя.`, "boss-damage");
+          }, tickMs);
+
+          packBiteEndTimeoutId = window.setTimeout(() => {
+            clearPackBiteBleed();
+          }, durationMs);
+
+          pushLog(
+            `${ability.name}: кровотечение наносит ${damagePerTick} урона каждые ${
+              tickMs / 1000
+            }с в течение ${durationMs / 1000}с.`,
+          );
+        }
+        break;
+      }
+      case "poison-blade": {
+        const result = applyBossAbilityHit(ability);
+        if (!result.hit) return;
+
+        if (
+          ability.dotDurationMs &&
+          ability.dotTickIntervalMs &&
+          ability.dotDamagePerTick != null
+        ) {
+          clearPoisonBladePoison();
+          const durationMs = ability.dotDurationMs;
+          const tickMs = ability.dotTickIntervalMs;
+          const damagePerTick = ability.dotDamagePerTick;
+          const endTime = Date.now() + durationMs;
+
+          playerDebuffs.value = [
+            ...playerDebuffs.value.filter((e) => e.id !== "poison-blade"),
+            {
+              id: "poison-blade",
+              name: ability.name,
+              icon: ability.icon ?? "IconBleed",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              debuffType: ability.debuffType ?? "poison",
+            },
+          ];
+
+          poisonBladeIntervalId = window.setInterval(() => {
+            if (isBattleOver.value) {
+              clearPoisonBladePoison();
+              return;
+            }
+            const debuffActive = playerDebuffs.value.some((e) => e.id === "poison-blade");
+            if (!debuffActive || Date.now() >= endTime) {
+              clearPoisonBladePoison();
+              return;
+            }
+            player.stats.hp -= damagePerTick;
+            clampHp(player.stats);
+            spawnPlayerDmg(damagePerTick, "player-damage");
+            pushLog(`Яд (${ability.name}): −${damagePerTick} HP у героя.`, "boss-damage");
+          }, tickMs);
+
+          poisonBladeEndTimeoutId = window.setTimeout(() => {
+            clearPoisonBladePoison();
+          }, durationMs);
+
+          pushLog(
+            `${ability.name}: яд наносит ${damagePerTick} урона каждые ${
+              tickMs / 1000
+            }с в течение ${durationMs / 1000}с. Снимайте Cleanse.`,
+          );
+        }
+        break;
+      }
+      case "fire-bolt": {
+        const result = applyBossAbilityHit(ability);
+        if (!result.hit) return;
+
+        if (
+          ability.dotDurationMs &&
+          ability.dotTickIntervalMs &&
+          ability.dotDamagePerTick != null
+        ) {
+          clearFireBoltBurn();
+          const durationMs = ability.dotDurationMs;
+          const tickMs = ability.dotTickIntervalMs;
+          const damagePerTick = ability.dotDamagePerTick;
+          const endTime = Date.now() + durationMs;
+
+          playerDebuffs.value = [
+            ...playerDebuffs.value.filter((e) => e.id !== "fire-bolt"),
+            {
+              id: "fire-bolt",
+              name: ability.name,
+              icon: ability.icon ?? "IconBleed",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              debuffType: ability.debuffType ?? "burn",
+            },
+          ];
+
+          fireBoltIntervalId = window.setInterval(() => {
+            if (isBattleOver.value) {
+              clearFireBoltBurn();
+              return;
+            }
+            const debuffActive = playerDebuffs.value.some((e) => e.id === "fire-bolt");
+            if (!debuffActive || Date.now() >= endTime) {
+              clearFireBoltBurn();
+              return;
+            }
+            player.stats.hp -= damagePerTick;
+            clampHp(player.stats);
+            spawnPlayerDmg(damagePerTick, "player-damage");
+            pushLog(`Горение (${ability.name}): −${damagePerTick} HP у героя.`, "boss-damage");
+          }, tickMs);
+
+          fireBoltEndTimeoutId = window.setTimeout(() => {
+            clearFireBoltBurn();
+          }, durationMs);
+
+          pushLog(
+            `${ability.name}: горение наносит ${damagePerTick} урона каждые ${
+              tickMs / 1000
+            }с в течение ${durationMs / 1000}с. Снимайте Cleanse.`,
+          );
+        }
+        break;
+      }
+      case "fireball": {
+        const result = applyBossAbilityHit(ability);
+        if (!result.hit) return;
+
+        if (
+          ability.dotDurationMs &&
+          ability.dotTickIntervalMs &&
+          ability.dotDamagePerTick != null
+        ) {
+          clearFireballBurn();
+          const durationMs = ability.dotDurationMs;
+          const tickMs = ability.dotTickIntervalMs;
+          const damagePerTick = ability.dotDamagePerTick;
+          const endTime = Date.now() + durationMs;
+
+          playerDebuffs.value = [
+            ...playerDebuffs.value.filter((e) => e.id !== "fireball"),
+            {
+              id: "fireball",
+              name: ability.name,
+              icon: ability.icon ?? "IconBleed",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              debuffType: ability.debuffType ?? "burn",
+            },
+          ];
+
+          fireballIntervalId = window.setInterval(() => {
+            if (isBattleOver.value) {
+              clearFireballBurn();
+              return;
+            }
+            const debuffActive = playerDebuffs.value.some((e) => e.id === "fireball");
+            if (!debuffActive || Date.now() >= endTime) {
+              clearFireballBurn();
+              return;
+            }
+            player.stats.hp -= damagePerTick;
+            clampHp(player.stats);
+            spawnPlayerDmg(damagePerTick, "player-damage");
+            pushLog(`Горение (${ability.name}): −${damagePerTick} HP у героя.`, "boss-damage");
+          }, tickMs);
+
+          fireballEndTimeoutId = window.setTimeout(() => {
+            clearFireballBurn();
+          }, durationMs);
+
+          pushLog(
+            `${ability.name}: горение наносит ${damagePerTick} урона каждые ${
+              tickMs / 1000
+            }с в течение ${durationMs / 1000}с. Снимайте Cleanse.`,
+          );
+        }
+        break;
+      }
+      case "yatagan-strike": {
+        const result = applyBossAbilityHit(ability);
+        if (!result.hit) return;
+
+        if (
+          ability.dotDurationMs &&
+          ability.dotTickIntervalMs &&
+          ability.dotDamagePerTick != null
+        ) {
+          clearYataganStrikeBleed();
+          const durationMs = ability.dotDurationMs;
+          const tickMs = ability.dotTickIntervalMs;
+          const damagePerTick = ability.dotDamagePerTick;
+          const endTime = Date.now() + durationMs;
+
+          playerDebuffs.value = [
+            ...playerDebuffs.value.filter((e) => e.id !== "yatagan-strike"),
+            {
+              id: "yatagan-strike",
+              name: ability.name,
+              icon: ability.icon ?? "IconBleed",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              debuffType: ability.debuffType ?? "bleed",
+            },
+          ];
+
+          yataganStrikeIntervalId = window.setInterval(() => {
+            if (isBattleOver.value) {
+              clearYataganStrikeBleed();
+              return;
+            }
+            const debuffActive = playerDebuffs.value.some((e) => e.id === "yatagan-strike");
+            if (!debuffActive || Date.now() >= endTime) {
+              clearYataganStrikeBleed();
+              return;
+            }
+            player.stats.hp -= damagePerTick;
+            clampHp(player.stats);
+            spawnPlayerDmg(damagePerTick, "player-damage");
+            pushLog(`Кровотечение (${ability.name}): −${damagePerTick} HP у героя.`, "boss-damage");
+          }, tickMs);
+
+          yataganStrikeEndTimeoutId = window.setTimeout(() => {
+            clearYataganStrikeBleed();
+          }, durationMs);
+
+          pushLog(
+            `${ability.name}: кровотечение наносит ${damagePerTick} урона каждые ${
+              tickMs / 1000
+            }с в течение ${durationMs / 1000}с.`,
+          );
+        }
+        break;
+      }
+      case "poison-flask": {
+        const result = applyBossAbilityHit(ability);
+        if (!result.hit) return;
+
+        if (
+          ability.dotDurationMs &&
+          ability.dotTickIntervalMs &&
+          ability.dotDamagePerTick != null
+        ) {
+          clearPoisonFlaskPoison();
+          const durationMs = ability.dotDurationMs;
+          const tickMs = ability.dotTickIntervalMs;
+          const damagePerTick = ability.dotDamagePerTick;
+          const endTime = Date.now() + durationMs;
+
+          playerDebuffs.value = [
+            ...playerDebuffs.value.filter((e) => e.id !== "poison-flask"),
+            {
+              id: "poison-flask",
+              name: ability.name,
+              icon: ability.icon ?? "IconBleed",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              debuffType: ability.debuffType ?? "poison",
+            },
+          ];
+
+          poisonFlaskIntervalId = window.setInterval(() => {
+            if (isBattleOver.value) {
+              clearPoisonFlaskPoison();
+              return;
+            }
+            const debuffActive = playerDebuffs.value.some((e) => e.id === "poison-flask");
+            if (!debuffActive || Date.now() >= endTime) {
+              clearPoisonFlaskPoison();
+              return;
+            }
+            player.stats.hp -= damagePerTick;
+            clampHp(player.stats);
+            spawnPlayerDmg(damagePerTick, "player-damage");
+            pushLog(`Яд (${ability.name}): −${damagePerTick} HP у героя.`, "boss-damage");
+          }, tickMs);
+
+          poisonFlaskEndTimeoutId = window.setTimeout(() => {
+            clearPoisonFlaskPoison();
+          }, durationMs);
+
+          pushLog(
+            `${ability.name}: яд наносит ${damagePerTick} урона каждые ${
+              tickMs / 1000
+            }с в течение ${durationMs / 1000}с. Снимайте Cleanse.`,
+          );
+        }
+        break;
+      }
+      case "fire-breath": {
+        const result = applyBossAbilityHit(ability);
+        if (!result.hit) return;
+
+        if (
+          ability.dotDurationMs &&
+          ability.dotTickIntervalMs &&
+          ability.dotDamagePerTick != null
+        ) {
+          clearFireBreathBurn();
+          const durationMs = ability.dotDurationMs;
+          const tickMs = ability.dotTickIntervalMs;
+          const damagePerTick = ability.dotDamagePerTick;
+          const endTime = Date.now() + durationMs;
+
+          playerDebuffs.value = [
+            ...playerDebuffs.value.filter((e) => e.id !== "fire-breath"),
+            {
+              id: "fire-breath",
+              name: ability.name,
+              icon: ability.icon ?? "IconBleed",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              debuffType: ability.debuffType ?? "burn",
+            },
+          ];
+
+          fireBreathIntervalId = window.setInterval(() => {
+            if (isBattleOver.value) {
+              clearFireBreathBurn();
+              return;
+            }
+            const debuffActive = playerDebuffs.value.some((e) => e.id === "fire-breath");
+            if (!debuffActive || Date.now() >= endTime) {
+              clearFireBreathBurn();
+              return;
+            }
+            player.stats.hp -= damagePerTick;
+            clampHp(player.stats);
+            spawnPlayerDmg(damagePerTick, "player-damage");
+            pushLog(`Горение (${ability.name}): −${damagePerTick} HP у героя.`, "boss-damage");
+          }, tickMs);
+
+          fireBreathEndTimeoutId = window.setTimeout(() => {
+            clearFireBreathBurn();
+          }, durationMs);
+
+          pushLog(
+            `${ability.name}: горение наносит ${damagePerTick} урона каждые ${
+              tickMs / 1000
+            }с в течение ${durationMs / 1000}с. Снимайте Cleanse.`,
+          );
+        }
+        break;
+      }
+      case "sticky-slime": {
+        const result = applyBossAbilityHit(ability);
+        if (!result.hit) return;
+
+        if (
+          ability.dotDurationMs &&
+          ability.dotTickIntervalMs &&
+          ability.dotDamagePerTick != null
+        ) {
+          clearStickySlimeDot();
+          const durationMs = ability.dotDurationMs;
+          const tickMs = ability.dotTickIntervalMs;
+          const damagePerTick = ability.dotDamagePerTick;
+          const endTime = Date.now() + durationMs;
+
+          playerDebuffs.value = [
+            ...playerDebuffs.value.filter((e) => e.id !== "sticky-slime"),
+            {
+              id: "sticky-slime",
+              name: ability.name,
+              icon: ability.icon ?? "IconBleed",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              debuffType: ability.debuffType ?? "other",
+            },
+          ];
+
+          stickySlimeIntervalId = window.setInterval(() => {
+            if (isBattleOver.value) {
+              clearStickySlimeDot();
+              return;
+            }
+            const debuffActive = playerDebuffs.value.some((e) => e.id === "sticky-slime");
+            if (!debuffActive || Date.now() >= endTime) {
+              clearStickySlimeDot();
+              return;
+            }
+            player.stats.hp -= damagePerTick;
+            clampHp(player.stats);
+            spawnPlayerDmg(damagePerTick, "player-damage");
+            pushLog(`Эффект (${ability.name}): −${damagePerTick} HP у героя.`, "boss-damage");
+          }, tickMs);
+
+          stickySlimeEndTimeoutId = window.setTimeout(() => {
+            clearStickySlimeDot();
+          }, durationMs);
+
+          pushLog(
+            `${ability.name}: эффект наносит ${damagePerTick} урона каждые ${
+              tickMs / 1000
+            }с в течение ${durationMs / 1000}с.`,
+          );
+        }
+        break;
+      }
+      case "arcane-shield": {
+        if (
+          ability.selfBuffType === "armor" &&
+          ability.selfBuffDurationMs &&
+          ability.selfBuffValue != null
+        ) {
+          clearArcaneShieldBuff();
+          const durationMs = ability.selfBuffDurationMs;
+          const endTime = Date.now() + durationMs;
+          bossBuffs.value = [
+            ...bossBuffs.value.filter((e) => e.id !== "arcane-shield"),
+            {
+              id: "arcane-shield",
+              name: ability.name,
+              icon: ability.icon ?? "IconArmorBreak",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              dispellable: ability.dispellable ?? true,
+            },
+          ];
+          arcaneShieldTimeoutId = window.setTimeout(() => {
+            clearArcaneShieldBuff();
+          }, durationMs);
+          pushLog(
+            `${ability.name}: броня босса увеличена на ${Math.round(
+              (ability.selfBuffValue ?? 0) * 100,
+            )}% на ${durationMs / 1000}с.`,
+          );
+        }
+        break;
+      }
+      case "stone-skin-buff": {
+        if (
+          ability.selfBuffType === "armor" &&
+          ability.selfBuffDurationMs &&
+          ability.selfBuffValue != null
+        ) {
+          clearStoneSkinBuff();
+          const durationMs = ability.selfBuffDurationMs;
+          const endTime = Date.now() + durationMs;
+          bossBuffs.value = [
+            ...bossBuffs.value.filter((e) => e.id !== "stone-skin-buff"),
+            {
+              id: "stone-skin-buff",
+              name: ability.name,
+              icon: ability.icon ?? "IconArmorBreak",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              dispellable: ability.dispellable ?? true,
+            },
+          ];
+          stoneSkinTimeoutId = window.setTimeout(() => {
+            clearStoneSkinBuff();
+          }, durationMs);
+          pushLog(
+            `${ability.name}: броня босса увеличена на ${Math.round(
+              (ability.selfBuffValue ?? 0) * 100,
+            )}% на ${durationMs / 1000}с.`,
+          );
+        }
+        break;
+      }
+      case "scale-armor": {
+        if (
+          ability.selfBuffType === "armor" &&
+          ability.selfBuffDurationMs &&
+          ability.selfBuffValue != null
+        ) {
+          clearScaleArmorBuff();
+          const durationMs = ability.selfBuffDurationMs;
+          const endTime = Date.now() + durationMs;
+          bossBuffs.value = [
+            ...bossBuffs.value.filter((e) => e.id !== "scale-armor"),
+            {
+              id: "scale-armor",
+              name: ability.name,
+              icon: ability.icon ?? "IconArmorBreak",
+              durationSeconds: durationMs / 1000,
+              endTime,
+              dispellable: ability.dispellable ?? true,
+            },
+          ];
+          scaleArmorTimeoutId = window.setTimeout(() => {
+            clearScaleArmorBuff();
+          }, durationMs);
+          pushLog(
+            `${ability.name}: броня босса увеличена на ${Math.round(
+              (ability.selfBuffValue ?? 0) * 100,
+            )}% на ${durationMs / 1000}с.`,
           );
         }
         break;
@@ -1568,6 +2411,12 @@ export function useBattle(bossId: () => string | undefined) {
     clearBearHugBleed();
     clearSharpenTusksBuff();
     clearRoarBuff();
+    clearHowlBuff();
+    clearRapidReloadBuff();
+    clearWarcryBuff();
+    clearArcaneShieldBuff();
+    clearStoneSkinBuff();
+    clearScaleArmorBuff();
 
     bossAbilityLastUsedTurn = {};
     bossAbilityTurnCounter = 0;
@@ -1603,6 +2452,26 @@ export function useBattle(bossId: () => string | undefined) {
       clearBearHugBleed();
       clearSharpenTusksBuff();
       clearRoarBuff();
+      clearHowlBuff();
+      clearRapidReloadBuff();
+      clearWarcryBuff();
+      clearArcaneShieldBuff();
+      clearStoneSkinBuff();
+      clearScaleArmorBuff();
+      clearPackBiteBleed();
+      clearPoisonBladePoison();
+      clearFireBoltBurn();
+      clearFireballBurn();
+      clearYataganStrikeBleed();
+      clearPoisonFlaskPoison();
+      clearFireBreathBurn();
+      clearStickySlimeDot();
+      clearHowlBuff();
+      clearRapidReloadBuff();
+      clearWarcryBuff();
+      clearArcaneShieldBuff();
+      clearStoneSkinBuff();
+      clearScaleArmorBuff();
       stopBattleTimer();
       // Сохраняем финальное HP сразу после окончания боя
       playerHp.saveHp();
@@ -1665,8 +2534,20 @@ export function useBattle(bossId: () => string | undefined) {
     if (poisonDotEndTimeoutId !== null) clearTimeout(poisonDotEndTimeoutId);
     clearInfectedBitePoison();
     clearBearHugBleed();
-    clearSharpenTusksBuff();
-    clearRoarBuff();
+      clearSharpenTusksBuff();
+      clearRoarBuff();
+      clearHowlBuff();
+      clearRapidReloadBuff();
+      clearWarcryBuff();
+      clearArcaneShieldBuff();
+      clearStoneSkinBuff();
+      clearScaleArmorBuff();
+    clearHowlBuff();
+    clearRapidReloadBuff();
+    clearWarcryBuff();
+    clearArcaneShieldBuff();
+    clearStoneSkinBuff();
+    clearScaleArmorBuff();
     clearBossCastTimer();
     if (nextBossAbilityTimeoutId !== null) {
       window.clearTimeout(nextBossAbilityTimeoutId);
