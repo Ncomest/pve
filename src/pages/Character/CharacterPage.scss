@@ -20,4 +20,21 @@
     flex-direction: row;
     gap: 18px;
   }
+
+  @media (max-width: 768px) {
+    gap: 6px;
+
+    &__title {
+      font-size: 20px;
+      margin: 0 0 6px;
+    }
+
+    &__subtitle {
+      font-size: 14px;
+    }
+
+    &__top {
+      flex-direction: column;
+    }
+  }
 }

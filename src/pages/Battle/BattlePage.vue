@@ -271,6 +271,69 @@ onUnmounted(() => {
         </dl>
       </div>
     </div>
+    <details class="battle-page__stats-mobile">
+      <summary class="battle-page__stats-mobile-summary">Характеристики</summary>
+      <div class="battle-page__stats-mobile-content">
+        <div class="battle-page__stats-panel battle-page__stats-panel--character">
+          <h3 class="battle-page__stats-title">Герой</h3>
+          <dl class="battle-page__stats-list">
+            <div class="battle-page__stats-row">
+              <dt>Сила</dt>
+              <dd>{{ playerPower }}</dd>
+            </div>
+            <div class="battle-page__stats-row">
+              <dt>Крит</dt>
+              <dd>{{ (playerEffectiveCrit * 100).toFixed(0) }}%</dd>
+            </div>
+            <div class="battle-page__stats-row">
+              <dt>Уклонение</dt>
+              <dd>{{ (playerEffectiveEvasion * 100).toFixed(0) }}%</dd>
+            </div>
+            <div class="battle-page__stats-row">
+              <dt>Скорость</dt>
+              <dd>{{ playerEffectiveSpeed.toFixed(1) }}</dd>
+            </div>
+            <div class="battle-page__stats-row">
+              <dt>Броня</dt>
+              <dd>{{ playerArmor }}</dd>
+            </div>
+            <div class="battle-page__stats-row">
+              <dt>Здоровье</dt>
+              <dd>{{ player.stats.hp }} / {{ player.stats.maxHp }}</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="battle-page__stats-panel battle-page__stats-panel--boss">
+          <h3 class="battle-page__stats-title">{{ boss.name }}</h3>
+          <dl class="battle-page__stats-list">
+            <div class="battle-page__stats-row">
+              <dt>Сила</dt>
+              <dd>{{ boss.stats.power }}</dd>
+            </div>
+            <div class="battle-page__stats-row">
+              <dt>Крит</dt>
+              <dd>{{ (boss.stats.chanceCrit * 100).toFixed(0) }}%</dd>
+            </div>
+            <div class="battle-page__stats-row">
+              <dt>Уклонение</dt>
+              <dd>{{ (boss.stats.evasion * 100).toFixed(0) }}%</dd>
+            </div>
+            <div class="battle-page__stats-row">
+              <dt>Скорость</dt>
+              <dd>{{ (boss.stats.speed ?? 2).toFixed(1) }}</dd>
+            </div>
+            <div class="battle-page__stats-row">
+              <dt>Броня</dt>
+              <dd>{{ bossEffectiveArmor }}</dd>
+            </div>
+            <div class="battle-page__stats-row">
+              <dt>Здоровье</dt>
+              <dd>{{ boss.stats.hp }} / {{ boss.stats.maxHp }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </details>
 
     <BattleResult
       v-if="isBattleOver"

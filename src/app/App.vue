@@ -295,6 +295,7 @@ const isBattlePage = computed(() => route.name === "battle");
 /* ── Навигация ── */
 .app-nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -407,5 +408,141 @@ const isBattlePage = computed(() => route.name === "battle");
 .app-main {
   flex: 1;
   display: flex;
+}
+
+@media (max-width: 900px) {
+  .app-root {
+    padding: 18px 12px 24px;
+  }
+
+  .app-header {
+    gap: 10px;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+
+  .char-status__bar-track {
+    width: 140px;
+  }
+
+  .app-header__gold {
+    padding: 5px 10px;
+  }
+
+  .app-header__gold-value {
+    font-size: 14px;
+  }
+
+  .app-nav {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .app-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-link {
+    height: 36px;
+    padding: 0 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-root {
+    padding: 12px 10px 16px;
+  }
+
+  .app-header {
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .char-status {
+    width: 100%;
+  }
+
+  .char-status__bars {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .char-status__bar-row {
+    gap: 6px;
+  }
+
+  .char-status__bar-track {
+    width: auto;
+    flex: 1;
+    min-width: 90px;
+  }
+
+  .char-status__bar-text {
+    font-size: 10px;
+  }
+
+  .char-status__regen {
+    font-size: 9px;
+  }
+
+  .app-header__gold {
+    align-self: flex-start;
+  }
+
+  .nav-link {
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 7px;
+  }
+
+  .nav-link__icon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 420px) {
+  .char-status__level {
+    width: 34px;
+    height: 34px;
+  }
+
+  .char-status__level-value {
+    font-size: 14px;
+  }
+
+  .char-status__level-label {
+    font-size: 8px;
+  }
+
+  .char-status__bar-track {
+    height: 6px;
+  }
+
+  .app-header__gold {
+    padding: 4px 8px;
+    border-radius: 7px;
+  }
+
+  .app-header__gold-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .app-header__gold-value {
+    font-size: 13px;
+  }
+
+  .nav-link {
+    gap: 5px;
+    padding: 0 9px;
+    font-size: 11px;
+  }
 }
 </style>

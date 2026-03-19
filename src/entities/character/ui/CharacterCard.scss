@@ -87,4 +87,70 @@
   &__effects {
     margin-top: 2px;
   }
+
+  @media (max-width: 820px) {
+    padding: 10px;
+    gap: 10px;
+
+    &__avatar {
+      width: 62px;
+      border-radius: 8px;
+    }
+
+    &__body {
+      gap: 8px;
+    }
+
+    &__title {
+      font-size: 15px;
+    }
+
+    &__combo {
+      gap: 4px;
+    }
+
+    &__combo-dot {
+      width: 8px;
+      height: 8px;
+    }
+
+    &__effects-wrap {
+      min-height: 42px;
+    }
+  }
+
+  @media (max-width: 426px){
+    padding: 8px;
+    gap: 8px;
+    align-items: stretch;
+
+    &__avatar {
+      width: 52px;
+      border-radius: 7px;
+    }
+
+    &__body {
+      gap: 6px;
+      padding: 0;
+    }
+
+    &__title {
+      font-size: 14px;
+      line-height: 1.2;
+    }
+
+    &__combo {
+      gap: 3px;
+    }
+
+    &__combo-dot {
+      width: 7px;
+      height: 7px;
+    }
+
+    &__effects-wrap {
+      min-height: 40px;
+    }
+  }
+
 }

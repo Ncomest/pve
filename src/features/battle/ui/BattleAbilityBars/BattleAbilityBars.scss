@@ -61,4 +61,31 @@
     pointer-events: none;
     opacity: 0.5;
   }
+
+  @media (max-width: 820px) {
+    gap: 6px;
+    padding: 4px 0;
+    width: 100%;
+
+    &__panel {
+      width: 100%;
+    }
+
+    &__slots {
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: nowrap;
+      overflow: hidden;
+    }
+
+    &__btn {
+      border-radius: 8px;
+    }
+  }
+
+  @media (max-width: 425px){
+    &__slots {
+      gap: 2px;
+    }
+  }
 }

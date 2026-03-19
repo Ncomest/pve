@@ -23,7 +23,7 @@ import { getDisplayItem } from "@/entities/item/model";
 import { createItemInstance } from "@/entities/item/lib/createInstance";
 import type { ItemInstance } from "@/entities/item/model";
 import { useDamageNumbers } from "@/shared/ui/DamageNumbers/useDamageNumbers";
-import { armorPointsToFraction } from "@/entities/item/lib/statPoints";
+import { armorPointsToFraction, speedPointsToFraction } from "@/entities/item/lib/statPoints";
 
 /** Тип записи лога боя для цветовой подсветки */
 export type BattleLogEntryType = "player-damage" | "boss-damage" | "player-dodge" | "boss-dodge" | "other";
@@ -317,14 +317,17 @@ export function useBattle(bossId: () => string | undefined) {
   const GCD_KEY = "__gcd__";
 
   /**
-   * Коэффициент скорости: speed=2 → 1.0 (без изменений),
-   * каждый +1 speed снижает кулдауны на 10%.
-   * Минимум 0.3 (70% снижение при очень высокой скорости).
+   * Коэффициент скорости для КД.
+   * Скорость от экипировки хранится как очки и конвертируется в долю:
+   * 50 очков = ~0.25% (см. speedPointsToFraction).
+   * Дополнительные временные баффы (speedBonus) добавляются как проценты.
    */
   const speedFactor = computed(() => {
-    const baseSpeed = player.stats.speed ?? 2;
-    const effectiveSpeed = baseSpeed * (1 + speedBonus.value);
-    return Math.max(0.3, 1 - (effectiveSpeed - 2) * 0.1);
+    const totalSpeed = player.stats.speed ?? 2;
+    const speedPoints = Math.max(0, totalSpeed - 2);
+    const speedFromPoints = speedPointsToFraction(speedPoints);
+    const totalCooldownReduction = Math.min(0.7, speedFromPoints + speedBonus.value);
+    return 1 - totalCooldownReduction;
   });
 
   /** GCD с учётом скорости персонажа */

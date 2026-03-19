@@ -163,4 +163,142 @@
       color: rgba(255, 255, 255, 0.92);
     }
   }
+
+  &__stats-mobile {
+    display: none;
+  }
+
+  @media (max-width: 820px) {
+    gap: 8px;
+
+    &__header {
+      gap: 6px;
+    }
+
+    &__title {
+      font-size: 22px;
+    }
+
+    &__timer {
+      font-size: 14px;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    &__flee-btn {
+      height: 32px;
+      padding: 0 10px;
+      gap: 4px;
+      font-size: 12px;
+    }
+
+    &__flee-icon {
+      width: 13px;
+      height: 13px;
+    }
+
+    &__arena {
+      gap: 10px;
+    }
+
+    &__abilities-row {
+      gap: 10px;
+    }
+
+    &__stats-panel {
+      display: none;
+    }
+
+    &__abilities-center {
+      width: 100%;
+      min-width: 0;
+    }
+
+    &__stats-mobile {
+      display: block;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    &__stats-mobile-summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 9px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.88);
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+    }
+
+    &__stats-mobile-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 0 8px 8px;
+
+      .battle-page__stats-panel {
+        display: block;
+        min-width: 0;
+      }
+    }
+  }
+
+  @media (max-width: 426px) {
+    gap: 6px;
+
+    &__header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        "title flee"
+        "timer timer";
+      align-items: center;
+      gap: 6px;
+    }
+
+    &__title {
+      grid-area: title;
+      font-size: 18px;
+    }
+
+    &__timer {
+      grid-area: timer;
+      justify-self: stretch;
+      width: 100%;
+      text-align: center;
+      padding: 6px 8px;
+      font-size: 13px;
+    }
+
+    &__flee-btn {
+      grid-area: flee;
+      justify-self: end;
+      min-width: 92px;
+      height: 30px;
+      padding: 0 8px;
+      font-size: 11px;
+    }
+
+    &__arena {
+      gap: 8px;
+    }
+
+    &__abilities-row {
+      gap: 8px;
+    }
+
+    &__stats-mobile-summary {
+      padding: 8px;
+      font-size: 12px;
+    }
+
+    &__stats-mobile-content {
+      gap: 6px;
+      padding: 0 6px 6px;
+    }
+  }
 }

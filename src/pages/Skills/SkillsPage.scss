@@ -68,6 +68,17 @@
     pointer-events: none;
     z-index: 50;
   }
+
+  @media (max-width: 426px) {
+    padding: 0.75rem;
+
+    &__slots {
+      display: grid;
+      grid-template-columns: repeat(5, 34px);
+      gap: 8px;
+      justify-content: center;
+    }
+  }
 }
 
 .ability-list {

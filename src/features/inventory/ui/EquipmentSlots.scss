@@ -196,4 +196,14 @@
   &__item-level {
     font-size: 10px;
   }
+
+  @media (max-width: 768px) {
+    &__avatar {
+      display: none;
+    }
+    
+    &__layout {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
 }
