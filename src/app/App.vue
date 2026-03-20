@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterView, RouterLink, useRoute } from "vue-router";
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
 import { usePlayerHp } from "@/features/character/model/usePlayerHp";
 import { useCharacterStore } from "@/app/store/character";
@@ -19,7 +19,6 @@ const { useRealtimeHp } = usePlayerHp();
 const { currentHp, currentMaxHp, hpPct } = useRealtimeHp(getMaxHp);
 
 const isFullHp = computed(() => currentHp.value >= currentMaxHp.value);
-const gold = computed(() => characterStore.gold ?? 0);
 
 function lerpColor(
   [r1, g1, b1]: [number, number, number],
@@ -52,6 +51,16 @@ const hpBarStyle = computed(() => {
 
 const route = useRoute();
 const isBattlePage = computed(() => route.name === "battle");
+
+const menuId = "app-burger-menu";
+const isMenuOpen = ref(false);
+
+watch(
+  () => route.fullPath,
+  () => {
+    isMenuOpen.value = false;
+  },
+);
 </script>
 
 <template>
@@ -84,16 +93,7 @@ const isBattlePage = computed(() => route.name === "battle");
         </div>
       </div>
 
-      <div class="app-header__gold">
-        <img
-          src="/images/currencies/coin.png"
-          alt="Золото"
-          class="app-header__gold-icon"
-        />
-        <span class="app-header__gold-value">{{ gold }}</span>
-      </div>
-
-      <nav class="app-nav">
+      <nav class="app-nav app-nav--desktop">
         <!-- Кнопка Битва — квадратная с иконкой мечей -->
         <RouterLink to="/" class="nav-link nav-link--battle">
           <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -152,6 +152,95 @@ const isBattlePage = computed(() => route.name === "battle");
           <span>Навыки</span>
         </RouterLink>
       </nav>
+
+      <button
+        type="button"
+        class="app-burger"
+        :aria-expanded="isMenuOpen"
+        :aria-controls="menuId"
+        @click="isMenuOpen = !isMenuOpen"
+      >
+        <svg class="app-burger__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M4 7h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M4 12h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </button>
+
+      <div v-if="isMenuOpen" :id="menuId" class="app-burger-panel">
+        <RouterLink
+          to="/"
+          class="nav-link nav-link--battle app-burger-panel__link"
+          @click="isMenuOpen = false"
+        >
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <line x1="3" y1="21" x2="10" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M10 14 L19 5 L22 2 L21 5 L18 6 L14 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="21" y1="21" x2="14" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M14 14 L5 5 L2 2 L5 3 L6 6 L10 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Битва</span>
+        </RouterLink>
+
+        <RouterLink
+          to="/merchant"
+          class="nav-link nav-link--merchant app-burger-panel__link"
+          @click="isMenuOpen = false"
+        >
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" fill="none"/>
+            <path d="M12 6v12M9 9h6M9 15h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span>Торговец</span>
+        </RouterLink>
+
+        <RouterLink
+          to="/craft"
+          class="nav-link nav-link--craft app-burger-panel__link"
+          @click="isMenuOpen = false"
+        >
+          <svg
+            class="nav-link__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M4 20L10 14M7 7L10 4L20 14L17 17M4 10L7 7M14 20H20M17 17V20"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>Крафт</span>
+        </RouterLink>
+
+        <RouterLink
+          to="/character"
+          class="nav-link nav-link--character app-burger-panel__link"
+          @click="isMenuOpen = false"
+        >
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="12" cy="7" r="3.5" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M17 12l1.5-1.5M19 10l1-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <span>Персонаж</span>
+        </RouterLink>
+
+        <RouterLink
+          to="/skills"
+          class="nav-link nav-link--skills app-burger-panel__link"
+          @click="isMenuOpen = false"
+        >
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 2L9 8l-6 1 4.5 4.5L6 19l6-3 6 3-1.5-5.5L21 9l-6-1-3-6z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Навыки</span>
+        </RouterLink>
+      </div>
     </header>
 
     <main class="app-main">
@@ -176,31 +265,10 @@ const isBattlePage = computed(() => route.name === "battle");
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
+  position: relative;
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   margin-bottom: 24px;
-}
-
-.app-header__gold {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  background: rgba(250, 204, 21, 0.1);
-  border: 1px solid rgba(250, 204, 21, 0.25);
-}
-
-.app-header__gold-icon {
-  width: 18px;
-  height: 18px;
-  color: #facc15;
-}
-
-.app-header__gold-value {
-  font-size: 15px;
-  font-weight: 600;
-  color: #facc15;
 }
 
 /* ── Статус персонажа ── */
@@ -297,6 +365,52 @@ const isBattlePage = computed(() => route.name === "battle");
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.app-burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.app-burger:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+.app-burger__icon {
+  width: 20px;
+  height: 20px;
+}
+
+.app-burger-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 240px;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(17, 24, 39, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 50;
+}
+
+.app-burger-panel__link {
+  justify-content: flex-start;
 }
 
 .nav-link {
@@ -416,6 +530,10 @@ const isBattlePage = computed(() => route.name === "battle");
   }
 
   .app-header {
+    flex-wrap: nowrap;
+  }
+
+  .app-header {
     gap: 10px;
     padding-bottom: 12px;
     margin-bottom: 16px;
@@ -425,24 +543,17 @@ const isBattlePage = computed(() => route.name === "battle");
     width: 140px;
   }
 
-  .app-header__gold {
-    padding: 5px 10px;
-  }
-
-  .app-header__gold-value {
-    font-size: 14px;
-  }
-
-  .app-nav {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding-bottom: 2px;
-  }
-
-  .app-nav::-webkit-scrollbar {
+  .app-nav--desktop {
     display: none;
+  }
+
+  .app-burger {
+    display: inline-flex;
+  }
+
+  .app-burger-panel {
+    width: calc(100vw - 24px);
+    max-width: 300px;
   }
 
   .nav-link {
@@ -460,12 +571,14 @@ const isBattlePage = computed(() => route.name === "battle");
   }
 
   .app-header {
-    align-items: stretch;
+    align-items: center;
     gap: 8px;
+    flex-wrap: nowrap;
   }
 
   .char-status {
-    width: 100%;
+    width: auto;
+    flex: 1;
   }
 
   .char-status__bars {
@@ -489,10 +602,6 @@ const isBattlePage = computed(() => route.name === "battle");
 
   .char-status__regen {
     font-size: 9px;
-  }
-
-  .app-header__gold {
-    align-self: flex-start;
   }
 
   .nav-link {
@@ -523,20 +632,6 @@ const isBattlePage = computed(() => route.name === "battle");
 
   .char-status__bar-track {
     height: 6px;
-  }
-
-  .app-header__gold {
-    padding: 4px 8px;
-    border-radius: 7px;
-  }
-
-  .app-header__gold-icon {
-    width: 16px;
-    height: 16px;
-  }
-
-  .app-header__gold-value {
-    font-size: 13px;
   }
 
   .nav-link {
