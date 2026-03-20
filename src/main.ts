@@ -11,6 +11,7 @@ import {
   faShieldHalved,
   faPersonRunning,
 } from "@fortawesome/free-solid-svg-icons";
+import "./app/_reset.scss";
 import "./style.css";
 
 library.add(faHeart, faBolt, faShieldHalved, faPersonRunning);

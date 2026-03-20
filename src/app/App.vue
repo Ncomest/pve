@@ -151,6 +151,27 @@ watch(
           </svg>
           <span>Навыки</span>
         </RouterLink>
+
+        <!-- Кнопка Обновление -->
+        <RouterLink to="/update" class="nav-link nav-link--update">
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path
+              d="M21 12a9 9 0 1 1-2.64-6.36"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M21 3v6h-6"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>Обновление</span>
+        </RouterLink>
       </nav>
 
       <button
@@ -239,6 +260,30 @@ watch(
             <path d="M12 2L9 8l-6 1 4.5 4.5L6 19l6-3 6 3-1.5-5.5L21 9l-6-1-3-6z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <span>Навыки</span>
+        </RouterLink>
+
+        <RouterLink
+          to="/update"
+          class="nav-link nav-link--update app-burger-panel__link"
+          @click="isMenuOpen = false"
+        >
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path
+              d="M21 12a9 9 0 1 1-2.64-6.36"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M21 3v6h-6"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>Обновление</span>
         </RouterLink>
       </div>
     </header>
