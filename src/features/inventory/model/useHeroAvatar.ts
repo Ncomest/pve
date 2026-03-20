@@ -8,6 +8,16 @@ const HERO_AVATARS = [
   { id: "3", label: "Герой 3", src: "/images/hero/3.jpg" },
   { id: "4", label: "Герой 4", src: "/images/hero/4.jpg" },
   { id: "5", label: "Герой 5", src: "/images/hero/5.jpg" },
+  { id: "6", label: "Герой 6", src: "/images/hero/6.jpg" },
+  { id: "7", label: "Герой 7", src: "/images/hero/7.webp" },
+  { id: "8", label: "Герой 8", src: "/images/hero/8.webp" },
+  { id: "9", label: "Герой 9", src: "/images/hero/9.webp" },
+  { id: "10", label: "Герой 10", src: "/images/hero/10.webp" },
+  { id: "11", label: "Герой 11", src: "/images/hero/11.webp" },
+  { id: "12", label: "Герой 12", src: "/images/hero/12.webp" },
+  { id: "13", label: "Герой 13", src: "/images/hero/13.webp" },
+  { id: "14", label: "Герой 14", src: "/images/hero/14.jpg" },
+  { id: "15", label: "Герой 15", src: "/images/hero/15.webp" },
 ];
 
 const savedId = localStorage.getItem(STORAGE_KEY) ?? "";
