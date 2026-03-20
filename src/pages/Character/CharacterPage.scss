@@ -34,7 +34,8 @@
     }
 
     &__top {
-      flex-direction: column;
+      // Сверху статы, ниже экипировка (в DOM сначала слоты, потом HeroStats)
+      flex-direction: column-reverse;
     }
   }
 }
