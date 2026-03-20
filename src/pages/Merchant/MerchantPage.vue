@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useCharacterStore } from "@/app/store/character";
 import { getItemSellPrice } from "@/shared/lib/merchant/getItemSellPrice";
 import {
-  MERCHANT_STOCK,
+  generateMerchantOffers,
   getMerchantItem,
   type MerchantOffer,
 } from "@/entities/merchant/model/merchant-stock";
@@ -15,10 +15,18 @@ import InventoryGrid from "@/features/inventory/ui/InventoryGrid.vue";
 import ConsumablesGrid from "@/features/inventory/ui/ConsumablesGrid.vue";
 import { ELIXIRS, getElixirDefinition } from "@/features/elixirs/model/elixirs";
 import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
+import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
 import "./MerchantPage.scss";
 
 const characterStore = useCharacterStore();
 const elixirsStore = useElixirsStore();
+const playerProgress = usePlayerProgress();
+
+const OFFER_COUNT = 5;
+const AUTO_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
+const MANUAL_REFRESH_COST_GOLD = 1000;
+const MERCHANT_OFFERS_STORAGE_KEY = "pve_merchant_offers_v1";
+
 const selectedIndex = ref<number | null>(null);
 const message = ref<string | null>(null);
 let messageTimer: ReturnType<typeof setTimeout> | null = null;
@@ -29,6 +37,18 @@ const activeTab = ref<MerchantTab>("equipment");
 const gold = computed(() => characterStore.gold ?? 0);
 const inventoryItems = computed(() => characterStore.inventoryItems);
 const consumableItems = computed(() => characterStore.consumableItems);
+
+const merchantOffers = ref<MerchantOffer[]>([]);
+const heroLevelAtGeneration = ref<number>(playerProgress.level.value);
+const nextRefreshAt = ref<number>(0);
+let autoRefreshTimer: ReturnType<typeof setTimeout> | null = null;
+
+const offersWithDisplay = computed(() =>
+  merchantOffers.value.map((offer) => ({
+    offer,
+    displayItem: getMerchantItem(offer),
+  })),
+);
 
 const selectedItem = computed(() => {
   const idx = selectedIndex.value;
@@ -99,6 +119,12 @@ function showMessage(text: string) {
     message.value = null;
     messageTimer = null;
   }, 2500);
+}
+
+interface MerchantOffersStorageState {
+  heroLevelAtGeneration: number;
+  nextRefreshAt: number;
+  offers: MerchantOffer[];
 }
 
 function selectSlot(_item: import("@/entities/item/model").ItemInstance | null, index: number) {
@@ -200,15 +226,26 @@ function getElixirOfferTooltip(elixir: (typeof ELIXIRS)[number]): string {
 }
 
 function buyItem(offer: MerchantOffer) {
-  const item = getMerchantItem(offer);
-  if (!item) return;
-  if (characterStore.gold < offer.price) {
+  if (offer.isSold) {
+    showMessage("Уже куплено.");
+    return;
+  }
+
+  const currentGold = characterStore.gold ?? 0;
+  if (currentGold < offer.price) {
     showMessage("Недостаточно золота.");
     return;
   }
-  const ok = characterStore.buyFromMerchant(offer.itemId);
-  if (ok) showMessage(`${item.name} куплен за ${offer.price} золотых.`);
-  else showMessage("Инвентарь заполнен.");
+
+  const display = getMerchantItem(offer);
+  const ok = characterStore.buyFromMerchant(offer);
+  if (ok) {
+    offer.isSold = true;
+    saveOffersToStorage();
+    showMessage(`${display?.name ?? "Предмет"} куплен за ${offer.price} золотых.`);
+  } else {
+    showMessage("Инвентарь заполнен.");
+  }
 }
 
 function buyElixir(elixirId: string) {
@@ -238,6 +275,97 @@ function getSlotIconSrc(slot: EquipmentSlot) {
   const file = SLOT_ICON_FILES[slot];
   return `/images/equipment/${file}.png`;
 }
+
+function saveOffersToStorage() {
+  if (typeof window === "undefined") return;
+  const state: MerchantOffersStorageState = {
+    heroLevelAtGeneration: heroLevelAtGeneration.value,
+    nextRefreshAt: nextRefreshAt.value,
+    offers: merchantOffers.value,
+  };
+  window.localStorage.setItem(MERCHANT_OFFERS_STORAGE_KEY, JSON.stringify(state));
+}
+
+function scheduleAutoRefresh() {
+  if (autoRefreshTimer) clearTimeout(autoRefreshTimer);
+  const delay = Math.max(0, nextRefreshAt.value - Date.now());
+  autoRefreshTimer = setTimeout(() => {
+    regenerateOffers();
+  }, delay);
+}
+
+function regenerateOffers() {
+  const heroLevel = playerProgress.level.value;
+  heroLevelAtGeneration.value = heroLevel;
+  merchantOffers.value = generateMerchantOffers(heroLevel, OFFER_COUNT);
+  nextRefreshAt.value = Date.now() + AUTO_REFRESH_INTERVAL_MS;
+  saveOffersToStorage();
+  scheduleAutoRefresh();
+}
+
+function loadOrRegenerateOffers() {
+  if (typeof window === "undefined") return;
+  const currentHeroLevel = playerProgress.level.value;
+  const now = Date.now();
+
+  try {
+    const raw = window.localStorage.getItem(MERCHANT_OFFERS_STORAGE_KEY);
+    if (!raw) {
+      regenerateOffers();
+      return;
+    }
+
+    const parsed = JSON.parse(raw) as Partial<MerchantOffersStorageState>;
+    const storedHeroLevel =
+      typeof parsed.heroLevelAtGeneration === "number" ? parsed.heroLevelAtGeneration : -1;
+    const storedNextRefreshAt =
+      typeof parsed.nextRefreshAt === "number" ? parsed.nextRefreshAt : 0;
+    const storedOffers = Array.isArray(parsed.offers) ? (parsed.offers as MerchantOffer[]) : [];
+
+    if (
+      storedHeroLevel !== currentHeroLevel ||
+      storedOffers.length !== OFFER_COUNT ||
+      storedNextRefreshAt <= now
+    ) {
+      regenerateOffers();
+      return;
+    }
+
+    merchantOffers.value = storedOffers;
+    heroLevelAtGeneration.value = storedHeroLevel;
+    nextRefreshAt.value = storedNextRefreshAt;
+  } catch {
+    regenerateOffers();
+  }
+}
+
+function refreshManually() {
+  const currentGold = characterStore.gold ?? 0;
+  if (currentGold < MANUAL_REFRESH_COST_GOLD) {
+    showMessage("Недостаточно золота.");
+    return;
+  }
+
+  characterStore.gold = currentGold - MANUAL_REFRESH_COST_GOLD;
+  regenerateOffers();
+  showMessage("Товары обновлены.");
+}
+
+const nextRefreshLabel = computed(() => {
+  if (!nextRefreshAt.value) return "";
+  const d = new Date(nextRefreshAt.value);
+  return `Следующее обновление: ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+});
+
+onMounted(() => {
+  loadOrRegenerateOffers();
+  if (nextRefreshAt.value) scheduleAutoRefresh();
+});
+
+onUnmounted(() => {
+  if (autoRefreshTimer) clearTimeout(autoRefreshTimer);
+  autoRefreshTimer = null;
+});
 </script>
 
 <template>
@@ -361,30 +489,41 @@ function getSlotIconSrc(slot: EquipmentSlot) {
 
         <template v-if="activeTab === 'equipment'">
           <h2 class="merchant-page__section-title">Товары торговца</h2>
+          <div class="merchant-page__stock-actions">
+            <button
+              type="button"
+              class="merchant-page__btn merchant-page__btn--refresh"
+              :disabled="gold < MANUAL_REFRESH_COST_GOLD"
+              @click="refreshManually"
+            >
+              Обновить ({{ MANUAL_REFRESH_COST_GOLD }})
+            </button>
+            <div v-if="nextRefreshLabel" class="merchant-page__refresh-label">{{ nextRefreshLabel }}</div>
+          </div>
           <div class="merchant-page__stock-list">
             <div
-              v-for="offer in MERCHANT_STOCK"
-              :key="offer.itemId"
+              v-for="row in offersWithDisplay"
+              :key="row.offer.id"
               class="merchant-page__offer"
-              :title="getEquipmentOfferTooltip(offer)"
+              :title="getEquipmentOfferTooltip(row.offer)"
             >
-              <template v-if="getMerchantItem(offer)">
+              <template v-if="row.displayItem">
                 <div
                   class="merchant-page__offer-icon"
-                  :style="{ color: rarityColor(getMerchantItem(offer)!.rarity) }"
+                  :style="{ color: rarityColor(row.displayItem.rarity) }"
                 >
                   <img
-                    :src="getSlotIconSrc(getMerchantItem(offer)!.slot)"
-                    :alt="SLOT_NAMES[getMerchantItem(offer)!.slot]"
+                    :src="getSlotIconSrc(row.displayItem.slot)"
+                    :alt="SLOT_NAMES[row.displayItem.slot]"
                     class="merchant-page__offer-icon-img"
                   />
                 </div>
                 <div class="merchant-page__offer-info">
                   <span
                     class="merchant-page__offer-name"
-                    :style="{ color: rarityColor(getMerchantItem(offer)!.rarity) }"
+                    :style="{ color: rarityColor(row.displayItem.rarity) }"
                   >
-                    {{ getMerchantItem(offer)!.name }}
+                    {{ row.displayItem.name }}
                   </span>
                   <span class="merchant-page__offer-price">
                     <img
@@ -392,16 +531,16 @@ function getSlotIconSrc(slot: EquipmentSlot) {
                       alt="Золото"
                       class="merchant-page__coin"
                     />
-                    {{ offer.price }}
+                    {{ row.offer.price }}
                   </span>
                 </div>
                 <button
                   type="button"
                   class="merchant-page__btn merchant-page__btn--buy"
-                  :disabled="gold < offer.price"
-                  @click="buyItem(offer)"
+                  :disabled="row.offer.isSold || gold < row.offer.price"
+                  @click="buyItem(row.offer)"
                 >
-                  Купить
+                  {{ row.offer.isSold ? "Куплено" : "Купить" }}
                 </button>
               </template>
             </div>

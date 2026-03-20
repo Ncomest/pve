@@ -5,9 +5,8 @@ import { getTemplate } from "@/entities/item/items-db";
 import { getDisplayItem } from "@/entities/item/model";
 import { critPointsToFraction, evasionPointsToFraction } from "@/entities/item/lib/statPoints";
 import { getItemSellPrice } from "@/shared/lib/merchant/getItemSellPrice";
-import { MERCHANT_STOCK } from "@/entities/merchant/model/merchant-stock";
+import type { MerchantOffer } from "@/entities/merchant/model/merchant-stock";
 import { generateInstanceId } from "@/entities/item/lib/createInstance";
-import { createItemInstance } from "@/entities/item/lib/createInstance";
 
 interface CharacterState {
   gold: number;
@@ -224,15 +223,17 @@ export const useCharacterStore = defineStore("character", {
       return amount;
     },
 
-    buyFromMerchant(itemId: string): boolean {
-      const offer = MERCHANT_STOCK.find((o) => o.itemId === itemId);
-      if (!offer) return false;
-      if (!getTemplate(offer.itemId)) return false;
+    buyFromMerchant(offer: MerchantOffer): boolean {
+      if (offer.isSold) return false;
+      const templateId = offer.itemInstance.templateId;
+      if (!getTemplate(templateId)) return false;
+
       const currentGold = this.gold ?? 0;
       if (currentGold < offer.price) return false;
-      const instance = createItemInstance(offer.itemId, 1);
-      const added = this.addItemToInventory(instance);
+
+      const added = this.addItemToInventory(offer.itemInstance);
       if (!added) return false;
+
       this.gold = currentGold - offer.price;
       return true;
     },

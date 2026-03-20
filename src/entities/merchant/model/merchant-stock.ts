@@ -1,26 +1,56 @@
-import type { Item } from "@/entities/item/model";
+import type { Item, ItemInstance } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
 import { getDisplayItem } from "@/entities/item/model";
 import { createItemInstance } from "@/entities/item/lib/createInstance";
+import { ALL_TEMPLATE_IDS } from "@/entities/item/items-db";
+import { getItemSellPrice } from "@/shared/lib/merchant/getItemSellPrice";
 
 export interface MerchantOffer {
-  itemId: string; // templateId
-  price: number; // золотые монеты
+  id: string;
+  itemInstance: ItemInstance;
+  price: number;
+  isSold: boolean;
 }
 
-/** Товары торговца: 5 позиций с фиксированными ценами (шаблоны из items-db). */
-export const MERCHANT_STOCK: MerchantOffer[] = [
-  { itemId: "weapon-2", price: 80 },
-  { itemId: "shield-2", price: 65 },
-  { itemId: "ring-2", price: 55 },
-  { itemId: "belt-2", price: 50 },
-  { itemId: "earring-2", price: 70 },
-];
-
-/** Возвращает отображаемый вид товара (уровень 1) для витрины. */
+/** Возвращает отображаемый вид товара (эффективные статы + itemLevel). */
 export function getMerchantItem(offer: MerchantOffer): Item | null {
-  const template = getTemplate(offer.itemId);
-  if (!template) return null;
-  const instance = createItemInstance(offer.itemId, 1);
-  return getDisplayItem(instance, getTemplate);
+  return getDisplayItem(offer.itemInstance, getTemplate);
 }
+
+function pickUniqueTemplateIds(count: number): string[] {
+  const pool = [...ALL_TEMPLATE_IDS];
+  const out: string[] = [];
+  for (let i = 0; i < count && pool.length > 0; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    out.push(pool[idx]!);
+    pool.splice(idx, 1);
+  }
+  return out;
+}
+
+/**
+ * Генерирует витрину торговца под уровень героя.
+ * Уровень вещи торговца совпадает с механикой дропа с босса: `1 + bossLevel * 3`,
+ * где bossLevel условно = heroLevel.
+ */
+export function generateMerchantOffers(heroLevel: number, count: number): MerchantOffer[] {
+  const itemLevel = 1 + heroLevel * 3;
+  const templateIds = pickUniqueTemplateIds(count);
+
+  return templateIds.map((templateId) => {
+    const itemInstance = createItemInstance(templateId, itemLevel);
+    const displayItem = getDisplayItem(itemInstance, getTemplate);
+    const price = displayItem ? getItemSellPrice(displayItem) * 3 : 0;
+
+    return {
+      id: itemInstance.instanceId,
+      itemInstance,
+      price,
+      isSold: false,
+    };
+  });
+}
+
+// Держим экспорт MERCHANT_STOCK только чтобы не сломать импорты в других местах.
+// В актуальной логике используется generateMerchantOffers + локальное состояние витрины.
+export const MERCHANT_STOCK: MerchantOffer[] = [];
