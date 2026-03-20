@@ -43,6 +43,7 @@ const {
         :selected-slot="selectedEquippedSlot"
         @unequip="handleUnequip"
         @select="selectEquippedItem"
+        @unequip-selected="handleUnequipSelected"
       />
 
       <HeroStats />
@@ -56,6 +57,7 @@ const {
       :selected-equipped-display-item="selectedEquippedDisplayItem"
       :inventory-full-warning="inventoryFullWarning"
       :is-item-equipped="isItemEquipped"
+      :show-equipped-in-inventory="false"
       @select="selectItem"
       @equip="handleEquip"
       @unequip-selected="handleUnequipSelected"

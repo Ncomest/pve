@@ -9,15 +9,20 @@ interface InventoryEntry {
   index: number;
 }
 
-const props = defineProps<{
-  items: InventoryEntry[];
-  selectedItem: { item: ItemInstance; index: number } | null;
-  selectedEquippedItem: ItemInstance | null;
-  selectedDisplayItem: Item | null;
-  selectedEquippedDisplayItem: Item | null;
-  inventoryFullWarning: boolean;
-  isItemEquipped: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    items: InventoryEntry[];
+    selectedItem: { item: ItemInstance; index: number } | null;
+    selectedEquippedItem: ItemInstance | null;
+    selectedDisplayItem: Item | null;
+    selectedEquippedDisplayItem: Item | null;
+    inventoryFullWarning: boolean;
+    isItemEquipped: boolean;
+    /** Если false — блок деталей надетой вещи не показывается (например, аккордеон на странице персонажа). */
+    showEquippedInInventory?: boolean;
+  }>(),
+  { showEquippedInInventory: true },
+);
 
 const emit = defineEmits<{
   select: [item: ItemInstance | null, index: number];
@@ -37,7 +42,10 @@ const emit = defineEmits<{
         :selected-index="props.selectedItem?.index ?? null"
         @select="(item, index) => emit('select', item, index)"
       />
-      <div v-if="props.selectedEquippedDisplayItem" class="inventory-section__item-details">
+      <div
+        v-if="props.showEquippedInInventory && props.selectedEquippedDisplayItem"
+        class="inventory-section__item-details"
+      >
         <ItemDetails
           :item="props.selectedEquippedDisplayItem"
           :is-equipped="true"

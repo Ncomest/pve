@@ -5,6 +5,7 @@ import { getDisplayItem } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
 import { rarityColor } from "@/entities/item/lib/rarityColor";
 import { useHeroAvatar } from "@/features/inventory/model/useHeroAvatar";
+import ItemDetails from "@/features/inventory/ui/ItemDetails.vue";
 
 interface SlotEntry {
   slot: EquipmentSlot;
@@ -20,6 +21,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   unequip: [slot: EquipmentSlot];
   select: [slot: EquipmentSlot];
+  /** Снять предмет из раскрытой панели (текущий выбранный слот в useInventory). */
+  unequipSelected: [];
 }>();
 
 const LEFT_SLOTS: EquipmentSlot[] = ["helmet", "chest", "belt", "pants", "boots"];
@@ -69,47 +72,62 @@ function getDisplay(inst: ItemInstance | null) {
         <div
           v-for="{ slot, label, item } in leftSlots"
           :key="slot"
-          class="equipment-slots__card"
-          :class="{
-            'equipment-slots__card--filled': item,
-            'equipment-slots__card--selected': item && selectedSlot === slot,
-          }"
-          @click="item && emit('select', slot)"
+          class="equipment-slots__accordion"
         >
-          <!-- Иконка слота -->
-          <div class="equipment-slots__icon" :class="{ 'equipment-slots__icon--filled': item }">
-            <img
-              :src="getSlotIconSrc(slot)"
-              :alt="label"
-              class="equipment-slots__icon-img"
-            />
-          </div>
-
-          <!-- Правая часть: заголовок + имя предмета/статус -->
-          <div class="equipment-slots__info">
-            <div class="equipment-slots__header">
-              <span class="equipment-slots__label">{{ label }}</span>
-              <button
-                v-if="item"
-                type="button"
-                class="equipment-slots__unequip-btn"
-                @click.stop="emit('unequip', slot)"
-              >
-                Снять
-              </button>
+          <div
+            class="equipment-slots__card"
+            :class="{
+              'equipment-slots__card--filled': item,
+              'equipment-slots__card--selected': item && selectedSlot === slot,
+            }"
+            @click="item && emit('select', slot)"
+          >
+            <!-- Иконка слота -->
+            <div class="equipment-slots__icon" :class="{ 'equipment-slots__icon--filled': item }">
+              <img
+                :src="getSlotIconSrc(slot)"
+                :alt="label"
+                class="equipment-slots__icon-img"
+              />
             </div>
-            <template v-if="item">
-              <div
-                class="equipment-slots__item-name"
-                :style="getDisplay(item) ? { color: rarityColor(getDisplay(item)!.rarity) } : {}"
-              >
-                {{ getDisplay(item)?.name }}
+
+            <!-- Правая часть: заголовок + имя предмета/статус -->
+            <div class="equipment-slots__info">
+              <div class="equipment-slots__header">
+                <span class="equipment-slots__label">{{ label }}</span>
+                <button
+                  v-if="item"
+                  type="button"
+                  class="equipment-slots__unequip-btn"
+                  @click.stop="emit('unequip', slot)"
+                >
+                  Снять
+                </button>
               </div>
-              <div v-if="getDisplay(item)?.itemLevel != null" class="equipment-slots__item-level">
-                Ур. {{ getDisplay(item)!.itemLevel }}
-              </div>
-            </template>
-            <div v-else class="equipment-slots__empty">Свободно</div>
+              <template v-if="item">
+                <div
+                  class="equipment-slots__item-name"
+                  :style="getDisplay(item) ? { color: rarityColor(getDisplay(item)!.rarity) } : {}"
+                >
+                  {{ getDisplay(item)?.name }}
+                </div>
+                <div v-if="getDisplay(item)?.itemLevel != null" class="equipment-slots__item-level">
+                  Ур. {{ getDisplay(item)!.itemLevel }}
+                </div>
+              </template>
+              <div v-else class="equipment-slots__empty">Свободно</div>
+            </div>
+          </div>
+          <div
+            v-if="item && selectedSlot === slot && getDisplay(item)"
+            class="equipment-slots__accordion-panel"
+          >
+            <ItemDetails
+              :item="getDisplay(item)!"
+              :is-equipped="true"
+              :is-equipped-slot="true"
+              @unequip="emit('unequipSelected')"
+            />
           </div>
         </div>
       </div>
@@ -158,47 +176,62 @@ function getDisplay(inst: ItemInstance | null) {
         <div
           v-for="{ slot, label, item } in rightSlots"
           :key="slot"
-          class="equipment-slots__card"
-          :class="{
-            'equipment-slots__card--filled': item,
-            'equipment-slots__card--selected': item && selectedSlot === slot,
-          }"
-          @click="item && emit('select', slot)"
+          class="equipment-slots__accordion"
         >
-          <!-- Иконка слота -->
-          <div class="equipment-slots__icon" :class="{ 'equipment-slots__icon--filled': item }">
-            <img
-              :src="getSlotIconSrc(slot)"
-              :alt="label"
-              class="equipment-slots__icon-img"
-            />
-          </div>
-
-          <!-- Правая часть: заголовок + имя предмета/статус -->
-          <div class="equipment-slots__info">
-            <div class="equipment-slots__header">
-              <span class="equipment-slots__label">{{ label }}</span>
-              <button
-                v-if="item"
-                type="button"
-                class="equipment-slots__unequip-btn"
-                @click.stop="emit('unequip', slot)"
-              >
-                Снять
-              </button>
+          <div
+            class="equipment-slots__card"
+            :class="{
+              'equipment-slots__card--filled': item,
+              'equipment-slots__card--selected': item && selectedSlot === slot,
+            }"
+            @click="item && emit('select', slot)"
+          >
+            <!-- Иконка слота -->
+            <div class="equipment-slots__icon" :class="{ 'equipment-slots__icon--filled': item }">
+              <img
+                :src="getSlotIconSrc(slot)"
+                :alt="label"
+                class="equipment-slots__icon-img"
+              />
             </div>
-            <template v-if="item">
-              <div
-                class="equipment-slots__item-name"
-                :style="getDisplay(item) ? { color: rarityColor(getDisplay(item)!.rarity) } : {}"
-              >
-                {{ getDisplay(item)?.name }}
+
+            <!-- Правая часть: заголовок + имя предмета/статус -->
+            <div class="equipment-slots__info">
+              <div class="equipment-slots__header">
+                <span class="equipment-slots__label">{{ label }}</span>
+                <button
+                  v-if="item"
+                  type="button"
+                  class="equipment-slots__unequip-btn"
+                  @click.stop="emit('unequip', slot)"
+                >
+                  Снять
+                </button>
               </div>
-              <div v-if="getDisplay(item)?.itemLevel != null" class="equipment-slots__item-level">
-                Ур. {{ getDisplay(item)!.itemLevel }}
-              </div>
-            </template>
-            <div v-else class="equipment-slots__empty">Свободно</div>
+              <template v-if="item">
+                <div
+                  class="equipment-slots__item-name"
+                  :style="getDisplay(item) ? { color: rarityColor(getDisplay(item)!.rarity) } : {}"
+                >
+                  {{ getDisplay(item)?.name }}
+                </div>
+                <div v-if="getDisplay(item)?.itemLevel != null" class="equipment-slots__item-level">
+                  Ур. {{ getDisplay(item)!.itemLevel }}
+                </div>
+              </template>
+              <div v-else class="equipment-slots__empty">Свободно</div>
+            </div>
+          </div>
+          <div
+            v-if="item && selectedSlot === slot && getDisplay(item)"
+            class="equipment-slots__accordion-panel"
+          >
+            <ItemDetails
+              :item="getDisplay(item)!"
+              :is-equipped="true"
+              :is-equipped-slot="true"
+              @unequip="emit('unequipSelected')"
+            />
           </div>
         </div>
       </div>
