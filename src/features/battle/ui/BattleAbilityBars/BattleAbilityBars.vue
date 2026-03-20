@@ -7,7 +7,7 @@ import { AbilityTooltip } from "@/shared/ui/AbilityTooltip";
 import "./BattleAbilityBars.scss";
 
 const props = defineProps<{
-  panels: [SkillBar, SkillBar];
+  panels: SkillBar[];
   isBattleOver: boolean;
   isAbilityReady: (id: string) => boolean;
   abilityCooldownText: (id: string) => string;

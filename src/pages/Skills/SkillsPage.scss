@@ -64,7 +64,9 @@
     transform: translateX(-50%);
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.15s, visibility 0.15s;
+    transition:
+      opacity 0.15s,
+      visibility 0.15s;
     pointer-events: none;
     z-index: 50;
   }
@@ -134,7 +136,10 @@
   cursor: pointer;
   text-align: left;
   color: rgba(255, 255, 255, 0.9);
-  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    background 0.15s;
 
   &:hover {
     background: rgba(255, 255, 255, 0.08);
@@ -200,7 +205,9 @@
     gap: 4px;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.15s, transform 0.15s;
+    transition:
+      opacity 0.15s,
+      transform 0.15s;
 
     @media (max-width: 426px) {
       left: 0;
