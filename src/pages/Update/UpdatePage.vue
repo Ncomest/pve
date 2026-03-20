@@ -1,16 +1,20 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import commitsData from "@/pages/Update/commits.json";
 
 interface CommitEntry {
-  hash: string;
-  shortHash: string;
+  hash?: string;
+  shortHash?: string;
   date: string;
-  author: string;
+  author?: string;
   message: string;
 }
 
 const commitsRaw = commitsData as CommitEntry[];
+const COMMITS_PAGE_SIZE = 10;
+const visibleCount = ref(COMMITS_PAGE_SIZE);
+const loadMoreTrigger = ref<HTMLElement | null>(null);
+let observer: IntersectionObserver | null = null;
 
 const commits = computed(() =>
   commitsRaw.map((commit) => ({
@@ -19,6 +23,14 @@ const commits = computed(() =>
     message: (commit.message ?? "").replace(/^\uFEFF/, ""),
   })),
 );
+
+const visibleCommits = computed(() => commits.value.slice(0, visibleCount.value));
+const hasMoreCommits = computed(() => visibleCount.value < commits.value.length);
+
+function loadMoreCommits(): void {
+  if (!hasMoreCommits.value) return;
+  visibleCount.value += COMMITS_PAGE_SIZE;
+}
 
 function formatDate(iso: string): string {
   const date = new Date(iso);
@@ -31,6 +43,30 @@ function formatDate(iso: string): string {
     minute: "2-digit",
   });
 }
+
+onMounted(() => {
+  if (!loadMoreTrigger.value) return;
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      const [entry] = entries;
+      if (!entry?.isIntersecting) return;
+      loadMoreCommits();
+    },
+    {
+      root: null,
+      rootMargin: "120px 0px",
+      threshold: 0,
+    },
+  );
+
+  observer.observe(loadMoreTrigger.value);
+});
+
+onBeforeUnmount(() => {
+  observer?.disconnect();
+  observer = null;
+});
 </script>
 
 <template>
@@ -39,14 +75,21 @@ function formatDate(iso: string): string {
     <p class="update-page__subtitle">История изменений проекта (git-коммиты).</p>
 
     <section class="update-page__list">
-      <article v-for="commit in commits" :key="commit.hash" class="update-card">
+      <article
+        v-for="(commit, index) in visibleCommits"
+        :key="commit.hash ?? `${commit.date}-${index}`"
+        class="update-card"
+      >
         <div class="update-card__meta">
           <span class="update-card__date">{{ formatDate(commit.date) }}</span>
-          <span class="update-card__author">{{ commit.author }}</span>
+          <span v-if="commit.author" class="update-card__author">{{ commit.author }}</span>
         </div>
         <div class="update-card__message">{{ commit.message }}</div>
-        <div class="update-card__hash">{{ commit.shortHash }}</div>
+        <div v-if="commit.shortHash" class="update-card__hash">{{ commit.shortHash }}</div>
       </article>
+
+      <div ref="loadMoreTrigger" class="update-page__load-trigger" />
+      <div v-if="hasMoreCommits" class="update-page__load-more-hint">Прокрути вниз, чтобы загрузить еще 10</div>
     </section>
   </div>
 </template>
@@ -76,6 +119,18 @@ function formatDate(iso: string): string {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.update-page__load-trigger {
+  width: 100%;
+  height: 1px;
+}
+
+.update-page__load-more-hint {
+  padding: 0.25rem 0 0.5rem;
+  font-size: 0.82rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .update-card {
