@@ -229,6 +229,22 @@ watch(
           </svg>
           <span>Обновление</span>
         </RouterLink>
+
+        <!-- Справка -->
+        <RouterLink to="/info" class="nav-link nav-link--info">
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+            <path
+              d="M9.5 9.5a2.5 2.5 0 0 1 4.2-1.7c.6.6.8 1.3.8 2.2 0 1.5-1 2-2 2.5-.4.2-.5.5-.5 1V15"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle cx="12" cy="17.5" r="0.9" fill="currentColor" />
+          </svg>
+          <span>Информация</span>
+        </RouterLink>
       </nav>
 
       <button
@@ -329,6 +345,25 @@ watch(
             <path d="M21 3v6h-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <span>Обновление</span>
+        </RouterLink>
+
+        <RouterLink
+          to="/info"
+          class="nav-link nav-link--info app-burger-panel__link"
+          @click="isMenuOpen = false"
+        >
+          <svg class="nav-link__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+            <path
+              d="M9.5 9.5a2.5 2.5 0 0 1 4.2-1.7c.6.6.8 1.3.8 2.2 0 1.5-1 2-2 2.5-.4.2-.5.5-.5 1V15"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle cx="12" cy="17.5" r="0.9" fill="currentColor" />
+          </svg>
+          <span>Информация</span>
         </RouterLink>
       </div>
     </header>

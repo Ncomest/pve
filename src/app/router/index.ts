@@ -6,6 +6,7 @@ import MerchantPage from "@/pages/Merchant/MerchantPage.vue";
 import SkillsPage from "@/pages/Skills/SkillsPage.vue";
 import CraftPage from "@/pages/Craft/CraftPage.vue";
 import UpdatePage from "@/pages/Update/UpdatePage.vue";
+import InfoPage from "@/pages/Info/InfoPage.vue";
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -38,6 +39,11 @@ export const routes: RouteRecordRaw[] = [
     path: "/update",
     name: "update",
     component: UpdatePage,
+  },
+  {
+    path: "/info",
+    name: "info",
+    component: InfoPage,
   },
   {
     path: "/craft",
