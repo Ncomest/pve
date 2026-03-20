@@ -69,6 +69,36 @@
     gap: 10px;
   }
 
+  &__dps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  &__dps-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  &__dps-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  &__dps-value {
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
   &__subtitle {
     opacity: 0.82;
     color: rgba(255, 255, 255, 0.8);
@@ -201,6 +231,19 @@
       gap: 10px;
     }
 
+    &__dps {
+      padding: 7px 10px;
+      gap: 8px;
+    }
+
+    &__dps-label {
+      font-size: 11px;
+    }
+
+    &__dps-value {
+      font-size: 13px;
+    }
+
     &__abilities-row {
       gap: 10px;
     }
@@ -251,40 +294,45 @@
     gap: 6px;
 
     &__header {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      grid-template-areas:
-        "title flee"
-        "timer timer";
+      display: flex;
+      justify-content: space-between;
       align-items: center;
       gap: 6px;
     }
 
     &__title {
-      grid-area: title;
       font-size: 18px;
+      flex-shrink: 0;
     }
 
     &__timer {
-      grid-area: timer;
-      justify-self: stretch;
-      width: 100%;
+      flex: 1;
+      min-width: 0;
       text-align: center;
       padding: 6px 8px;
       font-size: 13px;
     }
 
     &__flee-btn {
-      grid-area: flee;
-      justify-self: end;
       min-width: 92px;
       height: 30px;
       padding: 0 8px;
       font-size: 11px;
+      flex-shrink: 0;
     }
 
     &__arena {
       gap: 8px;
+    }
+
+    &__dps {
+      padding: 6px 8px;
+      gap: 6px;
+    }
+
+    &__dps-item {
+      width: 100%;
+      justify-content: space-between;
     }
 
     &__abilities-row {

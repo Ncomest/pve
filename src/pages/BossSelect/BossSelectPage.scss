@@ -41,7 +41,9 @@
     border: none;
     border-bottom: 2px solid transparent;
     cursor: pointer;
-    transition: color 0.2s, border-color 0.2s;
+    transition:
+      color 0.2s,
+      border-color 0.2s;
     position: relative;
     bottom: -1px;
     white-space: nowrap;
@@ -71,7 +73,9 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(15, 23, 42, 0.9);
   overflow: hidden;
-  transition: border-color 0.12s ease-out, box-shadow 0.12s ease-out;
+  transition:
+    border-color 0.12s ease-out,
+    box-shadow 0.12s ease-out;
 
   &:hover {
     border-color: rgba(96, 165, 250, 0.45);
@@ -144,7 +148,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     min-width: 0;
   }
 
@@ -284,7 +288,10 @@
     background: rgba(255, 255, 255, 0.05);
     color: rgba(255, 255, 255, 0.6);
     cursor: pointer;
-    transition: background 0.12s, color 0.12s, border-color 0.12s;
+    transition:
+      background 0.12s,
+      color 0.12s,
+      border-color 0.12s;
     flex-shrink: 0;
 
     svg {
@@ -399,8 +406,6 @@
     &__name {
       font-size: 15px;
       line-height: 1.25;
-      display: flex;
-      flex-direction: column;
     }
 
     &__effects-row {
@@ -415,7 +420,6 @@
     }
 
     &__rarity {
-      margin-top: 2px;
       font-size: 11px;
       padding: 2px 7px;
     }
@@ -531,7 +535,9 @@
     background: rgba(251, 191, 36, 0.07);
     cursor: default;
     flex-shrink: 0;
-    transition: transform 0.1s, border-color 0.1s;
+    transition:
+      transform 0.1s,
+      border-color 0.1s;
 
     &:hover {
       transform: scale(1.18);

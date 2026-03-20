@@ -59,6 +59,8 @@ const {
   bossAttackCooldownLeft,
   bossAttackCooldownMax,
   battleTimeFormatted,
+  playerDps,
+  incomingDps,
   currentBossAbility,
   bossCastState,
   bossCastTimeLeftMs,
@@ -152,6 +154,17 @@ onUnmounted(() => {
         <span>Побег</span>
       </button>
     </header>
+
+    <div class="battle-page__dps">
+      <div class="battle-page__dps-item">
+        <span class="battle-page__dps-label">Урон по боссу</span>
+        <span class="battle-page__dps-value">{{ playerDps.toFixed(1) }}/с</span>
+      </div>
+      <div class="battle-page__dps-item">
+        <span class="battle-page__dps-label">Урон от босса</span>
+        <span class="battle-page__dps-value">{{ incomingDps.toFixed(1) }}/с</span>
+      </div>
+    </div>
 
 
     <div class="battle-page__arena">

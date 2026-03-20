@@ -81,10 +81,10 @@
       <div class="boss-select-entry__info">
         <div class="boss-select-entry__name">
           {{ boss.name }}
-          <span class="boss-select-entry__rarity">
-            {{ rarityLabel(boss.rarity) }}
-          </span>
         </div>
+        <span class="boss-select-entry__rarity">
+          {{ rarityLabel(boss.rarity) }}
+        </span>
         <div
           v-if="(boss.bossAbilities?.length ?? 0) > 0"
           class="boss-select-entry__abilities-row"
