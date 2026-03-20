@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+.output
+.cache
+
+# Сборочные артефакты и минифицированные файлы
+*.min.js
+*.map
+

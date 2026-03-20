@@ -1,90 +1,97 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { useCharacterStore } from "@/app/store/character";
-import { useInventory } from "@/features/inventory/model/useInventory";
-import InventorySection from "@/features/inventory/ui/InventorySection.vue";
-import lootData from "@/entities/loot/loot.json";
-import { rarityColor } from "@/entities/item/lib/rarityColor";
-import { CRAFT_RECIPES, getCraftResultItem } from "@/entities/craft/model/craft-recipes";
-import type { EquipmentSlot } from "@/entities/item/model";
-import "./CraftPage.scss";
+  import { computed, ref } from "vue";
+  import { useCharacterStore } from "@/app/store/character";
+  import { useInventory } from "@/features/inventory/model/useInventory";
+  import InventorySection from "@/features/inventory/ui/InventorySection.vue";
+  import lootData from "@/entities/loot/loot.json";
+  import { rarityColor } from "@/entities/item/lib/rarityColor";
+  import {
+    CRAFT_RECIPES,
+    getCraftResultItem,
+  } from "@/entities/craft/model/craft-recipes";
+  import type { EquipmentSlot } from "@/entities/item/model";
+  import "./CraftPage.scss";
 
-interface LootEntry {
-  id: string;
-  name: string;
-  icon?: string;
-  slot: string;
-  rarity: "common" | "rare" | "epic" | "legendary";
-  description?: string;
-}
+  interface LootEntry {
+    id: string;
+    name: string;
+    icon?: string;
+    slot: string;
+    rarity: "common" | "rare" | "epic" | "legendary";
+    description?: string;
+  }
 
-const characterStore = useCharacterStore();
-const expandedRecipeId = ref<string | null>(null);
+  const characterStore = useCharacterStore();
+  const expandedRecipeId = ref<string | null>(null);
 
-const {
-  selectedItem,
-  selectedEquippedItem,
-  selectedDisplayItem,
-  selectedEquippedDisplayItem,
-  inventoryFullWarning,
-  isItemEquipped,
-  selectItem,
-  handleEquip,
-  handleUnequipSelected,
-  handleDelete,
-  closeWarning,
-} = useInventory();
+  const {
+    selectedItem,
+    selectedEquippedItem,
+    selectedDisplayItem,
+    selectedEquippedDisplayItem,
+    inventoryFullWarning,
+    isItemEquipped,
+    selectItem,
+    handleEquip,
+    handleUnequipSelected,
+    handleDelete,
+    closeWarning,
+  } = useInventory();
 
-const inventoryItems = computed(() => characterStore.inventoryItems);
+  const inventoryItems = computed(() => characterStore.inventoryItems);
 
-const lootEntries = lootData as LootEntry[];
-const resourceById = new Map<string, LootEntry>(
-  lootEntries.filter((entry) => entry.slot === "resource").map((entry) => [entry.id, entry]),
-);
+  const lootEntries = lootData as LootEntry[];
+  const resourceById = new Map<string, LootEntry>(
+    lootEntries
+      .filter((entry) => entry.slot === "resource")
+      .map((entry) => [entry.id, entry]),
+  );
 
-function getResource(resourceId: string): LootEntry | undefined {
-  return resourceById.get(resourceId);
-}
+  function getResource(resourceId: string): LootEntry | undefined {
+    return resourceById.get(resourceId);
+  }
 
-const recipesWithItems = computed(() =>
-  CRAFT_RECIPES.map((recipe) => ({
-    recipe,
-    resultItem: getCraftResultItem(recipe),
-  })),
-);
+  const recipesWithItems = computed(() =>
+    CRAFT_RECIPES.map((recipe) => ({
+      recipe,
+      resultItem: getCraftResultItem(recipe),
+    })),
+  );
 
-const SLOT_ICON_FILES: Record<EquipmentSlot, string> = {
-  helmet: "helmet",
-  chest: "chest",
-  belt: "belt",
-  pants: "pants",
-  boots: "boots",
-  necklace: "neck",
-  ring: "ring",
-  earring: "trinket",
-  weapon: "sword",
-  shield: "shield",
-};
+  const SLOT_ICON_FILES: Record<EquipmentSlot, string> = {
+    helmet: "helmet",
+    chest: "chest",
+    belt: "belt",
+    pants: "pants",
+    boots: "boots",
+    necklace: "neck",
+    ring: "ring",
+    earring: "trinket",
+    weapon: "sword",
+    shield: "shield",
+  };
 
-function getSlotIconSrc(slot: EquipmentSlot) {
-  const file = SLOT_ICON_FILES[slot];
-  return `/images/equipment/${file}.png`;
-}
+  function getSlotIconSrc(slot: EquipmentSlot) {
+    const file = SLOT_ICON_FILES[slot];
+    return `/images/equipment/${file}.png`;
+  }
 
-function toggleRecipe(recipeId: string) {
-  expandedRecipeId.value = expandedRecipeId.value === recipeId ? null : recipeId;
-}
+  function toggleRecipe(recipeId: string) {
+    expandedRecipeId.value =
+      expandedRecipeId.value === recipeId ? null : recipeId;
+  }
 
-function isRecipeExpanded(recipeId: string): boolean {
-  return expandedRecipeId.value === recipeId;
-}
+  function isRecipeExpanded(recipeId: string): boolean {
+    return expandedRecipeId.value === recipeId;
+  }
 </script>
 
 <template>
   <div class="craft-page">
     <h1 class="craft-page__title">Крафт</h1>
     <p class="craft-page__subtitle">
-      Используйте ресурсы, добытые с боссов, чтобы создавать усиленное снаряжение.
+      Используйте ресурсы, добытые с боссов, чтобы создавать усиленное
+      снаряжение.
     </p>
 
     <div class="craft-page__content">
@@ -106,7 +113,8 @@ function isRecipeExpanded(recipeId: string): boolean {
       <section class="craft-page__recipes">
         <h2 class="craft-page__recipes-title">Рецепты крафта</h2>
         <p class="craft-page__recipes-hint">
-          Пока крафт работает как прототип: здесь отображаются рецепты и требуемые материалы.
+          Пока крафт работает как прототип: здесь отображаются рецепты и
+          требуемые материалы.
         </p>
 
         <div class="craft-page__recipes-list">
@@ -114,7 +122,9 @@ function isRecipeExpanded(recipeId: string): boolean {
             v-for="entry in recipesWithItems"
             :key="entry.recipe.id"
             class="craft-page__recipe"
-            :class="{ 'craft-page__recipe--expanded': isRecipeExpanded(entry.recipe.id) }"
+            :class="{
+              'craft-page__recipe--expanded': isRecipeExpanded(entry.recipe.id),
+            }"
           >
             <button
               type="button"
@@ -128,17 +138,16 @@ function isRecipeExpanded(recipeId: string): boolean {
                   :alt="entry.resultItem.name"
                   class="craft-page__recipe-icon-img"
                 />
-                <span
-                  v-else
-                  class="craft-page__recipe-icon-placeholder"
-                >
+                <span v-else class="craft-page__recipe-icon-placeholder">
                   ⚒
                 </span>
               </div>
               <div class="craft-page__recipe-main">
                 <div
                   class="craft-page__recipe-name"
-                  :style="{ color: rarityColor(entry.resultItem?.rarity ?? 'common') }"
+                  :style="{
+                    color: rarityColor(entry.resultItem?.rarity ?? 'common'),
+                  }"
                 >
                   {{ entry.recipe.name }}
                 </div>
@@ -171,7 +180,9 @@ function isRecipeExpanded(recipeId: string): boolean {
                 <span class="craft-page__recipe-result-label">Результат:</span>
                 <span
                   class="craft-page__recipe-result-name"
-                  :style="{ color: rarityColor(entry.resultItem?.rarity ?? 'common') }"
+                  :style="{
+                    color: rarityColor(entry.resultItem?.rarity ?? 'common'),
+                  }"
                 >
                   {{ entry.resultItem?.name ?? "Неизвестный предмет" }}
                 </span>
@@ -208,4 +219,3 @@ function isRecipeExpanded(recipeId: string): boolean {
     </div>
   </div>
 </template>
-
