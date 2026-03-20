@@ -962,17 +962,17 @@
     "id": "dragon",
     "name": "Пещерный Дракон",
     "image": "/images/bosses/dragon.jpg",
-    "level": 100,
+    "level": 10,
     "rarity": "epic",
     "xpReward": 500,
     "stats": {
-      "hp": 2000000,
-      "maxHp": 2000000,
-      "power": 150,
+      "hp": 20000,
+      "maxHp": 20000,
+      "power": 55,
       "chanceCrit": 0.25,
-      "evasion": 0.22,
+      "evasion": 0.12,
       "speed": 3,
-      "armor": 40
+      "armor": 12
     },
     "buffs": [
       {
@@ -1049,10 +1049,10 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Дыхание огнём. Урон и горение на 8 секунд",
-        "baseDamageX": 10.5,
+        "baseDamageX": 1.5,
         "dotDurationMs": 8000,
         "dotTickIntervalMs": 2000,
-        "dotDamagePerTick": 180,
+        "dotDamagePerTick": 18,
         "debuffType": "burn"
       },
       {
@@ -1066,7 +1066,7 @@
         "canBeInterrupted": false,
         "requiredDefensiveTag": "block",
         "description": "Размашистый удар хвостом. Блокируется щитом",
-        "baseDamageX": 23.2
+        "baseDamageX": 3.2
       },
       {
         "id": "ancient-curse",
@@ -1080,7 +1080,7 @@
         "debuffRequiresCleanse": true,
         "debuffType": "curse",
         "description": "Накладывает древнее проклятие, ослабляющее героя. Снимается Cleanse",
-        "baseDamageX": 20.8
+        "baseDamageX": 0.8
       },
       {
         "id": "scale-armor",
@@ -1108,7 +1108,7 @@
         "canBeInterrupted": false,
         "requiredDefensiveTag": "full-dodge",
         "description": "Серия ударов когтями. Избежать можно только уворотом",
-        "baseDamageX": 20.2
+        "baseDamageX": 2.2
       }
     ],
     "abilityConfig": {
