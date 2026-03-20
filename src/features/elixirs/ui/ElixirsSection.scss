@@ -1,0 +1,176 @@
+.elixirs-section {
+  margin-top: 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.elixirs-section__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.elixirs-section__body {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 14px;
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.elixirs-section__details {
+  border-radius: 10px;
+  border: 1px solid rgba(96, 165, 250, 0.5);
+  background: rgba(15, 23, 42, 0.95);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: fit-content;
+
+  @media (max-width: 1024px) {
+    order: -1;
+  }
+}
+
+.elixirs-section__details--empty {
+  justify-content: center;
+  text-align: center;
+}
+
+.elixirs-section__details-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.elixirs-section__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: rgba(8, 14, 30, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.elixirs-section__icon-img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.elixirs-section__details-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.elixirs-section__elixir-name {
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.elixirs-section__timer {
+  font-size: 12px;
+  opacity: 0.85;
+  color: rgba(134, 239, 172, 0.95);
+  font-weight: 600;
+}
+
+.elixirs-section__elixir-description {
+  font-size: 13px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: pre-line;
+}
+
+.elixirs-section__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.elixirs-section__btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+  border: 1px solid transparent;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    transform: translateY(-1px);
+  }
+}
+
+.elixirs-section__btn--drink {
+  background: rgba(34, 197, 94, 0.22);
+  color: rgba(134, 239, 172, 0.95);
+  border-color: rgba(34, 197, 94, 0.45);
+
+  &:not(:disabled):hover {
+    background: rgba(34, 197, 94, 0.35);
+    border-color: rgba(34, 197, 94, 0.7);
+  }
+}
+
+.elixirs-section__btn--discard {
+  background: rgba(185, 28, 28, 0.22);
+  color: rgba(255, 255, 255, 0.95);
+  border-color: rgba(220, 38, 38, 0.45);
+
+  &:not(:disabled):hover {
+    background: rgba(185, 28, 28, 0.32);
+    border-color: rgba(220, 38, 38, 0.75);
+  }
+}
+
+.elixirs-section__empty-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.4;
+}
+
+.elixirs-section__toast {
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: rgba(134, 239, 172, 0.95);
+  font-size: 14px;
+  animation: elixirs-toast-in 0.25s ease-out;
+}
+
+@keyframes elixirs-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

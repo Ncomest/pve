@@ -1,0 +1,16 @@
+.consumables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 6px;
+  align-content: start;
+
+  .inventory-grid__slot {
+    cursor: default;
+    padding: 0;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}
+

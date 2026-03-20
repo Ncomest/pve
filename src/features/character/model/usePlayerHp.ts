@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 /** 1 HP восстанавливается каждые N миллисекунд */
 const HP_REGEN_INTERVAL_MS = 10_000;
 const STORAGE_KEY = "pve_player_hp_v1";
+const REGEN_ELIXIR_EXTRA_PER_TICK = 3; // 1 -> 4 HP / 10с
 
 interface HpSnapshot {
   /** Текущее HP в момент сохранения */
@@ -13,13 +14,61 @@ interface HpSnapshot {
   savedAt: number;
 }
 
-const calcRegenerated = (snapshot: HpSnapshot, now: number): number => {
-  const elapsedMs = Math.max(0, now - snapshot.savedAt);
-  const regenAmount = Math.floor(elapsedMs / HP_REGEN_INTERVAL_MS);
-  return Math.min(snapshot.maxHp, snapshot.hp + regenAmount);
+export type RegenWindow = { startAt: number; endAt: number };
+
+const countRegenTicksInWindow = (args: {
+  snapshotSavedAt: number;
+  now: number;
+  intervalMs: number;
+  regenWindow: RegenWindow;
+}): number => {
+  const { snapshotSavedAt, now, intervalMs, regenWindow } = args;
+
+  const effectiveWindowStart = Math.max(regenWindow.startAt, snapshotSavedAt);
+  const effectiveWindowEnd = Math.min(regenWindow.endAt, now);
+
+  // Тики начинаются с snapshotSavedAt + intervalMs
+  // поэтому диапазон по m начинается с m=1.
+  if (effectiveWindowEnd <= effectiveWindowStart) return 0;
+  const mMin = Math.max(1, Math.ceil((effectiveWindowStart - snapshotSavedAt) / intervalMs));
+  const mMaxExclusive = Math.ceil((effectiveWindowEnd - snapshotSavedAt) / intervalMs);
+  const count = mMaxExclusive - mMin;
+  return Math.max(0, count);
 };
 
-const loadHp = (maxHp: number): number => {
+const calcRegeneratedWithOptions = (args: {
+  snapshot: HpSnapshot;
+  now: number;
+  maxHpCap: number;
+  regenWindow?: RegenWindow | null;
+  regenElixirExtraPerTick?: number;
+}): number => {
+  const {
+    snapshot,
+    now,
+    maxHpCap,
+    regenWindow = null,
+    regenElixirExtraPerTick = REGEN_ELIXIR_EXTRA_PER_TICK,
+  } = args;
+
+  const elapsedMs = Math.max(0, now - snapshot.savedAt);
+  const baseTicks = Math.floor(elapsedMs / HP_REGEN_INTERVAL_MS);
+  let extraTicks = 0;
+
+  if (regenWindow) {
+    extraTicks = countRegenTicksInWindow({
+      snapshotSavedAt: snapshot.savedAt,
+      now,
+      intervalMs: HP_REGEN_INTERVAL_MS,
+      regenWindow,
+    });
+  }
+
+  const totalRegen = baseTicks + extraTicks * regenElixirExtraPerTick;
+  return Math.min(maxHpCap, snapshot.hp + totalRegen);
+};
+
+const loadHp = (maxHp: number, regenWindow?: RegenWindow | null): number => {
   if (typeof window === "undefined") return maxHp;
 
   try {
@@ -35,15 +84,20 @@ const loadHp = (maxHp: number): number => {
       return maxHp;
     }
 
-    return calcRegenerated(snapshot as HpSnapshot, Date.now());
+    return calcRegeneratedWithOptions({
+      snapshot: snapshot as HpSnapshot,
+      now: Date.now(),
+      maxHpCap: maxHp,
+      regenWindow: regenWindow ?? null,
+    });
   } catch {
     return maxHp;
   }
 };
 
-const saveHp = (hp: number, maxHp: number) => {
+const saveHp = (hp: number, maxHp: number, savedAt: number = Date.now()) => {
   if (typeof window === "undefined") return;
-  const snapshot: HpSnapshot = { hp, maxHp, savedAt: Date.now() };
+  const snapshot: HpSnapshot = { hp, maxHp, savedAt };
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
 };
 
@@ -78,11 +132,27 @@ export const readHpFromStorage = (): HpSnapshot | null => {
   }
 };
 
-export const calcCurrentHp = (snapshot: HpSnapshot, now = Date.now()): number =>
-  calcRegenerated(snapshot, now);
+export const calcCurrentHp = (
+  snapshot: HpSnapshot,
+  now: number = Date.now(),
+  maxHpCap: number = snapshot.maxHp,
+  regenWindow?: RegenWindow | null,
+  regenElixirExtraPerTick: number = REGEN_ELIXIR_EXTRA_PER_TICK,
+): number =>
+  calcRegeneratedWithOptions({
+    snapshot,
+    now,
+    maxHpCap,
+    regenWindow: regenWindow ?? null,
+    regenElixirExtraPerTick,
+  });
+
+export const saveHpSnapshot = (hp: number, maxHp: number, savedAt: number = Date.now()) => {
+  saveHp(hp, maxHp, savedAt);
+};
 
 export function usePlayerHp() {
-  const init = (maxHp: number) => {
+  const init = (maxHp: number, regenWindow?: RegenWindow | null) => {
     // Вотч навешиваем только один раз, но HP всегда перечитываем из localStorage,
     // чтобы при повторном входе в бой не получить старое (возможно нулевое) значение
     if (!isWatchAttached) {
@@ -95,7 +165,7 @@ export function usePlayerHp() {
     }
 
     state.maxHp = maxHp;
-    state.hp = loadHp(maxHp);
+    state.hp = loadHp(maxHp, regenWindow ?? null);
   };
 
   /** Вызывать при смене уровня / экипировки, чтобы пересчитать maxHp */
@@ -129,7 +199,10 @@ export function usePlayerHp() {
    * Принимает геттер актуального maxHp (с учётом уровня и экипировки).
    * Обновляет значение каждую секунду через setInterval.
    */
-  const useRealtimeHp = (getMaxHp: () => number) => {
+  const useRealtimeHp = (
+    getMaxHp: () => number,
+    getRegenWindow?: () => RegenWindow | null,
+  ) => {
     const currentHp = ref(0);
     const currentMaxHp = ref(0);
 
@@ -146,7 +219,8 @@ export function usePlayerHp() {
       // Используем актуальный maxHp (из уровня + экипировки), а не из снимка
       currentMaxHp.value = actualMaxHp;
       // HP ограничиваем актуальным maxHp
-      currentHp.value = Math.min(actualMaxHp, calcCurrentHp(snapshot));
+      const regenWindow = getRegenWindow ? getRegenWindow() : null;
+      currentHp.value = calcCurrentHp(snapshot, Date.now(), actualMaxHp, regenWindow);
     };
 
     let timer: number | null = null;

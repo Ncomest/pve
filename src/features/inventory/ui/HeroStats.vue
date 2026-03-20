@@ -6,10 +6,12 @@ import { computed } from "vue";
 import { PLAYER_CHARACTER } from "@/entities/character/model";
 import { useHeroAvatar } from "@/features/inventory/model/useHeroAvatar";
 import { speedPointsToFraction, armorPointsToFraction } from "@/entities/item/lib/statPoints";
+import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
 import "./HeroStats.scss";
 
 const { level, xp, xpToNext, percentToNext } = usePlayerProgress();
 const characterStore = useCharacterStore();
+const elixirsStore = useElixirsStore();
 
 const base = PLAYER_CHARACTER.stats;
 const eq = computed(() => characterStore.equipmentStats);
@@ -23,7 +25,7 @@ interface StatRow {
 
 const statRows = computed<StatRow[]>(() => {
   const hpBonusFromLevel = (level.value - 1) * 20;
-  const hpBonusTotal = hpBonusFromLevel + eq.value.hp;
+  const hpBonusTotal = hpBonusFromLevel + eq.value.hp + elixirsStore.activeHealthPercentBonusApplied;
   return [
     {
       label: "Атака",
@@ -66,13 +68,22 @@ const statRows = computed<StatRow[]>(() => {
 
 const getMaxHp = () => {
   const bonusHp = (level.value - 1) * 20;
-  return PLAYER_CHARACTER.stats.maxHp + bonusHp + characterStore.equipmentStats.hp;
+  return (
+    PLAYER_CHARACTER.stats.maxHp +
+    bonusHp +
+    characterStore.equipmentStats.hp +
+    elixirsStore.activeHealthPercentBonusApplied
+  );
 };
 
 const { useRealtimeHp } = usePlayerHp();
-const { currentHp, currentMaxHp, hpPct } = useRealtimeHp(getMaxHp);
+const { currentHp, currentMaxHp, hpPct } = useRealtimeHp(getMaxHp, () => elixirsStore.activeRegenWindow);
 
 const isFullHp = computed(() => currentHp.value >= currentMaxHp.value);
+const regenHintText = computed(() => {
+  if (isFullHp.value) return "";
+  return elixirsStore.activeRegenWindow ? "+4/10с" : "+1/10с";
+});
 
 const { avatars, selectedAvatarId, selectedSrc, selectAvatar } = useHeroAvatar();
 
@@ -129,7 +140,7 @@ const currentAvatarSrc = computed(() => selectedSrc());
 
           <span class="hero-stats__bar-label hero-stats__bar-label--hp">
             {{ currentHp }} / {{ currentMaxHp }}
-            <span v-if="!isFullHp" class="hero-stats__regen-hint">+1/10с</span>
+            <span v-if="regenHintText" class="hero-stats__regen-hint">{{ regenHintText }}</span>
           </span>
           <div class="hero-stats__bar-wrap">
             <div

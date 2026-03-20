@@ -18,6 +18,7 @@ import { expGainedFromMonster } from "@/shared/lib/experience/experience";
 import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
 import { usePlayerHp } from "@/features/character/model/usePlayerHp";
 import { useCharacterStore } from "@/app/store/character";
+import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
 import { ALL_TEMPLATE_IDS, getTemplate } from "@/entities/item/items-db";
 import { getDisplayItem } from "@/entities/item/model";
 import { createItemInstance } from "@/entities/item/lib/createInstance";
@@ -79,6 +80,7 @@ export function useBattle(bossId: () => string | undefined) {
   const playerProgress = usePlayerProgress();
   const characterStore = useCharacterStore();
   const playerHp = usePlayerHp();
+  const elixirsStore = useElixirsStore();
 
   const { numbers: bossDamageNumbers, spawnNumber: spawnBossDmg } = useDamageNumbers();
   const { numbers: playerDamageNumbers, spawnNumber: spawnPlayerDmg } = useDamageNumbers();
@@ -111,8 +113,18 @@ export function useBattle(bossId: () => string | undefined) {
     return allBosses.find((b) => b.id === id) ?? allBosses[0];
   });
 
-  const initialStats = buildPlayerStatsForLevel(playerProgress.level.value);
-  playerHp.init(initialStats.maxHp);
+  const basePlayerStatsForRevert = buildPlayerStatsForLevel(playerProgress.level.value);
+
+  // Эликсиры могут менять maxHp/статы в бою.
+  const healthPercentBonus = elixirsStore.activeHealthPercentBonusApplied;
+  const regenWindow = elixirsStore.activeRegenWindow;
+
+  const initialStats = {
+    ...basePlayerStatsForRevert,
+    maxHp: basePlayerStatsForRevert.maxHp + healthPercentBonus,
+    hp: basePlayerStatsForRevert.hp + healthPercentBonus,
+  };
+  playerHp.init(initialStats.maxHp, regenWindow);
 
   const player = reactive({
     name: PLAYER_CHARACTER.name,
@@ -150,6 +162,78 @@ export function useBattle(bossId: () => string | undefined) {
 
   /** Баффы на персонаже игрока */
   const playerBuffs = ref<ActiveEffect[]>([]);
+  /**
+   * Применяем остальные стат-модификаторы активного эликсира (если он не истёк).
+   * Эликсиры не стакуются: предыдущий баф заменяется новым.
+   */
+  const activeElixirDef = elixirsStore.activeElixirDef;
+  const elixirEndAt = elixirsStore.activeElixirEndAt;
+  let elixirRevertTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  if (activeElixirDef && elixirEndAt != null && Date.now() < elixirEndAt) {
+    const remainingMs = elixirEndAt - Date.now();
+    const effectId = `elixir-${activeElixirDef.id}`;
+
+    playerBuffs.value = [
+      ...playerBuffs.value.filter((e) => e.id !== effectId),
+      {
+        id: effectId,
+        name: activeElixirDef.name,
+        icon: activeElixirDef.icon,
+        durationSeconds: remainingMs / 1000,
+        endTime: elixirEndAt,
+      },
+    ];
+
+    // Кэшируем базовые значения без баффа (для отката).
+    const revert = () => {
+      player.stats.power = basePlayerStatsForRevert.power;
+      player.stats.armor = basePlayerStatsForRevert.armor;
+      player.stats.chanceCrit = basePlayerStatsForRevert.chanceCrit;
+      player.stats.evasion = basePlayerStatsForRevert.evasion;
+      player.stats.speed = basePlayerStatsForRevert.speed;
+      player.stats.maxHp = basePlayerStatsForRevert.maxHp;
+      player.stats.hp = Math.min(player.stats.hp, player.stats.maxHp);
+      playerBuffs.value = playerBuffs.value.filter((e) => e.id !== effectId);
+    };
+
+    if (elixirRevertTimeoutId !== null) clearTimeout(elixirRevertTimeoutId);
+    elixirRevertTimeoutId = window.setTimeout(revert, remainingMs);
+
+    switch (activeElixirDef.kind) {
+      case "heal_flat":
+      case "regen_elixir":
+        // Модификаторов боевых статов нет.
+        break;
+      case "power":
+        player.stats.power += activeElixirDef.powerDelta ?? 0;
+        break;
+      case "armor_percent":
+        player.stats.armor = Math.round(
+          player.stats.armor * (1 + (activeElixirDef.armorPercentBonus ?? 0)),
+        );
+        break;
+      case "crit_percent":
+        player.stats.chanceCrit = Math.min(
+          1,
+          player.stats.chanceCrit + (activeElixirDef.critPercentBonus ?? 0),
+        );
+        break;
+      case "speed_percent":
+        player.stats.speed = player.stats.speed * (1 + (activeElixirDef.speedPercentBonus ?? 0));
+        break;
+      case "health_percent":
+        // maxHp уже увеличен на этапе playerHp.init.
+        break;
+      case "evasion_percent":
+        player.stats.evasion = Math.min(
+          1,
+          player.stats.evasion + (activeElixirDef.evasionPercentBonus ?? 0),
+        );
+        break;
+      default:
+        break;
+    }
+  }
   /** Дебаффы на персонаже игрока (яд, проклятья, огненная земля и т.п.) */
   const playerDebuffs = ref<ActiveEffect[]>([]);
   /** Баффы на боссе (которые босс наложил на себя) */
@@ -2360,6 +2444,10 @@ export function useBattle(bossId: () => string | undefined) {
       window.clearTimeout(nextBossAbilityTimeoutId);
       nextBossAbilityTimeoutId = null;
     }
+    if (elixirRevertTimeoutId !== null) {
+      clearTimeout(elixirRevertTimeoutId);
+      elixirRevertTimeoutId = null;
+    }
     effectTimeoutIds.value.forEach((id) => clearTimeout(id));
     effectTimeoutIds.value = [];
     effectIntervalIds.value.forEach((id) => clearInterval(id));
@@ -2476,6 +2564,10 @@ export function useBattle(bossId: () => string | undefined) {
       clearStoneSkinBuff();
       clearScaleArmorBuff();
       stopBattleTimer();
+      if (elixirRevertTimeoutId !== null) {
+        clearTimeout(elixirRevertTimeoutId);
+        elixirRevertTimeoutId = null;
+      }
       // Сохраняем финальное HP сразу после окончания боя
       playerHp.saveHp();
 
@@ -2526,6 +2618,10 @@ export function useBattle(bossId: () => string | undefined) {
     stopBossAttackCooldownTicker();
     stopBattleTimer();
     stopPowerBoostTimer();
+    if (elixirRevertTimeoutId !== null) {
+      clearTimeout(elixirRevertTimeoutId);
+      elixirRevertTimeoutId = null;
+    }
     stopEffectsTicker();
     if (sweepingCritTimerId !== null) clearTimeout(sweepingCritTimerId);
     if (cunningBuffTimerId !== null) clearTimeout(cunningBuffTimerId);

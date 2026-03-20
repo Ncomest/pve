@@ -90,6 +90,31 @@
     margin-bottom: 12px;
   }
 
+  &__tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  &__tab-btn {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    color: rgba(255, 255, 255, 0.75);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+
+    &--active {
+      background: rgba(250, 204, 21, 0.12);
+      border-color: rgba(250, 204, 21, 0.4);
+      color: rgba(255, 255, 255, 0.95);
+    }
+  }
+
   &__inventory-body {
     display: grid;
     grid-template-columns: 1fr 260px;
@@ -98,6 +123,20 @@
     @media (max-width: 600px) {
       grid-template-columns: 1fr;
     }
+  }
+
+  &__inventory-left {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__consumables-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 4px 0 0;
+    opacity: 0.95;
   }
 
   &__sell-card {
@@ -139,6 +178,20 @@
     flex-shrink: 0;
   }
 
+  &__elixir-description {
+    font-size: 13px;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.85);
+    white-space: pre-line;
+  }
+
+  &__elixir-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
   &__btn {
     padding: 10px 16px;
     border-radius: 8px;
@@ -174,6 +227,17 @@
         border-color: rgba(96, 165, 250, 0.7);
       }
     }
+
+    &--drink {
+      background: rgba(34, 197, 94, 0.22);
+      color: rgba(134, 239, 172, 0.95);
+      border-color: rgba(34, 197, 94, 0.45);
+
+      &:hover:not(:disabled) {
+        background: rgba(34, 197, 94, 0.35);
+        border-color: rgba(34, 197, 94, 0.7);
+      }
+    }
   }
 
   &__stock-list {
@@ -190,6 +254,11 @@
     border-radius: 10px;
     border: 1px solid rgba(148, 163, 184, 0.25);
     background: rgba(8, 14, 30, 0.6);
+
+    &--elixir {
+      background: rgba(15, 23, 42, 0.75);
+      border-color: rgba(250, 204, 21, 0.25);
+    }
   }
 
   &__offer-icon {

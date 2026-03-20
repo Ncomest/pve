@@ -1,12 +1,17 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useCharacterStore } from "@/app/store/character";
 import { useInventory } from "@/features/inventory/model/useInventory";
 import HeroStats from "@/features/inventory/ui/HeroStats.vue";
 import EquipmentSlots from "@/features/inventory/ui/EquipmentSlots.vue";
 import InventorySection from "@/features/inventory/ui/InventorySection.vue";
+import ElixirsSection from "@/features/elixirs/ui/ElixirsSection.vue";
 import "./CharacterPage.scss";
 
 const characterStore = useCharacterStore();
+const equipmentInventoryItems = computed(() =>
+  characterStore.inventoryItems.filter(({ item }) => !item?.templateId.startsWith("elixir-")),
+);
 
 const {
   equipmentSlots,
@@ -44,7 +49,7 @@ const {
     </div>
 
     <InventorySection
-      :items="characterStore.inventoryItems"
+      :items="equipmentInventoryItems"
       :selected-item="selectedItem"
       :selected-equipped-item="selectedEquippedItem"
       :selected-display-item="selectedDisplayItem"
@@ -57,5 +62,7 @@ const {
       @delete="handleDelete"
       @close-warning="closeWarning"
     />
+
+    <ElixirsSection :items="characterStore.consumableItems" />
   </div>
 </template>

@@ -5,20 +5,43 @@ import { usePlayerProgress } from "@/features/character/model/usePlayerProgress"
 import { usePlayerHp } from "@/features/character/model/usePlayerHp";
 import { useCharacterStore } from "@/app/store/character";
 import { PLAYER_CHARACTER } from "@/entities/character/model";
+import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
 
 const { level, xp, xpToNext, percentToNext } = usePlayerProgress();
 const characterStore = useCharacterStore();
 characterStore.init();
+const elixirsStore = useElixirsStore();
 
 const getMaxHp = () => {
   const bonusHp = (level.value - 1) * 20;
-  return PLAYER_CHARACTER.stats.maxHp + bonusHp + characterStore.equipmentStats.hp;
+  return (
+    PLAYER_CHARACTER.stats.maxHp +
+    bonusHp +
+    characterStore.equipmentStats.hp +
+    elixirsStore.activeHealthPercentBonusApplied
+  );
 };
 
 const { useRealtimeHp } = usePlayerHp();
-const { currentHp, currentMaxHp, hpPct } = useRealtimeHp(getMaxHp);
-
+const { currentHp, currentMaxHp, hpPct } = useRealtimeHp(getMaxHp, () => elixirsStore.activeRegenWindow);
 const isFullHp = computed(() => currentHp.value >= currentMaxHp.value);
+const regenHintText = computed(() => {
+  if (isFullHp.value) return "";
+  const isRegenActive = elixirsStore.activeRegenWindow != null;
+  return isRegenActive ? "+4/10с" : "+1/10с";
+});
+
+const formatRemainingTime = (msLeft: number) => {
+  if (msLeft <= 0) return "0с";
+  const totalSeconds = Math.ceil(msLeft / 1000);
+  if (totalSeconds < 60) return `${totalSeconds}с`;
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+};
+
+const elixirRemainingText = computed(() => formatRemainingTime(elixirsStore.activeElixirRemainingMs));
+const elixirShown = computed(() => elixirsStore.isActive && elixirsStore.activeElixirName);
 
 function lerpColor(
   [r1, g1, b1]: [number, number, number],
@@ -79,8 +102,18 @@ watch(
             </div>
             <span class="char-status__bar-text char-status__bar-text--hp">
               {{ currentHp }}&thinsp;/&thinsp;{{ currentMaxHp }}
-              <span v-if="!isFullHp" class="char-status__regen">+1/10с</span>
+              <span v-if="regenHintText" class="char-status__regen">{{ regenHintText }}</span>
             </span>
+            <div v-if="elixirShown" class="char-status__elixir">
+              <img
+                :src="elixirsStore.activeElixirIcon ?? undefined"
+                alt="Бафф"
+                class="char-status__elixir-icon"
+              />
+              <span class="char-status__elixir-text">
+                {{ elixirsStore.activeElixirName }}: {{ elixirRemainingText }}
+              </span>
+            </div>
           </div>
           <div class="char-status__bar-row">
             <div class="char-status__bar-track">
@@ -189,6 +222,18 @@ watch(
       </button>
 
       <div v-if="isMenuOpen" :id="menuId" class="app-burger-panel">
+        <div v-if="elixirShown" class="app-burger-elixir">
+          <img
+            :src="elixirsStore.activeElixirIcon ?? undefined"
+            alt="Бафф"
+            class="app-burger-elixir__icon"
+          />
+          <div class="app-burger-elixir__text">
+            <div class="app-burger-elixir__title">Бафф: {{ elixirsStore.activeElixirName }}</div>
+            <div class="app-burger-elixir__time">{{ elixirRemainingText }}</div>
+          </div>
+        </div>
+
         <RouterLink
           to="/"
           class="nav-link nav-link--battle app-burger-panel__link"
@@ -456,6 +501,67 @@ watch(
 
 .app-burger-panel__link {
   justify-content: flex-start;
+}
+
+.char-status__elixir {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(250, 204, 21, 0.12);
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.char-status__elixir-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.char-status__elixir-text {
+  font-size: 10px;
+  opacity: 0.95;
+  white-space: nowrap;
+}
+
+.app-burger-elixir {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(250, 204, 21, 0.08);
+  border: 1px solid rgba(250, 204, 21, 0.25);
+}
+
+.app-burger-elixir__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.app-burger-elixir__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.app-burger-elixir__title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.app-burger-elixir__time {
+  margin-top: 2px;
+  font-size: 12px;
+  opacity: 0.85;
 }
 
 .nav-link {

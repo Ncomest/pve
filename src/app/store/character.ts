@@ -12,10 +12,13 @@ import { createItemInstance } from "@/entities/item/lib/createInstance";
 interface CharacterState {
   gold: number;
   inventory: (ItemInstance | null)[];
+  /** Раздельный инвентарь под расходники (зелья/эликсиры). */
+  consumables: (ItemInstance | null)[];
   equipped: Record<EquipmentSlot, ItemInstance | null>;
 }
 
 const MAX_INVENTORY_SIZE = 30;
+const MAX_CONSUMABLES_SIZE = 10;
 const STARTING_GOLD = 100;
 
 /** Проверяет, что объект — старый формат вещи (Item с stats без templateId). */
@@ -40,6 +43,7 @@ export const useCharacterStore = defineStore("character", {
   state: (): CharacterState => ({
     gold: STARTING_GOLD,
     inventory: Array.from({ length: MAX_INVENTORY_SIZE }, () => null),
+    consumables: Array.from({ length: MAX_CONSUMABLES_SIZE }, () => null),
     equipped: {
       helmet: null,
       chest: null,
@@ -80,6 +84,10 @@ export const useCharacterStore = defineStore("character", {
       return state.inventory.map((item, index) => ({ item, index }));
     },
 
+    consumableItems(state) {
+      return state.consumables.map((item, index) => ({ item, index }));
+    },
+
     isEquipped: (state) => (instanceId: string) => {
       return Object.values(state.equipped).some(
         (inst) => inst?.instanceId === instanceId
@@ -99,10 +107,28 @@ export const useCharacterStore = defineStore("character", {
         this.gold = STARTING_GOLD;
       }
 
-      // Миграция инвентаря
+      // Убедимся, что новое поле `consumables` присутствует при старых сохранениях
+      // (pinia-plugin-persistedstate может подставлять только то, что было раньше).
+      if (!this.consumables || this.consumables.length !== MAX_CONSUMABLES_SIZE) {
+        this.consumables = Array.from({ length: MAX_CONSUMABLES_SIZE }, () => null);
+      }
+
+      // Миграция инвентаря:
+      // если в старом сохранении эликсиры лежали в основном `inventory`, переносим их в `consumables`.
       for (let i = 0; i < this.inventory.length; i++) {
         this.inventory[i] = migrateSlot(this.inventory[i]);
       }
+
+      for (let i = 0; i < this.inventory.length; i++) {
+        const inst = this.inventory[i];
+        if (!inst) continue;
+        if (!inst.templateId.startsWith("elixir-")) continue;
+        const emptyIndex = this.consumables.findIndex((s) => s === null);
+        if (emptyIndex === -1) continue; // если нет места — оставляем в inventory (мягкая деградация)
+        this.consumables[emptyIndex] = inst;
+        this.inventory[i] = null;
+      }
+
       // Миграция экипировки
       for (const slot of Object.keys(this.equipped) as EquipmentSlot[]) {
         this.equipped[slot] = migrateSlot(this.equipped[slot]);
@@ -116,9 +142,21 @@ export const useCharacterStore = defineStore("character", {
       return true;
     },
 
+    addItemToConsumables(instance: ItemInstance): boolean {
+      const emptyIndex = this.consumables.findIndex((slot) => slot === null);
+      if (emptyIndex === -1) return false;
+      this.consumables[emptyIndex] = instance;
+      return true;
+    },
+
     removeItemFromInventory(index: number) {
       if (index < 0 || index >= this.inventory.length) return;
       this.inventory[index] = null;
+    },
+
+    removeItemFromConsumables(index: number) {
+      if (index < 0 || index >= this.consumables.length) return;
+      this.consumables[index] = null;
     },
 
     equipItem(inventoryIndex: number): boolean {
@@ -172,6 +210,17 @@ export const useCharacterStore = defineStore("character", {
       const amount = getItemSellPrice(displayItem);
       this.gold = (this.gold ?? 0) + amount;
       this.inventory[index] = null;
+      return amount;
+    },
+
+    sellItemFromConsumables(index: number): number {
+      const instance = this.consumables[index];
+      if (!instance) return 0;
+      const displayItem = getDisplayItem(instance, getTemplate);
+      if (!displayItem) return 0;
+      const amount = getItemSellPrice(displayItem);
+      this.gold = (this.gold ?? 0) + amount;
+      this.consumables[index] = null;
       return amount;
     },
 

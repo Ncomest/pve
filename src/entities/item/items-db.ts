@@ -202,10 +202,81 @@ function buildTemplates(): Record<string, ItemTemplate> {
   return out;
 }
 
-export const ITEMS_TEMPLATES: Record<string, ItemTemplate> = buildTemplates();
-
 /** Все id шаблонов для пула дропа. */
-export const ALL_TEMPLATE_IDS: string[] = Object.keys(ITEMS_TEMPLATES);
+const ELIXIR_TEMPLATE_SLOT: EquipmentSlot = "belt";
+
+/**
+ * Шаблоны эликсиров (расходники) — хранятся в inventory как обычные ItemInstance.
+ * Slot задан заглушкой, чтобы система инвентаря не падала на типах.
+ */
+const ELIXIR_TEMPLATES: Record<string, ItemTemplate> = {
+  "elixir-heal_flat": {
+    id: "elixir-heal_flat",
+    name: "Зелье здоровья",
+    slot: ELIXIR_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+  "elixir-regen": {
+    id: "elixir-regen",
+    name: "Эликсир восстановления",
+    slot: ELIXIR_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+  "elixir-power_plus_5": {
+    id: "elixir-power_plus_5",
+    name: "Эликсир атаки",
+    slot: ELIXIR_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+  "elixir-armor_plus_5": {
+    id: "elixir-armor_plus_5",
+    name: "Эликсир брони",
+    slot: ELIXIR_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+  "elixir-crit_plus_5": {
+    id: "elixir-crit_plus_5",
+    name: "Эликсир крита",
+    slot: ELIXIR_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+  "elixir-speed_plus_5": {
+    id: "elixir-speed_plus_5",
+    name: "Эликсир скорости",
+    slot: ELIXIR_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+  "elixir-health_percent_plus_15": {
+    id: "elixir-health_percent_plus_15",
+    name: "Эликсир здоровья",
+    slot: ELIXIR_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+  "elixir-evasion_plus_5": {
+    id: "elixir-evasion_plus_5",
+    name: "Эликсир уворота",
+    slot: ELIXIR_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+};
+
+export const ITEMS_TEMPLATES: Record<string, ItemTemplate> = {
+  ...buildTemplates(),
+  ...ELIXIR_TEMPLATES,
+};
+
+/** Все id шаблонов для пула дропа (эликсиры исключаем). */
+export const ALL_TEMPLATE_IDS: string[] = Object.keys(ITEMS_TEMPLATES).filter(
+  (id) => !id.startsWith("elixir-"),
+);
 
 export function getTemplate(id: string): ItemTemplate | null {
   return ITEMS_TEMPLATES[id] ?? null;
