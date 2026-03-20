@@ -202,12 +202,25 @@
     pointer-events: none;
     transition: opacity 0.15s, transform 0.15s;
 
+    @media (max-width: 426px) {
+      left: 0;
+      top: calc(100% + 10px);
+      transform: none;
+      min-width: 0;
+      width: 90vw;
+      max-width: 90vw;
+    }
+
     &-title {
       font-size: 0.85rem;
       font-weight: 700;
       color: rgba(255, 255, 255, 0.95);
       margin-bottom: 4px;
       white-space: nowrap;
+
+      @media (max-width: 426px) {
+        white-space: normal;
+      }
     }
   }
 
@@ -235,6 +248,10 @@
       .ability-card__detail-value {
         margin-left: 0;
       }
+    }
+
+    @media (max-width: 426px) {
+      white-space: normal;
     }
   }
 

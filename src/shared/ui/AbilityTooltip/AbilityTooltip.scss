@@ -11,6 +11,8 @@
   gap: 4px;
   z-index: 100;
   pointer-events: none;
+  /* Чтобы при узких экранах текст не раздвигал ширину тултипа */
+  overflow-wrap: anywhere;
 
   &__title {
     font-size: 0.85rem;
@@ -47,5 +49,26 @@
   &__value {
     color: rgba(255, 255, 255, 0.85);
     font-weight: 500;
+  }
+
+  @media (max-width: 426px) {
+    min-width: 0;
+    max-width: 90vw;
+    width: 90vw;
+
+    &__title {
+      white-space: normal;
+    }
+
+    &__row {
+      white-space: normal;
+      gap: 0.4rem;
+    }
+
+    &__value,
+    &__label {
+      white-space: normal;
+      word-break: break-word;
+    }
   }
 }
