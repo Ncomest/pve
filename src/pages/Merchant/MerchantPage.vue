@@ -30,6 +30,8 @@ const MERCHANT_OFFERS_STORAGE_KEY = "pve_merchant_offers_v1";
 const selectedIndex = ref<number | null>(null);
 const message = ref<string | null>(null);
 let messageTimer: ReturnType<typeof setTimeout> | null = null;
+const expandedEquipmentOfferId = ref<string | null>(null);
+const expandedElixirId = ref<string | null>(null);
 
 type MerchantTab = "equipment" | "consumables";
 const activeTab = ref<MerchantTab>("equipment");
@@ -189,6 +191,19 @@ function getEquipmentOfferTooltip(offer: MerchantOffer): string {
   return lines.join("\n");
 }
 
+function getEquipmentOfferStatsLines(offer: MerchantOffer): string[] {
+  const item = getMerchantItem(offer);
+  if (!item) return [];
+  const lines: string[] = [];
+  if (item.stats.hp != null) lines.push(`HP: +${item.stats.hp}`);
+  if (item.stats.power != null) lines.push(`Атака: +${item.stats.power}`);
+  if (item.stats.chanceCrit != null) lines.push(`Крит: +${item.stats.chanceCrit} крита`);
+  if (item.stats.evasion != null) lines.push(`Уклонение: +${item.stats.evasion} уклонения`);
+  if (item.stats.speed != null) lines.push(`Скорость: +${item.stats.speed}`);
+  if (item.stats.armor != null) lines.push(`Броня: +${item.stats.armor}`);
+  return lines;
+}
+
 function getElixirOfferTooltip(elixir: (typeof ELIXIRS)[number]): string {
   const base = `Цена торговца: ${elixir.price} зол.\n`;
   const def = elixir;
@@ -228,6 +243,19 @@ function getElixirOfferTooltip(elixir: (typeof ELIXIRS)[number]): string {
     lines.push("Бафф: 5 минут. Не стакается.");
   }
   return lines.join("\n");
+}
+
+function getElixirOfferDescriptionLines(elixir: (typeof ELIXIRS)[number]): string[] {
+  const text = getElixirOfferTooltip(elixir);
+  return text.split("\n").filter(Boolean);
+}
+
+function toggleEquipmentOffer(offerId: string) {
+  expandedEquipmentOfferId.value = expandedEquipmentOfferId.value === offerId ? null : offerId;
+}
+
+function toggleElixirOffer(elixirId: string) {
+  expandedElixirId.value = expandedElixirId.value === elixirId ? null : elixirId;
 }
 
 function buyItem(offer: MerchantOffer) {
@@ -425,6 +453,26 @@ onUnmounted(() => {
             <div v-if="selectedDisplayItem.itemLevel != null" class="merchant-page__item-level">
               Ур. вещи: {{ selectedDisplayItem.itemLevel }}
             </div>
+            <div class="merchant-page__item-stats">
+              <div v-if="selectedDisplayItem.stats.hp != null" class="merchant-page__item-stat">
+                HP: +{{ selectedDisplayItem.stats.hp }}
+              </div>
+              <div v-if="selectedDisplayItem.stats.power != null" class="merchant-page__item-stat">
+                Атака: +{{ selectedDisplayItem.stats.power }}
+              </div>
+              <div v-if="selectedDisplayItem.stats.chanceCrit != null" class="merchant-page__item-stat">
+                Крит: +{{ selectedDisplayItem.stats.chanceCrit }} крита
+              </div>
+              <div v-if="selectedDisplayItem.stats.evasion != null" class="merchant-page__item-stat">
+                Уклонение: +{{ selectedDisplayItem.stats.evasion }} уклонения
+              </div>
+              <div v-if="selectedDisplayItem.stats.speed != null" class="merchant-page__item-stat">
+                Скорость: +{{ selectedDisplayItem.stats.speed }}
+              </div>
+              <div v-if="selectedDisplayItem.stats.armor != null" class="merchant-page__item-stat">
+                Броня: +{{ selectedDisplayItem.stats.armor }}
+              </div>
+            </div>
             <div class="merchant-page__sell-price">
               <img
                 src="/images/currencies/coin.png"
@@ -533,6 +581,7 @@ onUnmounted(() => {
               :key="row.offer.id"
               class="merchant-page__offer"
               :title="getEquipmentOfferTooltip(row.offer)"
+              :class="{ 'merchant-page__offer--expanded': expandedEquipmentOfferId === row.offer.id }"
             >
               <template v-if="row.displayItem">
                 <div
@@ -552,6 +601,7 @@ onUnmounted(() => {
                   >
                     {{ row.displayItem.name }}
                   </span>
+                  <span class="merchant-page__offer-level">Ур. {{ row.displayItem.itemLevel ?? 1 }}</span>
                   <span class="merchant-page__offer-price">
                     <img
                       src="/images/currencies/coin.png"
@@ -563,12 +613,42 @@ onUnmounted(() => {
                 </div>
                 <button
                   type="button"
+                  class="merchant-page__offer-expand"
+                  @click="toggleEquipmentOffer(row.offer.id)"
+                >
+                  {{ expandedEquipmentOfferId === row.offer.id ? "Скрыть" : "Подробнее" }}
+                </button>
+                <button
+                  type="button"
                   class="merchant-page__btn merchant-page__btn--buy"
                   :disabled="row.offer.isSold || gold < row.offer.price"
                   @click="buyItem(row.offer)"
                 >
                   {{ row.offer.isSold ? "Куплено" : "Купить" }}
                 </button>
+                <div
+                  v-if="expandedEquipmentOfferId === row.offer.id"
+                  class="merchant-page__offer-accordion"
+                >
+                  <div class="merchant-page__offer-slot">
+                    Слот: {{ SLOT_NAMES[row.displayItem.slot] }}
+                  </div>
+                  <div
+                    v-for="line in getEquipmentOfferStatsLines(row.offer)"
+                    :key="`${row.offer.id}-${line}`"
+                    class="merchant-page__offer-stat"
+                  >
+                    {{ line }}
+                  </div>
+                  <button
+                    type="button"
+                    class="merchant-page__btn merchant-page__btn--buy merchant-page__btn--buy-accordion"
+                    :disabled="row.offer.isSold || gold < row.offer.price"
+                    @click="buyItem(row.offer)"
+                  >
+                    {{ row.offer.isSold ? "Куплено" : "Купить" }}
+                  </button>
+                </div>
               </template>
             </div>
           </div>
@@ -583,6 +663,7 @@ onUnmounted(() => {
               :key="elixir.id"
               class="merchant-page__offer merchant-page__offer--elixir"
               :title="getElixirOfferTooltip(elixir)"
+              :class="{ 'merchant-page__offer--expanded': expandedElixirId === elixir.id }"
             >
               <div class="merchant-page__offer-icon merchant-page__offer-icon--elixir">
                 <img :src="elixir.icon" :alt="elixir.name" class="merchant-page__offer-icon-img" />
@@ -596,12 +677,39 @@ onUnmounted(() => {
               </div>
               <button
                 type="button"
+                class="merchant-page__offer-expand"
+                @click="toggleElixirOffer(elixir.id)"
+              >
+                {{ expandedElixirId === elixir.id ? "Скрыть" : "Подробнее" }}
+              </button>
+              <button
+                type="button"
                 class="merchant-page__btn merchant-page__btn--buy"
                 :disabled="gold < elixir.price"
                 @click="buyElixir(elixir.id)"
               >
                 Купить
               </button>
+              <div
+                v-if="expandedElixirId === elixir.id"
+                class="merchant-page__offer-accordion"
+              >
+                <div
+                  v-for="line in getElixirOfferDescriptionLines(elixir)"
+                  :key="`${elixir.id}-${line}`"
+                  class="merchant-page__offer-stat"
+                >
+                  {{ line }}
+                </div>
+                <button
+                  type="button"
+                  class="merchant-page__btn merchant-page__btn--buy merchant-page__btn--buy-accordion"
+                  :disabled="gold < elixir.price"
+                  @click="buyElixir(elixir.id)"
+                >
+                  Купить
+                </button>
+              </div>
             </div>
           </div>
 
