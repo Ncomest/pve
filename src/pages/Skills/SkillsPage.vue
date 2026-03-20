@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref } from "vue";
+  import { computed, onMounted, onUnmounted, ref, watch } from "vue";
   import { useSkillsStore } from "@/app/store/skills";
   import {
     ABILITIES,
@@ -14,6 +14,11 @@
 
   const skillsStore = useSkillsStore();
   const selectedAbilityId = ref<string | null>(null);
+
+  const activeAbilitiesTab = ref<"general" | "class">("general");
+  const expandedAbilityId = ref<string | null>(null);
+  const isMobile = ref(false);
+  let mq: MediaQueryList | null = null;
 
   const abilityById = (id: string): Ability | undefined =>
     ALL_ABILITIES.find((a) => a.id === id);
@@ -48,6 +53,16 @@
       selectedAbilityId.value === ability.id ? null : ability.id;
   }
 
+  function toggleMobileAccordion(abilityId: string) {
+    expandedAbilityId.value =
+      expandedAbilityId.value === abilityId ? null : abilityId;
+  }
+
+  function handleAssignFromAccordion(ability: Ability) {
+    selectAbility(ability);
+    expandedAbilityId.value = null;
+  }
+
   function abilityTypeLabel(type: Ability["type"]): string {
     const map: Record<Ability["type"], string> = {
       damage: "Урон",
@@ -58,6 +73,55 @@
     };
     return map[type];
   }
+
+  const activeAbilities = computed(() =>
+    activeAbilitiesTab.value === "general"
+      ? ABILITIES
+      : BLADE_AND_POISON_ABILITIES,
+  );
+
+  const mobileDescriptions = computed(() => {
+    if (activeAbilitiesTab.value === "general") {
+      return "Эти способности позволяют выполнять механику боя с боссом — уклоняться от атак, прерывать врага, очищать дебаффы и восстанавливать здоровье.";
+    }
+
+    return "Способности класса «Клинок и Яд» для нанесения урона, управления и усиления комбинаций.";
+  });
+
+  watch(activeAbilitiesTab, () => {
+    expandedAbilityId.value = null;
+  });
+
+  const updateIsMobile = () => {
+    if (!mq) return;
+    isMobile.value = mq.matches;
+    // На смене режима закрываем аккордеон, чтобы не оставалось "висящего" контента.
+    if (!mq.matches) expandedAbilityId.value = null;
+  };
+
+  onMounted(() => {
+    if (typeof window === "undefined") return;
+    mq = window.matchMedia("(max-width: 600px)");
+    updateIsMobile();
+
+    // Safari/старые браузеры могут не поддерживать addEventListener на MediaQueryList
+    if (mq.addEventListener) {
+      mq.addEventListener("change", updateIsMobile);
+    } else {
+      // eslint-disable-next-line deprecation/deprecation
+      mq.addListener(updateIsMobile);
+    }
+  });
+
+  onUnmounted(() => {
+    if (!mq) return;
+    if (mq.removeEventListener) {
+      mq.removeEventListener("change", updateIsMobile);
+    } else {
+      // eslint-disable-next-line deprecation/deprecation
+      mq.removeListener(updateIsMobile);
+    }
+  });
 </script>
 
 <template>
@@ -108,141 +172,191 @@
     </div>
 
     <p class="ability-list__hint">
-      Нажмите на способность, чтобы выбрать её, затем кликните на пустой слот
-      панели для назначения. Выбрано:
+      <template v-if="!isMobile">
+        Нажмите на способность, чтобы выбрать её, затем кликните на пустой
+        слот панели для назначения. Выбрано:
+      </template>
+      <template v-else>
+        Нажмите на способность, чтобы открыть описание, затем нажмите
+        «Назначить». Выбрано:
+      </template>
       <strong v-if="selectedAbilityId">{{
         abilityById(selectedAbilityId)?.name ?? selectedAbilityId
       }}</strong>
       <span v-else>—</span>
     </p>
 
-    <section class="ability-list">
-      <h2 class="ability-list__title">Общие способности</h2>
-      <p class="ability-list__description">
-        Эти способности позволяют выполнять механику боя с боссом — уклоняться
-        от атак, прерывать врага, очищать дебаффы и восстанавливать здоровье.
-      </p>
-      <div class="ability-list__grid">
-        <button
-          v-for="ability in ABILITIES"
-          :key="ability.id"
-          type="button"
-          class="ability-card"
-          :class="[
-            `ability-card--${ability.type}`,
-            { 'ability-card--selected': selectedAbilityId === ability.id },
-          ]"
-          @click="selectAbility(ability)"
-        >
-          <span class="ability-card__icon-wrap">
-            <img
-              v-if="
-                ability.icon &&
-                (ability.icon.startsWith('/') ||
-                  ability.icon.startsWith('http'))
-              "
-              :src="ability.icon"
-              :alt="ability.name"
-            />
-            <component
-              v-else-if="ability.icon && iconComponents[ability.icon]"
-              :is="iconComponents[ability.icon]"
-            />
-            <span class="ability-card__tooltip">
-              <span class="ability-card__tooltip-title">{{
-                ability.name
-              }}</span>
-              <span
-                v-if="ability.cooldownMs > 0"
-                class="ability-card__detail-row"
-              >
-                <span class="ability-card__detail-label">Перезарядка:</span>
-                <span class="ability-card__detail-value"
-                  >{{ (ability.cooldownMs / 1000).toFixed(0) }} сек</span
-                >
-              </span>
-              <span class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Роль:</span>
-                <span class="ability-card__detail-value">{{
-                  abilityTypeLabel(ability.type)
-                }}</span>
-              </span>
-              <span
-                v-if="ability.description"
-                class="ability-card__detail-row ability-card__detail-row--description"
-              >
-                <span class="ability-card__detail-label">Описание:</span>
-                <span class="ability-card__detail-value">{{
-                  ability.description
-                }}</span>
-              </span>
-            </span>
-          </span>
-          <span class="ability-card__name">{{ ability.name }}</span>
-        </button>
-      </div>
-    </section>
+    <div class="abilities-tabs">
+      <button
+        type="button"
+        class="abilities-tabs__tab"
+        :class="{
+          'abilities-tabs__tab--active': activeAbilitiesTab === 'general',
+        }"
+        @click="activeAbilitiesTab = 'general'"
+      >
+        Общие
+      </button>
+      <button
+        type="button"
+        class="abilities-tabs__tab"
+        :class="{
+          'abilities-tabs__tab--active': activeAbilitiesTab === 'class',
+        }"
+        @click="activeAbilitiesTab = 'class'"
+      >
+        Классовые
+      </button>
+    </div>
 
-    <section class="ability-list ability-list--class">
-      <h2 class="ability-list__title">Способности класса</h2>
+    <section class="ability-list">
+      <h2 class="ability-list__title">
+        {{
+          activeAbilitiesTab === "general"
+            ? "Общие способности"
+            : "Способности класса"
+        }}
+      </h2>
+      <p class="ability-list__description">{{ mobileDescriptions }}</p>
+
       <div class="ability-list__grid">
-        <button
-          v-for="ability in BLADE_AND_POISON_ABILITIES"
+        <div
+          v-for="ability in activeAbilities"
           :key="ability.id"
-          type="button"
-          class="ability-card"
-          :class="[
-            `ability-card--${ability.type}`,
-            { 'ability-card--selected': selectedAbilityId === ability.id },
-          ]"
-          @click="selectAbility(ability)"
+          class="ability-list__accordion-item"
         >
-          <span class="ability-card__icon-wrap">
-            <img
-              v-if="
-                ability.icon &&
-                (ability.icon.startsWith('/') ||
-                  ability.icon.startsWith('http'))
-              "
-              :src="ability.icon"
-              :alt="ability.name"
-            />
-            <component
-              v-else-if="ability.icon && iconComponents[ability.icon]"
-              :is="iconComponents[ability.icon]"
-            />
-            <span class="ability-card__tooltip">
-              <span class="ability-card__tooltip-title">{{
-                ability.name
-              }}</span>
-              <span
-                v-if="ability.cooldownMs > 0"
-                class="ability-card__detail-row"
-              >
-                <span class="ability-card__detail-label">Перезарядка:</span>
-                <span class="ability-card__detail-value"
-                  >{{ (ability.cooldownMs / 1000).toFixed(0) }} сек</span
+          <!-- Desktop: hover tooltip -->
+          <button
+            v-if="!isMobile"
+            type="button"
+            class="ability-card"
+            :class="[
+              `ability-card--${ability.type}`,
+              { 'ability-card--selected': selectedAbilityId === ability.id },
+            ]"
+            @click="selectAbility(ability)"
+          >
+            <span class="ability-card__icon-wrap">
+              <img
+                v-if="
+                  ability.icon &&
+                  (ability.icon.startsWith('/') ||
+                    ability.icon.startsWith('http'))
+                "
+                :src="ability.icon"
+                :alt="ability.name"
+              />
+              <component
+                v-else-if="ability.icon && iconComponents[ability.icon]"
+                :is="iconComponents[ability.icon]"
+              />
+              <span class="ability-card__tooltip">
+                <span class="ability-card__tooltip-title">{{
+                  ability.name
+                }}</span>
+                <span
+                  v-if="ability.cooldownMs > 0"
+                  class="ability-card__detail-row"
                 >
-              </span>
-              <span class="ability-card__detail-row">
-                <span class="ability-card__detail-label">Роль:</span>
-                <span class="ability-card__detail-value">{{
-                  abilityTypeLabel(ability.type)
-                }}</span>
-              </span>
-              <span
-                v-if="ability.description"
-                class="ability-card__detail-row ability-card__detail-row--description"
-              >
-                <span class="ability-card__detail-label">Описание:</span>
-                <span class="ability-card__detail-value">{{
-                  ability.description
-                }}</span>
+                  <span class="ability-card__detail-label"
+                    >Перезарядка:</span
+                  >
+                  <span class="ability-card__detail-value"
+                    >{{ (ability.cooldownMs / 1000).toFixed(0) }} сек</span
+                  >
+                </span>
+                <span class="ability-card__detail-row">
+                  <span class="ability-card__detail-label">Роль:</span>
+                  <span class="ability-card__detail-value">{{
+                    abilityTypeLabel(ability.type)
+                  }}</span>
+                </span>
+                <span
+                  v-if="ability.description"
+                  class="ability-card__detail-row ability-card__detail-row--description"
+                >
+                  <span class="ability-card__detail-label">Описание:</span>
+                  <span class="ability-card__detail-value">{{
+                    ability.description
+                  }}</span>
+                </span>
               </span>
             </span>
-          </span>
-          <span class="ability-card__name">{{ ability.name }}</span>
-        </button>
+            <span class="ability-card__name">{{ ability.name }}</span>
+          </button>
+
+          <!-- Mobile: accordion + "Назначить" -->
+          <div v-else class="ability-accordion-item">
+            <button
+              type="button"
+              class="ability-card ability-accordion-item__summary"
+              :class="[
+                `ability-card--${ability.type}`,
+                { 'ability-card--selected': selectedAbilityId === ability.id },
+              ]"
+              @click="toggleMobileAccordion(ability.id)"
+            >
+              <span class="ability-card__icon-wrap">
+                <img
+                  v-if="
+                    ability.icon &&
+                    (ability.icon.startsWith('/') ||
+                      ability.icon.startsWith('http'))
+                  "
+                  :src="ability.icon"
+                  :alt="ability.name"
+                />
+                <component
+                  v-else-if="ability.icon && iconComponents[ability.icon]"
+                  :is="iconComponents[ability.icon]"
+                />
+              </span>
+              <span class="ability-card__name">{{ ability.name }}</span>
+            </button>
+
+            <div
+              v-if="expandedAbilityId === ability.id"
+              class="ability-accordion-item__content"
+            >
+              <div class="ability-accordion-item__details">
+                <div
+                  v-if="ability.cooldownMs > 0"
+                  class="ability-card__detail-row"
+                >
+                  <span class="ability-card__detail-label">Перезарядка:</span>
+                  <span class="ability-card__detail-value"
+                    >{{ (ability.cooldownMs / 1000).toFixed(0) }} сек</span
+                  >
+                </div>
+                <div class="ability-card__detail-row">
+                  <span class="ability-card__detail-label">Роль:</span>
+                  <span class="ability-card__detail-value">{{
+                    abilityTypeLabel(ability.type)
+                  }}</span>
+                </div>
+                <div
+                  v-if="ability.description"
+                  class="ability-card__detail-row ability-card__detail-row--description"
+                >
+                  <span class="ability-card__detail-label">Описание:</span>
+                  <span class="ability-card__detail-value">{{
+                    ability.description
+                  }}</span>
+                </div>
+              </div>
+
+              <div class="ability-accordion-item__actions">
+                <button
+                  type="button"
+                  class="ability-accordion-item__assign-btn"
+                  @click.stop="handleAssignFromAccordion(ability)"
+                >
+                  Назначить
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </div>
