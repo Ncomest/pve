@@ -7,10 +7,21 @@
   .inventory-grid__slot {
     cursor: default;
     padding: 0;
+    position: relative; /* нужно для overlay-лейблов (кол-во) */
 
     &:hover {
       transform: none;
     }
   }
+}
+
+.inventory-grid__count {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(250, 204, 21, 0.95);
+  line-height: 1;
 }
 

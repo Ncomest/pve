@@ -6,7 +6,7 @@ export function getElixirDescription(def: ElixirDefinition): string {
 
   switch (def.kind) {
     case "heal_flat":
-      return `Восстанавливает 200 HP мгновенно.\n${base}`;
+      return `Восстанавливает 200 HP мгновенно.\nАктивные эликсиры/баффы не сбиваются.`;
     case "regen_elixir": {
       const baseRegenHpPerTick = 1;
       const extra = def.regenExtraPerTick ?? 0;

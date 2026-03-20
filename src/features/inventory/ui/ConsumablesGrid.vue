@@ -28,6 +28,7 @@ const displayByIndex = computed(() =>
       icon: def?.icon ?? "/images/hero/ability/heal_potion.png",
       name: def?.name ?? "Эликсир",
       itemLevel: entry.item.itemLevel,
+      count: entry.item.count ?? 1,
     };
   }),
 );
@@ -58,7 +59,16 @@ function handleClick(item: ItemInstance | null, index: number) {
           :alt="displayByIndex[index]!.name"
           class="inventory-grid__icon"
         />
-        <span v-if="displayByIndex[index]!.itemLevel != null" class="inventory-grid__level">
+        <span
+          v-if="(displayByIndex[index]!.count ?? 1) > 1"
+          class="inventory-grid__count"
+        >
+          {{ displayByIndex[index]!.count }}
+        </span>
+        <span
+          v-else-if="displayByIndex[index]!.itemLevel != null"
+          class="inventory-grid__level"
+        >
           {{ displayByIndex[index]!.itemLevel }}
         </span>
       </template>

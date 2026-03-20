@@ -229,6 +229,9 @@
     }
 
     &--refresh {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       background: rgba(250, 204, 21, 0.18);
       color: rgba(250, 204, 21, 0.95);
       border-color: rgba(250, 204, 21, 0.5);
@@ -259,7 +262,8 @@
 
   &__stock-actions {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 12px;
     margin-bottom: 12px;
   }
@@ -269,6 +273,33 @@
     opacity: 0.75;
     color: rgba(255, 255, 255, 0.85);
     white-space: nowrap;
+  }
+
+  &__refresh-button-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1;
+  }
+
+  &__refresh-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  &__refresh-cost {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #facc15;
+  }
+
+  &__refresh-coin {
+    width: 16px;
+    height: 16px;
   }
 
   &__offer {

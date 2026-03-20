@@ -18,6 +18,8 @@ interface CharacterState {
 
 const MAX_INVENTORY_SIZE = 30;
 const MAX_CONSUMABLES_SIZE = 10;
+// Максимальный размер стака для расходников/эликсиров.
+const MAX_CONSUMABLE_STACK_SIZE = 99;
 const STARTING_GOLD = 100;
 
 /** Проверяет, что объект — старый формат вещи (Item с stats без templateId). */
@@ -142,9 +144,45 @@ export const useCharacterStore = defineStore("character", {
     },
 
     addItemToConsumables(instance: ItemInstance): boolean {
-      const emptyIndex = this.consumables.findIndex((slot) => slot === null);
-      if (emptyIndex === -1) return false;
-      this.consumables[emptyIndex] = instance;
+      const templateId = instance.templateId;
+      const initialCount = Math.max(0, instance.count ?? 1);
+      if (!templateId || initialCount <= 0) return false;
+
+      let remainingToAdd = initialCount;
+
+      // 1) Сначала заполняем существующие стаки.
+      while (remainingToAdd > 0) {
+        const existingIndex = this.consumables.findIndex(
+          (slot) =>
+            slot != null &&
+            slot.templateId === templateId &&
+            (slot.count ?? 1) < MAX_CONSUMABLE_STACK_SIZE,
+        );
+
+        if (existingIndex !== -1) {
+          const existing = this.consumables[existingIndex];
+          if (!existing) break;
+
+          const existingCount = existing.count ?? 1;
+          const canAdd = Math.min(MAX_CONSUMABLE_STACK_SIZE - existingCount, remainingToAdd);
+          existing.count = existingCount + canAdd;
+          remainingToAdd -= canAdd;
+          continue;
+        }
+
+        // 2) Если подходящих стакoв нет — пробуем создать новый.
+        const emptyIndex = this.consumables.findIndex((slot) => slot === null);
+        if (emptyIndex === -1) return false;
+
+        const addCount = Math.min(MAX_CONSUMABLE_STACK_SIZE, remainingToAdd);
+        this.consumables[emptyIndex] = {
+          ...instance,
+          instanceId: generateInstanceId(),
+          count: addCount,
+        };
+        remainingToAdd -= addCount;
+      }
+
       return true;
     },
 
@@ -156,6 +194,28 @@ export const useCharacterStore = defineStore("character", {
     removeItemFromConsumables(index: number) {
       if (index < 0 || index >= this.consumables.length) return;
       this.consumables[index] = null;
+    },
+
+    /**
+     * Уменьшает количество предмета в ячейке.
+     * Если осталось 0 — освобождает слот.
+     */
+    consumeItemFromConsumables(index: number, amount: number = 1): boolean {
+      if (index < 0 || index >= this.consumables.length) return false;
+      const inst = this.consumables[index];
+      if (!inst) return false;
+
+      const safeAmount = Math.max(1, amount);
+      const current = inst.count ?? 1;
+      const next = current - safeAmount;
+
+      if (next > 0) {
+        inst.count = next;
+      } else {
+        this.consumables[index] = null;
+      }
+
+      return true;
     },
 
     equipItem(inventoryIndex: number): boolean {
@@ -217,7 +277,10 @@ export const useCharacterStore = defineStore("character", {
       if (!instance) return 0;
       const displayItem = getDisplayItem(instance, getTemplate);
       if (!displayItem) return 0;
-      const amount = getItemSellPrice(displayItem);
+
+      const count = instance.count ?? 1;
+      const amountPer = getItemSellPrice(displayItem);
+      const amount = amountPer * count;
       this.gold = (this.gold ?? 0) + amount;
       this.consumables[index] = null;
       return amount;

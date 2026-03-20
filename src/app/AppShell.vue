@@ -49,10 +49,14 @@ onBeforeUnmount(() => {
 const regenHintText = computed(() => {
   // Делаем вычисление зависимым от тика, чтобы оно обновлялось.
   nowMs.value;
-  if (isFullHp.value) return "";
-
   const isRegenActive = elixirsStore.activeRegenWindow != null;
-  return isRegenActive ? "+4/10с" : "+1/10с";
+
+  // Если HP полностью, убираем подсказку базового регена.
+  // Но при активном “эликсире восстановления” показываем, чтобы было видно усиление.
+  if (!isRegenActive && isFullHp.value) return "";
+
+  const regenPer10s = isRegenActive ? 4 : 1;
+  return `+${regenPer10s} ед / 10с`;
 });
 
 const formatRemainingTime = (msLeft: number) => {

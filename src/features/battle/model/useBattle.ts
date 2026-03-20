@@ -24,7 +24,12 @@ import { getDisplayItem } from "@/entities/item/model";
 import { createItemInstance } from "@/entities/item/lib/createInstance";
 import type { ItemInstance } from "@/entities/item/model";
 import { useDamageNumbers } from "@/shared/ui/DamageNumbers/useDamageNumbers";
-import { armorPointsToFraction, speedPointsToFraction } from "@/entities/item/lib/statPoints";
+import {
+  armorPointsToFraction,
+  speedPointsToFraction,
+  ARMOR_POINTS_TO_FRACTION,
+  SPEED_POINTS_TO_FRACTION,
+} from "@/entities/item/lib/statPoints";
 
 /** Тип записи лога боя для цветовой подсветки */
 export type BattleLogEntryType = "player-damage" | "boss-damage" | "player-dodge" | "boss-dodge" | "other";
@@ -208,9 +213,16 @@ export function useBattle(bossId: () => string | undefined) {
         player.stats.power += activeElixirDef.powerDelta ?? 0;
         break;
       case "armor_percent":
-        player.stats.armor = Math.round(
-          player.stats.armor * (1 + (activeElixirDef.armorPercentBonus ?? 0)),
-        );
+        // Эликсир "+X% к броне" интерпретируем так же, как "+X% к криту":
+        // добавляем X процентных пунктов к эффективной доле снижения урона.
+        // Затем переводим эту долю обратно в очки брони.
+        {
+          const armorBonus = activeElixirDef.armorPercentBonus ?? 0;
+          const beforeArmor = player.stats.armor ?? 0;
+          const beforeReduction = armorPointsToFraction(beforeArmor);
+          const afterReduction = Math.min(0.9, beforeReduction + armorBonus);
+          player.stats.armor = Math.round(afterReduction / ARMOR_POINTS_TO_FRACTION);
+        }
         break;
       case "crit_percent":
         player.stats.chanceCrit = Math.min(
@@ -219,7 +231,16 @@ export function useBattle(bossId: () => string | undefined) {
         );
         break;
       case "speed_percent":
-        player.stats.speed = player.stats.speed * (1 + (activeElixirDef.speedPercentBonus ?? 0));
+        // Аналогично броне: добавляем X процентных пунктов к доле сокращения кулдаунов.
+        {
+          const speedBonus = activeElixirDef.speedPercentBonus ?? 0;
+          const beforeSpeedTotal = player.stats.speed ?? 2;
+          const beforeSpeedPoints = Math.max(0, beforeSpeedTotal - 2);
+          const beforeReduction = speedPointsToFraction(beforeSpeedPoints);
+          const afterReduction = Math.min(1, beforeReduction + speedBonus);
+          const afterSpeedPoints = afterReduction / SPEED_POINTS_TO_FRACTION;
+          player.stats.speed = afterSpeedPoints + 2;
+        }
         break;
       case "health_percent":
         // maxHp уже увеличен на этапе playerHp.init.

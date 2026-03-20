@@ -83,7 +83,8 @@ const selectedSellPrice = computed(() =>
 const selectedElixirSellPrice = computed(() => {
   if (!selectedConsumableItem.value) return 0;
   const displayItem = getDisplayItem(selectedConsumableItem.value, getTemplate);
-  return displayItem ? getItemSellPrice(displayItem) : 0;
+  const count = selectedConsumableItem.value.count ?? 1;
+  return displayItem ? getItemSellPrice(displayItem) * count : 0;
 });
 
 const selectedElixirDescription = computed(() => {
@@ -92,7 +93,7 @@ const selectedElixirDescription = computed(() => {
   const base = `Бафф: 5 минут.\nНе стакается: выпивание сбивает предыдущий.`;
   switch (def.kind) {
     case "heal_flat":
-      return `Восстанавливает 200 HP мгновенно.\n${base}`;
+      return `Восстанавливает 200 HP мгновенно.\nАктивные эликсиры/баффы не сбиваются.`;
     case "regen_elixir":
       return `Восстановление вне боя: 1 → 4 HP каждые 10с (плюс 3 HP/10с).\n${base}`;
     case "power":
@@ -221,7 +222,11 @@ function getElixirOfferTooltip(elixir: (typeof ELIXIRS)[number]): string {
     default:
       break;
   }
-  lines.push("Бафф: 5 минут. Не стакается.");
+  if (def.kind === "heal_flat") {
+    lines.push("Баффы эликсиров не сбиваются.");
+  } else {
+    lines.push("Бафф: 5 минут. Не стакается.");
+  }
   return lines.join("\n");
 }
 
@@ -496,7 +501,29 @@ onUnmounted(() => {
               :disabled="gold < MANUAL_REFRESH_COST_GOLD"
               @click="refreshManually"
             >
-              Обновить ({{ MANUAL_REFRESH_COST_GOLD }})
+              <span class="merchant-page__refresh-button-content">
+                <svg
+                  class="merchant-page__refresh-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M21 12a9 9 0 1 1-3.1-6.7" />
+                  <polyline points="21 3 21 9 15 9" />
+                </svg>
+                <span class="merchant-page__refresh-cost">
+                  <img
+                    src="/images/currencies/coin.png"
+                    alt="Золото"
+                    class="merchant-page__coin merchant-page__refresh-coin"
+                  />
+                  {{ MANUAL_REFRESH_COST_GOLD }}
+                </span>
+              </span>
             </button>
             <div v-if="nextRefreshLabel" class="merchant-page__refresh-label">{{ nextRefreshLabel }}</div>
           </div>

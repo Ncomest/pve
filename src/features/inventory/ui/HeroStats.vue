@@ -5,7 +5,12 @@ import { useCharacterStore } from "@/app/store/character";
 import { computed } from "vue";
 import { PLAYER_CHARACTER } from "@/entities/character/model";
 import { useHeroAvatar } from "@/features/inventory/model/useHeroAvatar";
-import { speedPointsToFraction, armorPointsToFraction } from "@/entities/item/lib/statPoints";
+import {
+  speedPointsToFraction,
+  armorPointsToFraction,
+  SPEED_POINTS_TO_FRACTION,
+  ARMOR_POINTS_TO_FRACTION,
+} from "@/entities/item/lib/statPoints";
 import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
 import "./HeroStats.scss";
 
@@ -26,11 +31,56 @@ interface StatRow {
 const statRows = computed<StatRow[]>(() => {
   const hpBonusFromLevel = (level.value - 1) * 20;
   const hpBonusTotal = hpBonusFromLevel + eq.value.hp + elixirsStore.activeHealthPercentBonusApplied;
+
+  const elixirDef = elixirsStore.activeElixirDef;
+  const elixirPowerDelta = elixirDef?.kind === "power" ? elixirDef.powerDelta ?? 0 : 0;
+  const elixirCritPercentBonus =
+    elixirDef?.kind === "crit_percent" ? elixirDef.critPercentBonus ?? 0 : 0;
+  const elixirSpeedPercentBonus =
+    elixirDef?.kind === "speed_percent" ? elixirDef.speedPercentBonus ?? 0 : 0;
+  const elixirEvasionPercentBonus =
+    elixirDef?.kind === "evasion_percent" ? elixirDef.evasionPercentBonus ?? 0 : 0;
+  const elixirArmorPercentBonus =
+    elixirDef?.kind === "armor_percent" ? elixirDef.armorPercentBonus ?? 0 : 0;
+
+  const equipPower = eq.value.power ?? 0;
+  const equipCrit = eq.value.chanceCrit ?? 0;
+  const equipSpeed = eq.value.speed ?? 0;
+  const equipEvasion = eq.value.evasion ?? 0;
+  const equipArmor = eq.value.armor ?? 0;
+
+  const powerBonusFromElixir = elixirPowerDelta;
+
+  const critBeforeElixir = (base.chanceCrit ?? 0) + equipCrit;
+  const critAfterElixir = Math.min(1, critBeforeElixir + elixirCritPercentBonus);
+  const critDeltaFromElixir = critAfterElixir - critBeforeElixir;
+
+  const evasionBeforeElixir = (base.evasion ?? 0) + equipEvasion;
+  const evasionAfterElixir = Math.min(1, evasionBeforeElixir + elixirEvasionPercentBonus);
+  const evasionDeltaFromElixir = evasionAfterElixir - evasionBeforeElixir;
+
+  // В бою скорость переводится в долю (speedPointsToFraction) по формуле:
+  // speedPoints = speed - 2, поэтому работаем в "очках скорости" (speedPoints).
+  const baseSpeedPoints = Math.max(0, (base.speed ?? 2) - 2);
+  const speedBeforePoints = baseSpeedPoints + equipSpeed;
+  const speedBeforeFraction = speedPointsToFraction(speedBeforePoints);
+  const speedAfterFraction = Math.min(1, speedBeforeFraction + elixirSpeedPercentBonus);
+  const speedAfterPoints = speedAfterFraction / SPEED_POINTS_TO_FRACTION;
+  const speedDeltaFromElixir = speedAfterPoints - speedBeforePoints;
+
+  // В бою `armor_percent` применяется как прибавка к "доле снижения урона" (armorPointsToFraction),
+  // затем снова переводится в очки брони с округлением.
+  const armorBeforePoints = (base.armor ?? 0) + equipArmor;
+  const armorBeforeFraction = armorPointsToFraction(armorBeforePoints);
+  const armorAfterFraction = Math.min(0.9, armorBeforeFraction + elixirArmorPercentBonus);
+  const armorAfterPoints = Math.round(armorAfterFraction / ARMOR_POINTS_TO_FRACTION);
+  const armorDeltaFromElixir = armorAfterPoints - armorBeforePoints;
+
   return [
     {
       label: "Атака",
       base: base.power,
-      bonus: eq.value.power,
+      bonus: equipPower + powerBonusFromElixir,
       fmt: (v) => String(v),
     },
     {
@@ -41,26 +91,27 @@ const statRows = computed<StatRow[]>(() => {
     },
     {
       label: "Скорость",
-      base: base.speed,
-      bonus: eq.value.speed,
+      base: baseSpeedPoints,
+      bonus: equipSpeed + speedDeltaFromElixir,
       fmt: (v) => (speedPointsToFraction(v) * 100).toFixed(2) + "%",
     },
     {
       label: "Крит",
       base: base.chanceCrit,
-      bonus: eq.value.chanceCrit,
+      bonus: equipCrit + critDeltaFromElixir,
       fmt: (v) => (v * 100).toFixed(2) + "%",
     },
     {
       label: "Броня",
       base: base.armor,
-      bonus: eq.value.armor,
+      // В `bonus` включаем и экипировку, и прирост от активного эликсира.
+      bonus: equipArmor + armorDeltaFromElixir,
       fmt: (v) => (armorPointsToFraction(v) * 100).toFixed(2) + "%",
     },
     {
       label: "Уклонение",
       base: base.evasion,
-      bonus: eq.value.evasion,
+      bonus: equipEvasion + evasionDeltaFromElixir,
       fmt: (v) => (v * 100).toFixed(2) + "%",
     },
   ];

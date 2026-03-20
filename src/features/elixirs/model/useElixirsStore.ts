@@ -154,6 +154,19 @@ export const useElixirsStore = defineStore("elixirs", {
 
       const currentHpBefore = calcCurrentHp(snapBase, now, currentMaxHpBefore, regenWindowBefore);
 
+      // "Зелье" (heal_flat) должно только лечить и не сбивать/заменять активные бафф-эликсиры.
+      if (def.kind === "heal_flat") {
+        const nextHp = Math.min(currentMaxHpBefore, currentHpBefore + 200);
+
+        // Выпиваем 1 шт из стака.
+        characterStore.consumeItemFromConsumables(idx, 1);
+
+        // Синхронизируем HP/MaxHP в localStorage на момент выпивания.
+        saveHpSnapshot(nextHp, currentMaxHpBefore, now);
+
+        return { ok: true };
+      }
+
       // Применяем мгновенный эффект (если есть) и обновляем localStorage.
       const durationMs = def.durationMs;
       const nextStartAt = now;
@@ -164,14 +177,12 @@ export const useElixirsStore = defineStore("elixirs", {
 
       const nextMaxHp = baseMaxHp + nextHealthPercentBonusHp;
       const nextHp =
-        def.kind === "heal_flat"
-          ? Math.min(nextMaxHp, currentHpBefore + 200)
-          : def.kind === "health_percent"
-            ? Math.min(nextMaxHp, currentHpBefore + nextHealthPercentBonusHp)
-            : currentHpBefore;
+        def.kind === "health_percent"
+          ? Math.min(nextMaxHp, currentHpBefore + nextHealthPercentBonusHp)
+          : currentHpBefore;
 
       // Удаляем эликсир из инвентаря.
-      characterStore.removeItemFromConsumables(idx);
+      characterStore.consumeItemFromConsumables(idx, 1);
 
       // Обновляем баф-таймеры + параметры.
       this.activeElixirId = def.id;
