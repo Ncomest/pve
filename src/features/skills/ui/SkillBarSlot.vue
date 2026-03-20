@@ -27,6 +27,24 @@ const emit = defineEmits<{
 
 const iconMap: Record<string, ReturnType<typeof defineAsyncComponent>> = Icons as never;
 
+const isMobile = computed(() => {
+  // iOS/Safari при фокусировке на инпуте может увеличивать страницу.
+  // Поэтому на мобильных устройствах отключаем назначение горячей клавиши.
+  if (typeof window === "undefined" || typeof navigator === "undefined") return false;
+
+  const ua = navigator.userAgent || "";
+  const iOS = /iPhone|iPad|iPod/i.test(ua);
+  const android = /Android/i.test(ua);
+
+  // На планшетах/телефонах чаще всего pointer "coarse" и есть touch.
+  const coarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
+  const hasTouch = (navigator.maxTouchPoints ?? 0) > 0;
+
+  return iOS || android || (coarsePointer && hasTouch);
+});
+
+const canEditHotkey = computed(() => !!props.editable && !isMobile.value);
+
 const isImageIcon = computed(() =>
   !!props.ability?.icon && (props.ability.icon.startsWith("/") || props.ability.icon.startsWith("http"))
 );
@@ -62,7 +80,7 @@ const cdProgress = computed(() => {
     }"
   >
     <input
-      v-if="editable"
+      v-if="canEditHotkey"
       :value="hotkey"
       type="text"
       class="skill-bar-slot__hotkey"
