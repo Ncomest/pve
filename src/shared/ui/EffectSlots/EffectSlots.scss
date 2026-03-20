@@ -79,14 +79,15 @@
 
   @media (max-width: 820px) {
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     gap: 6px;
-    min-height: 34px;
+    min-height: 38px;
 
     &__row {
       min-height: 0;
       gap: 3px;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
+      align-content: flex-start;
     }
 
     &__cell {
@@ -110,9 +111,17 @@
       }
     }
 
-    &__duration,
+    /* Таймеры оставляем видимыми; компактный шрифт, чтобы помещались в двухколоночной сетке */
+    &__duration {
+      font-size: 9px;
+      margin-top: 1px;
+      line-height: 1.1;
+    }
+
     &__stacks {
-      display: none;
+      font-size: 9px;
+      margin-top: 1px;
+      line-height: 1.1;
     }
   }
 }
