@@ -47,11 +47,14 @@ function pick<T>(a: T, b: T): T {
  * Генерирует базовые статы предмета по редкости (до множителя уровня вещи).
  */
 export function generateBaseStatsForRarity(rarity: ItemRarity): ItemStats {
-  const S = rollStrengthPercent(rarity);
   const out: ItemStats = {};
 
+  /** Отдельный ролл силы для каждой линии, иначе одинаковый PROC_BASE даёт одинаковые числа (напр. броня и дух). */
   const scale = (key: keyof typeof PROC_BASE) =>
-    Math.max(1, Math.round((PROC_BASE[key] ?? 0) * S));
+    Math.max(
+      1,
+      Math.round((PROC_BASE[key] ?? 0) * rollStrengthPercent(rarity)),
+    );
 
   if (rarity === "common") {
     if (pick(0, 1) === 0) {
