@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import type { ItemInstance } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
-import lootData from "@/entities/loot/loot.json";
+import { getResourceItemIconSrc } from "@/entities/item/lib/resourceItemIcon";
 import "./ConsumablesGrid.scss";
 
 interface ResourceEntry {
@@ -21,18 +21,12 @@ const emit = defineEmits<{
   select: [item: ItemInstance | null, index: number];
 }>();
 
-const iconByLootId = new Map(
-  (lootData as { id: string; icon?: string }[]).map((e) => [e.id, e.icon]),
-);
-
 const displayByIndex = computed(() =>
   props.items.map((entry) => {
     if (!entry.item) return null;
     const tmpl = getTemplate(entry.item.templateId);
-    const icon =
-      iconByLootId.get(entry.item.templateId) ?? "📦";
     return {
-      icon,
+      iconSrc: getResourceItemIconSrc(entry.item.templateId),
       name: tmpl?.name ?? entry.item.templateId,
       count: entry.item.count ?? 1,
     };
@@ -60,12 +54,15 @@ function handleClick(item: ItemInstance | null, index: number) {
       @click="handleClick(item, index)"
     >
       <template v-if="displayByIndex[index]">
-        <span
-          class="resources-grid__emoji"
-          aria-hidden="true"
+        <img
+          class="resources-grid__icon-img"
+          :src="displayByIndex[index]!.iconSrc"
+          :alt="displayByIndex[index]!.name"
+          width="32"
+          height="32"
+          loading="lazy"
+          decoding="async"
         >
-          {{ displayByIndex[index]!.icon }}
-        </span>
         <span
           v-if="(displayByIndex[index]!.count ?? 1) > 1"
           class="inventory-grid__count"
@@ -97,13 +94,11 @@ function handleClick(item: ItemInstance | null, index: number) {
 </template>
 
 <style scoped>
-.resources-grid__emoji {
-  font-size: 26px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
+.resources-grid__icon-img {
+  display: block;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  pointer-events: none;
 }
 </style>
