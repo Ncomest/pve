@@ -98,7 +98,15 @@ const cdProgress = computed(() => {
     >
       <AbilitySlotPlaceholder v-if="!ability" />
       <template v-else>
-        <img v-if="isImageIcon" :src="ability!.icon" class="skill-bar-slot__icon" :alt="ability!.name" />
+        <img
+          v-if="isImageIcon"
+          :src="ability!.icon"
+          class="skill-bar-slot__icon"
+          :alt="ability!.name"
+          width="50"
+          height="50"
+          decoding="async"
+        />
         <component v-else :is="iconComponent" class="skill-bar-slot__icon" />
         <CooldownOverlay
           v-if="!editable"

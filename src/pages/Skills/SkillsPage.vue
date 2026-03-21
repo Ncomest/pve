@@ -245,6 +245,10 @@
                 "
                 :src="ability.icon"
                 :alt="ability.name"
+                width="42"
+                height="42"
+                loading="lazy"
+                decoding="async"
               />
               <component
                 v-else-if="ability.icon && iconComponents[ability.icon]"
@@ -305,6 +309,10 @@
                   "
                   :src="ability.icon"
                   :alt="ability.name"
+                  width="42"
+                  height="42"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <component
                   v-else-if="ability.icon && iconComponents[ability.icon]"

@@ -112,6 +112,10 @@ function drinkSelectedElixir() {
               :src="selectedElixirDef.icon"
               :alt="selectedElixirDef.name"
               class="elixirs-section__icon-img"
+              width="44"
+              height="44"
+              loading="lazy"
+              decoding="async"
             />
           </div>
 

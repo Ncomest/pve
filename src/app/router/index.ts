@@ -1,54 +1,46 @@
 import type { RouteRecordRaw } from "vue-router";
-import BossSelectPage from "@/pages/BossSelect/BossSelectPage.vue";
-import BattlePage from "@/pages/Battle/BattlePage.vue";
-import CharacterPage from "@/pages/Character/CharacterPage.vue";
-import MerchantPage from "@/pages/Merchant/MerchantPage.vue";
-import SkillsPage from "@/pages/Skills/SkillsPage.vue";
-import CraftPage from "@/pages/Craft/CraftPage.vue";
-import UpdatePage from "@/pages/Update/UpdatePage.vue";
-import InfoPage from "@/pages/Info/InfoPage.vue";
 
 export const routes: RouteRecordRaw[] = [
   {
     path: "/",
     name: "boss-select",
-    component: BossSelectPage,
+    component: () => import("@/pages/BossSelect/BossSelectPage.vue"),
   },
   {
     path: "/battle/:bossId",
     name: "battle",
-    component: BattlePage,
+    component: () => import("@/pages/Battle/BattlePage.vue"),
     props: true,
   },
   {
     path: "/character",
     name: "character",
-    component: CharacterPage,
+    component: () => import("@/pages/Character/CharacterPage.vue"),
   },
   {
     path: "/merchant",
     name: "merchant",
-    component: MerchantPage,
+    component: () => import("@/pages/Merchant/MerchantPage.vue"),
   },
   {
     path: "/skills",
     name: "skills",
-    component: SkillsPage,
+    component: () => import("@/pages/Skills/SkillsPage.vue"),
   },
   {
     path: "/update",
     name: "update",
-    component: UpdatePage,
+    component: () => import("@/pages/Update/UpdatePage.vue"),
   },
   {
     path: "/info",
     name: "info",
-    component: InfoPage,
+    component: () => import("@/pages/Info/InfoPage.vue"),
   },
   {
     path: "/craft",
     name: "craft",
-    component: CraftPage,
+    component: () => import("@/pages/Craft/CraftPage.vue"),
   },
 ];
 

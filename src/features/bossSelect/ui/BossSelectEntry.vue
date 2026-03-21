@@ -52,6 +52,10 @@
           :src="boss.image"
           :alt="boss.name"
           class="boss-select-entry__avatar-img"
+          width="52"
+          height="88"
+          loading="lazy"
+          decoding="async"
         />
         <svg
           v-else
@@ -102,6 +106,10 @@
               :src="ability.icon"
               :alt="ability.name"
               class="boss-select-entry__ability-icon"
+              width="18"
+              height="18"
+              loading="lazy"
+              decoding="async"
             />
             <span v-else class="boss-select-entry__ability-icon-fallback"
               >?</span

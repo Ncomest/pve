@@ -58,6 +58,10 @@ function handleClick(item: ItemInstance | null, index: number) {
           :src="displayByIndex[index]!.icon"
           :alt="displayByIndex[index]!.name"
           class="inventory-grid__icon"
+          width="32"
+          height="32"
+          loading="lazy"
+          decoding="async"
         />
         <span
           v-if="(displayByIndex[index]!.count ?? 1) > 1"

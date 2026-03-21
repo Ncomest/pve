@@ -130,6 +130,10 @@ function handleClick(item: ItemInstance | null, index: number) {
           :src="getSlotIconSrc(displayByIndex[index]!.slot)"
           :alt="displayByIndex[index]!.name"
           class="inventory-grid__icon"
+          width="32"
+          height="32"
+          loading="lazy"
+          decoding="async"
         />
         <span v-if="displayByIndex[index]?.itemLevel != null" class="inventory-grid__level">
           {{ displayByIndex[index]!.itemLevel }}

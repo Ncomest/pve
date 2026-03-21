@@ -173,6 +173,9 @@ watch(
             :src="activeElixirDef?.icon ?? undefined"
             alt="Бафф"
             class="char-status__elixir-icon"
+            width="18"
+            height="18"
+            decoding="async"
           />
           <span class="char-status__elixir-text">
             {{ activeElixirDef?.name }}: {{ elixirRemainingText }}
@@ -273,6 +276,9 @@ watch(
             :src="activeElixirDef?.icon ?? undefined"
             alt="Бафф"
             class="app-burger-elixir__icon"
+            width="34"
+            height="34"
+            decoding="async"
           />
           <div class="app-burger-elixir__text">
             <div class="app-burger-elixir__title">Бафф: {{ activeElixirDef?.name ?? "" }}</div>

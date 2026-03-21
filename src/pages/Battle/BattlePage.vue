@@ -106,7 +106,11 @@ const playerStatRows = computed(() =>
 );
 
 const bossStatRows = computed(() =>
-  buildBossStatRows(selectedBoss.value.stats, boss.stats, bossEffectiveArmor.value),
+  buildBossStatRows(
+    selectedBoss.value?.stats ?? boss.stats,
+    boss.stats,
+    bossEffectiveArmor.value,
+  ),
 );
 
 const powerBoostText = computed(() => {

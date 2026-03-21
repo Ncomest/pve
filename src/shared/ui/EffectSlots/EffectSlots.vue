@@ -44,6 +44,10 @@ const formatDuration = (seconds: number) => {
           :src="effect.icon"
           :alt="effect.name"
           class="effect-slots__icon effect-slots__icon--img"
+          width="20"
+          height="20"
+          loading="lazy"
+          decoding="async"
         />
         <span v-else class="effect-slots__icon">{{ effect.icon }}</span>
         <span v-if="effect.stacks !== undefined" class="effect-slots__stacks">
@@ -73,6 +77,10 @@ const formatDuration = (seconds: number) => {
           :src="effect.icon"
           :alt="effect.name"
           class="effect-slots__icon effect-slots__icon--img"
+          width="20"
+          height="20"
+          loading="lazy"
+          decoding="async"
         />
         <span v-else class="effect-slots__icon">{{ effect.icon }}</span>
         <span v-if="effect.durationSeconds > 0" class="effect-slots__duration">

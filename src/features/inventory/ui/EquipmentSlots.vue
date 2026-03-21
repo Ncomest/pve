@@ -88,6 +88,10 @@ function getDisplay(inst: ItemInstance | null) {
                 :src="getSlotIconSrc(slot)"
                 :alt="label"
                 class="equipment-slots__icon-img"
+                width="44"
+                height="44"
+                loading="lazy"
+                decoding="async"
               />
             </div>
 
@@ -139,6 +143,10 @@ function getDisplay(inst: ItemInstance | null) {
           :src="avatarSrc"
           alt="Аватар героя"
           class="equipment-slots__avatar-img"
+          width="200"
+          height="352"
+          loading="lazy"
+          decoding="async"
         />
         <svg
           v-else
@@ -192,6 +200,10 @@ function getDisplay(inst: ItemInstance | null) {
                 :src="getSlotIconSrc(slot)"
                 :alt="label"
                 class="equipment-slots__icon-img"
+                width="44"
+                height="44"
+                loading="lazy"
+                decoding="async"
               />
             </div>
 

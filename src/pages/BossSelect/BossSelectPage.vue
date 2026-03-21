@@ -11,8 +11,7 @@ import {
 import { useBossSelect } from "@/features/bossSelect/model/useBossSelect";
 import { BossSelectEntry } from "@/features/bossSelect/ui";
 import type { Boss } from "@/entities/boss/model";
-import bossesData from "@/entities/boss/bosses.json";
-import resourcesData from "@/entities/boss/resources.json";
+import { loadBossCatalog } from "@/entities/boss/lib/loadBossCatalog";
 import "./BossSelectPage.scss";
 
 type TabType = "bosses" | "resources";
@@ -23,8 +22,9 @@ const PAGE_SIZE = 6;
 
 const activeTab = ref<TabType>("bosses");
 
-const allBosses = bossesData as Boss[];
-const allResources = resourcesData as Boss[];
+const allBosses = ref<Boss[]>([]);
+const allResources = ref<Boss[]>([]);
+const catalogLoading = ref(true);
 
 const isMobile = ref(false);
 let mobileMql: MediaQueryList | null = null;
@@ -44,7 +44,7 @@ const {
 } = useBossSelect();
 
 const fullListForTab = computed(() =>
-  activeTab.value === "bosses" ? allBosses : allResources,
+  activeTab.value === "bosses" ? allBosses.value : allResources.value,
 );
 
 const bosses = computed(() => {
@@ -116,6 +116,11 @@ onMounted(() => {
   syncMobile();
   mobileMql = window.matchMedia(`(max-width: ${MOBILE_MAX_WIDTH})`);
   mobileMql.addEventListener("change", syncMobile);
+  void loadBossCatalog().then((cat) => {
+    allBosses.value = cat.bosses;
+    allResources.value = cat.resources;
+    catalogLoading.value = false;
+  });
 });
 
 onUnmounted(() => {
@@ -148,7 +153,15 @@ onUnmounted(() => {
       </button>
     </div>
 
-    <div class="boss-select-page__list">
+    <div
+      v-if="catalogLoading"
+      class="boss-select-page__catalog-loading"
+      role="status"
+    >
+      Загрузка списка…
+    </div>
+
+    <div v-else class="boss-select-page__list">
       <BossSelectEntry
         v-for="boss in bosses"
         :key="boss.id"

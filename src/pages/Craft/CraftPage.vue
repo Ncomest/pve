@@ -138,6 +138,10 @@
                   :src="getSlotIconSrc(entry.resultItem.slot as ItemSlot)"
                   :alt="entry.resultItem.name"
                   class="craft-page__recipe-icon-img"
+                  width="36"
+                  height="36"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <span v-else class="craft-page__recipe-icon-placeholder">
                   ⚒

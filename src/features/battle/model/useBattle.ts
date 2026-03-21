@@ -1,4 +1,12 @@
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue";
+import {
+  computed,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+  shallowRef,
+  watch,
+} from "vue";
 import type {
   Boss,
   BossAbility,
@@ -6,8 +14,7 @@ import type {
   Stats,
 } from "@/entities/boss/model";
 import type { ActiveEffect } from "@/shared/lib/effects/types";
-import bossesData from "@/entities/boss/bosses.json";
-import resourcesData from "@/entities/boss/resources.json";
+import { loadBossCatalog } from "@/entities/boss/lib/loadBossCatalog";
 import { PLAYER_CHARACTER } from "@/entities/character/model";
 import { ABILITIES, ALL_ABILITIES } from "@/features/abilities/model/abilities";
 import type { Ability } from "@/features/abilities/model/types";
@@ -101,8 +108,8 @@ const formatCooldown = (ms: number) => {
 };
 
 export function useBattle(bossId: () => string | undefined) {
-  const allBosses = [...(bossesData as Boss[]), ...(resourcesData as Boss[])];
-  const resourceBossIdSet = new Set((resourcesData as Boss[]).map((b) => b.id));
+  const allBosses = shallowRef<Boss[]>([]);
+  const resourceBossIdSet = shallowRef<Set<string>>(new Set());
   const playerProgress = usePlayerProgress();
   const characterStore = useCharacterStore();
   const playerHp = usePlayerHp();
@@ -122,8 +129,10 @@ export function useBattle(bossId: () => string | undefined) {
   };
 
   const selectedBoss = computed(() => {
+    const list = allBosses.value;
+    if (list.length === 0) return undefined;
     const id = bossId();
-    return allBosses.find((b) => b.id === id) ?? allBosses[0];
+    return list.find((b) => b.id === id) ?? list[0];
   });
 
   const basePlayerStatsForRevert = buildPlayerStatsForLevel(playerProgress.level.value);
@@ -2654,7 +2663,7 @@ export function useBattle(bossId: () => string | undefined) {
         const itemLevel = 1 + bossLevel * 3;
         const bossId = selectedBoss.value?.id ?? "";
 
-        if (resourceBossIdSet.has(bossId) && RESOURCE_TEMPLATE_IDS.length > 0) {
+        if (resourceBossIdSet.value.has(bossId) && RESOURCE_TEMPLATE_IDS.length > 0) {
           const rIdx = Math.floor(rng() * RESOURCE_TEMPLATE_IDS.length);
           const resId = RESOURCE_TEMPLATE_IDS[rIdx]!;
           loot.value = [createItemInstance(resId, itemLevel)];
@@ -2682,7 +2691,10 @@ export function useBattle(bossId: () => string | undefined) {
     }
   });
 
-  onMounted(() => {
+  onMounted(async () => {
+    const cat = await loadBossCatalog();
+    allBosses.value = cat.allBosses;
+    resourceBossIdSet.value = cat.resourceBossIdSet;
     applySelectedBoss();
     scheduleNextBossAttack();
     startEffectsTicker();

@@ -36,6 +36,10 @@ const avatarSrc = computed(() => selectedSrc());
         :src="avatarSrc"
         alt="Герой"
         class="character-card__avatar-img"
+        width="80"
+        height="80"
+        decoding="async"
+        fetchpriority="low"
       />
       <svg
         v-else

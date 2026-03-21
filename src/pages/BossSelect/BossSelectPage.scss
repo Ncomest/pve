@@ -18,6 +18,13 @@
     color: rgba(255, 255, 255, 0.78);
   }
 
+  &__catalog-loading {
+    padding: 24px 0;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 15px;
+  }
+
   &__tabs {
     display: flex;
     gap: 8px;

@@ -37,6 +37,9 @@ const iconMap: Record<string, ReturnType<typeof defineAsyncComponent>> = Icons a
         :src="ability.icon"
         :alt="ability.name"
         class="ability-panel__icon"
+        width="26"
+        height="26"
+        decoding="async"
       />
       <component
         v-else

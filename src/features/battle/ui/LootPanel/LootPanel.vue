@@ -64,6 +64,9 @@ const slotIconSrc = (slot: string | undefined) => {
               class="loot-panel__item-icon"
               :src="slotIconSrc(display.slot)"
               alt=""
+              width="32"
+              height="32"
+              decoding="async"
             >
           </div>
           <div class="loot-panel__item-info">

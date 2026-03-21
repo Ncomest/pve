@@ -426,6 +426,9 @@ onUnmounted(() => {
         src="/images/currencies/coin.png"
         alt="Золото"
         class="merchant-page__gold-icon"
+        width="24"
+        height="24"
+        decoding="async"
       />
       <span class="merchant-page__gold-value">{{ gold }}</span>
       <span class="merchant-page__gold-label">золотых</span>
@@ -510,6 +513,9 @@ onUnmounted(() => {
                 src="/images/currencies/coin.png"
                 alt="Золото"
                 class="merchant-page__coin"
+                width="18"
+                height="18"
+                decoding="async"
               />
               {{ selectedSellPrice }} золотых
             </div>
@@ -529,6 +535,9 @@ onUnmounted(() => {
                 src="/images/currencies/coin.png"
                 alt="Золото"
                 class="merchant-page__coin"
+                width="18"
+                height="18"
+                decoding="async"
               />
               {{ selectedElixirSellPrice }} золотых
             </div>
@@ -600,6 +609,9 @@ onUnmounted(() => {
                     src="/images/currencies/coin.png"
                     alt="Золото"
                     class="merchant-page__coin merchant-page__refresh-coin"
+                    width="18"
+                    height="18"
+                    decoding="async"
                   />
                   {{ MANUAL_REFRESH_COST_GOLD }}
                 </span>
@@ -624,6 +636,10 @@ onUnmounted(() => {
                     :src="getSlotIconSrc(row.displayItem.slot)"
                     :alt="SLOT_NAMES[row.displayItem.slot]"
                     class="merchant-page__offer-icon-img"
+                    width="40"
+                    height="40"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
                 <div class="merchant-page__offer-info">
@@ -639,6 +655,9 @@ onUnmounted(() => {
                       src="/images/currencies/coin.png"
                       alt="Золото"
                       class="merchant-page__coin"
+                      width="18"
+                      height="18"
+                      decoding="async"
                     />
                     {{ row.offer.price }}
                   </span>
@@ -698,12 +717,27 @@ onUnmounted(() => {
               :class="{ 'merchant-page__offer--expanded': expandedElixirId === elixir.id }"
             >
               <div class="merchant-page__offer-icon merchant-page__offer-icon--elixir">
-                <img :src="elixir.icon" :alt="elixir.name" class="merchant-page__offer-icon-img" />
+                <img
+                  :src="elixir.icon"
+                  :alt="elixir.name"
+                  class="merchant-page__offer-icon-img"
+                  width="40"
+                  height="40"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
               <div class="merchant-page__offer-info">
                 <span class="merchant-page__offer-name">{{ elixir.name }}</span>
                 <span class="merchant-page__offer-price">
-                  <img src="/images/currencies/coin.png" alt="Золото" class="merchant-page__coin" />
+                  <img
+                    src="/images/currencies/coin.png"
+                    alt="Золото"
+                    class="merchant-page__coin"
+                    width="18"
+                    height="18"
+                    decoding="async"
+                  />
                   {{ elixir.price }}
                 </span>
               </div>

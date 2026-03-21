@@ -105,7 +105,16 @@ const castCategoryClass = computed(() => {
   <div class="boss-card">
     <div class="boss-card__left">
       <div class="boss-card__avatar">
-        <img v-if="image" :src="image" :alt="name" class="boss-card__avatar-img" />
+        <img
+          v-if="image"
+          :src="image"
+          :alt="name"
+          class="boss-card__avatar-img"
+          width="80"
+          height="80"
+          decoding="async"
+          fetchpriority="high"
+        />
         <svg v-else class="boss-card__avatar-placeholder" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="48" height="48" rx="8" fill="rgba(255,255,255,0.04)" />
           <circle cx="24" cy="18" r="7" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" />
@@ -113,7 +122,14 @@ const castCategoryClass = computed(() => {
         </svg>
       </div>
       <div class="boss-card__attack-icon">
-        <img src="/images/bosses/icons/common/attack.png" alt="Атака" class="boss-card__attack-icon-img" />
+        <img
+          src="/images/bosses/icons/common/attack.png"
+          alt="Атака"
+          class="boss-card__attack-icon-img"
+          width="48"
+          height="48"
+          decoding="async"
+        />
         <CooldownOverlay
           :progress="attackCooldownProgress"
           :cooldown-text="attackCooldownText"
@@ -139,6 +155,9 @@ const castCategoryClass = computed(() => {
               v-if="currentAbilityIcon"
               :src="currentAbilityIcon"
               :alt="currentAbilityName || 'Способность босса'"
+              width="32"
+              height="32"
+              decoding="async"
             />
             <svg
               v-else

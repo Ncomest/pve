@@ -70,6 +70,10 @@ const currentAvatarSrc = computed(() => selectedSrc());
           :src="currentAvatarSrc"
           alt="Аватар героя"
           class="hero-stats__avatar-img"
+          width="90"
+          height="90"
+          loading="lazy"
+          decoding="async"
         />
         <!-- SVG-заглушка если аватар не выбран -->
         <svg
