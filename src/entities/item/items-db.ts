@@ -239,7 +239,7 @@ const RESOURCE_TEMPLATE_SLOT: ItemSlot = "resource";
 const RESOURCE_TEMPLATES: Record<string, ItemTemplate> = {
   "resource-fire-essence": {
     id: "resource-fire-essence",
-    name: "Эссенция огня",
+    name: "Эфир огня",
     slot: RESOURCE_TEMPLATE_SLOT,
     rarity: "common",
     baseStats: {},
@@ -281,7 +281,7 @@ const RESOURCE_TEMPLATES: Record<string, ItemTemplate> = {
   },
   "resource-earth-essence": {
     id: "resource-earth-essence",
-    name: "Эссенция земли",
+    name: "Эфир земли",
     slot: RESOURCE_TEMPLATE_SLOT,
     rarity: "common",
     baseStats: {},

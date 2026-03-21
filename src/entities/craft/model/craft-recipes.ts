@@ -1,7 +1,4 @@
-import type { Item } from "@/entities/item/model";
-import { getTemplate } from "@/entities/item/items-db";
-import { getDisplayItem } from "@/entities/item/model";
-import { createItemInstance } from "@/entities/item/lib/createInstance";
+import type { EquipmentSlot } from "@/entities/item/model";
 
 export interface CraftRequirement {
   resourceId: string;
@@ -9,276 +6,103 @@ export interface CraftRequirement {
 }
 
 export interface CraftRecipe {
-  /** Уникальный id рецепта */
   id: string;
-  /** Id шаблона предмета-результата (templateId из items-db). */
+  /** Слот экипировки (один рецепт на слот). */
+  slot: EquipmentSlot;
+  /** Id шаблона предмета-результата (середина линейки *-5 как «база» слота). */
   resultItemId: string;
-  /** Отображаемое имя рецепта (может отличаться от имени предмета) */
   name: string;
-  /** Краткое описание эффекта или фантазийного лора */
   description: string;
-  /** Условная сложность крафта для визуального отображения */
-  difficulty: "easy" | "normal" | "hard";
-  /** Требуемые ресурсы (id из loot.json) */
   requirements: CraftRequirement[];
 }
 
+/**
+ * Ровно 10 рецептов: по одному на слот. Стоимость — 1× ресурс с соответствующего босса-ресурса.
+ * Редкость и статы результата — как у дропа с обычных боссов (createItemInstance).
+ */
 export const CRAFT_RECIPES: CraftRecipe[] = [
-  // Оружие
   {
-    id: "craft-iron-sword",
-    resultItemId: "weapon-2",
-    name: "Железный меч",
-    description: "Базовое улучшение оружия для начала охоты на элементалей.",
-    difficulty: "easy",
-    requirements: [
-      { resourceId: "resource-fire-essence", amount: 2 },
-      { resourceId: "resource-stone-shard", amount: 1 },
-    ],
+    id: "craft-slot-weapon",
+    slot: "weapon",
+    resultItemId: "weapon-5",
+    name: "Крафт оружия",
+    description: "Случайное оружие уровня героя. Нужен эфир/эссенция огня.",
+    requirements: [{ resourceId: "resource-fire-essence", amount: 1 }],
   },
   {
-    id: "craft-legendary-blade",
-    resultItemId: "weapon-10",
-    name: "Легендарный клинок",
-    description: "Мощное оружие с высоким шансом крита для опытных воинов.",
-    difficulty: "hard",
-    requirements: [
-      { resourceId: "resource-ethereal-dust", amount: 2 },
-      { resourceId: "resource-essence-pure", amount: 1 },
-      { resourceId: "resource-flame-crystal", amount: 2 },
-    ],
-  },
-
-  // Щиты
-  {
-    id: "craft-iron-shield",
-    resultItemId: "shield-2",
-    name: "Железный щит",
-    description: "Надёжная защита с хорошим балансом здоровья и уклонения.",
-    difficulty: "easy",
-    requirements: [
-      { resourceId: "resource-earth-essence", amount: 2 },
-      { resourceId: "resource-stone-shard", amount: 1 },
-    ],
+    id: "craft-slot-shield",
+    slot: "shield",
+    resultItemId: "shield-5",
+    name: "Крафт щита",
+    description: "Случайный щит. Нужна эссенция земли.",
+    requirements: [{ resourceId: "resource-earth-essence", amount: 1 }],
   },
   {
-    id: "craft-dragon-shield",
-    resultItemId: "shield-10",
-    name: "Драконий щит",
-    description: "Эпический щит из драконьей чешуи с мощной защитой.",
-    difficulty: "normal",
-    requirements: [
-      { resourceId: "resource-golem-core", amount: 1 },
-      { resourceId: "resource-earth-essence", amount: 3 },
-      { resourceId: "resource-aqua-pearl", amount: 1 },
-    ],
-  },
-
-  // Шлемы
-  {
-    id: "craft-iron-helmet",
-    resultItemId: "helmet-2",
-    name: "Железный шлем",
-    description: "Прочный шлем, увеличивающий запас здоровья.",
-    difficulty: "easy",
-    requirements: [
-      { resourceId: "resource-fire-essence", amount: 1 },
-      { resourceId: "resource-earth-essence", amount: 1 },
-    ],
+    id: "craft-slot-helmet",
+    slot: "helmet",
+    resultItemId: "helmet-5",
+    name: "Крафт шлема",
+    description: "Случайный шлем. Нужен каменный осколок.",
+    requirements: [{ resourceId: "resource-stone-shard", amount: 1 }],
   },
   {
-    id: "craft-royal-helmet",
-    resultItemId: "helmet-9",
-    name: "Королевский шлем",
-    description: "Роскошный шлем с усилением силы и защиты.",
-    difficulty: "normal",
-    requirements: [
-      { resourceId: "resource-golem-core", amount: 1 },
-      { resourceId: "resource-stone-shard", amount: 2 },
-    ],
-  },
-
-  // Нагрудники
-  {
-    id: "craft-iron-chest",
-    resultItemId: "chest-2",
-    name: "Железная кираса",
-    description: "Крепкая броня, обеспечивающая хорошую защиту корпуса.",
-    difficulty: "easy",
-    requirements: [
-      { resourceId: "resource-earth-essence", amount: 2 },
-      { resourceId: "resource-fire-essence", amount: 1 },
-    ],
+    id: "craft-slot-chest",
+    slot: "chest",
+    resultItemId: "chest-5",
+    name: "Крафт нагрудника",
+    description: "Случайный нагрудник. Нужно ядро голема.",
+    requirements: [{ resourceId: "resource-golem-core", amount: 1 }],
   },
   {
-    id: "craft-dragon-chest",
-    resultItemId: "chest-10",
-    name: "Драконья броня",
-    description: "Легендарная броня с огромным запасом здоровья и силой.",
-    difficulty: "hard",
-    requirements: [
-      { resourceId: "resource-golem-core", amount: 2 },
-      { resourceId: "resource-essence-pure", amount: 1 },
-      { resourceId: "resource-earth-essence", amount: 3 },
-    ],
-  },
-
-  // Серьги
-  {
-    id: "craft-silver-earring",
-    resultItemId: "earring-2",
-    name: "Серебряная серьга",
-    description: "Элегантное украшение, повышающее шанс крита.",
-    difficulty: "easy",
-    requirements: [
-      { resourceId: "resource-air-essence", amount: 2 },
-      { resourceId: "resource-storm-feather", amount: 1 },
-    ],
+    id: "craft-slot-earring",
+    slot: "earring",
+    resultItemId: "earring-5",
+    name: "Крафт серьги",
+    description: "Случайная серьга. Нужна эссенция воздуха.",
+    requirements: [{ resourceId: "resource-air-essence", amount: 1 }],
   },
   {
-    id: "craft-emerald-earring",
-    resultItemId: "earring-9",
-    name: "Изумрудная серьга",
-    description: "Изысканное украшение с мощным усилением крита и урона.",
-    difficulty: "normal",
-    requirements: [
-      { resourceId: "resource-ethereal-dust", amount: 1 },
-      { resourceId: "resource-aqua-pearl", amount: 1 },
-      { resourceId: "resource-storm-feather", amount: 1 },
-    ],
-  },
-
-  // Кольца
-  {
-    id: "craft-silver-ring",
-    resultItemId: "ring-2",
-    name: "Серебряное кольцо",
-    description: "Кольцо с умеренным усилением здоровья и крита.",
-    difficulty: "easy",
-    requirements: [
-      { resourceId: "resource-water-essence", amount: 2 },
-      { resourceId: "resource-aqua-pearl", amount: 1 },
-    ],
+    id: "craft-slot-ring",
+    slot: "ring",
+    resultItemId: "ring-5",
+    name: "Крафт кольца",
+    description: "Случайное кольцо. Нужна эссенция воды.",
+    requirements: [{ resourceId: "resource-water-essence", amount: 1 }],
   },
   {
-    id: "craft-mystic-ring",
-    resultItemId: "ring-10",
-    name: "Мистическое кольцо",
-    description: "Легендарное кольцо с мощным усилением всех характеристик.",
-    difficulty: "hard",
-    requirements: [
-      { resourceId: "resource-essence-pure", amount: 1 },
-      { resourceId: "resource-ethereal-dust", amount: 2 },
-      { resourceId: "resource-aqua-pearl", amount: 1 },
-    ],
-  },
-
-  // Пояса
-  {
-    id: "craft-iron-belt",
-    resultItemId: "belt-2",
-    name: "Железный пояс",
-    description: "Крепкий пояс с усилением брони и здоровья.",
-    difficulty: "easy",
-    requirements: [
-      { resourceId: "resource-earth-essence", amount: 2 },
-      { resourceId: "resource-stone-shard", amount: 1 },
-    ],
+    id: "craft-slot-belt",
+    slot: "belt",
+    resultItemId: "belt-5",
+    name: "Крафт пояса",
+    description: "Случайный пояс. Нужна пыль огня.",
+    requirements: [{ resourceId: "resource-dust-fire", amount: 1 }],
   },
   {
-    id: "craft-dragonscale-belt",
-    resultItemId: "belt-9",
-    name: "Пояс из чешуи дракона",
-    description: "Эпический пояс с мощной защитой и уклонением.",
-    difficulty: "normal",
-    requirements: [
-      { resourceId: "resource-golem-core", amount: 1 },
-      { resourceId: "resource-flame-crystal", amount: 1 },
-      { resourceId: "resource-earth-essence", amount: 2 },
-    ],
-  },
-
-  // Штаны
-  {
-    id: "craft-chainmail-pants",
-    resultItemId: "pants-2",
-    name: "Кольчужные штаны",
-    description: "Прочные штаны с хорошей бронёй и здоровьем.",
-    difficulty: "easy",
-    requirements: [
-      { resourceId: "resource-fire-essence", amount: 1 },
-      { resourceId: "resource-earth-essence", amount: 2 },
-    ],
+    id: "craft-slot-pants",
+    slot: "pants",
+    resultItemId: "pants-5",
+    name: "Крафт штанов",
+    description: "Случайные штаны. Нужен эфир воздуха.",
+    requirements: [{ resourceId: "resource-ether-air", amount: 1 }],
   },
   {
-    id: "craft-shadow-pants",
-    resultItemId: "pants-9",
-    name: "Штаны тени",
-    description: "Лёгкие штаны для скрытных бойцов, усиливающие скорость.",
-    difficulty: "normal",
-    requirements: [
-      { resourceId: "resource-ethereal-dust", amount: 1 },
-      { resourceId: "resource-air-essence", amount: 2 },
-      { resourceId: "resource-storm-feather", amount: 1 },
-    ],
-  },
-
-  // Ботинки
-  {
-    id: "craft-iron-boots",
-    resultItemId: "boots-2",
-    name: "Железные сапоги",
-    description: "Прочные сапоги с умеренной скоростью и бронёй.",
-    difficulty: "easy",
-    requirements: [
-      { resourceId: "resource-earth-essence", amount: 1 },
-      { resourceId: "resource-fire-essence", amount: 1 },
-    ],
+    id: "craft-slot-boots",
+    slot: "boots",
+    resultItemId: "boots-5",
+    name: "Крафт обуви",
+    description: "Случайная обувь. Нужен пламенный кристалл.",
+    requirements: [{ resourceId: "resource-flame-crystal", amount: 1 }],
   },
   {
-    id: "craft-wind-boots",
-    resultItemId: "boots-10",
-    name: "Сапоги ветра",
-    description: "Легендарные сапоги с огромной скоростью и уклонением.",
-    difficulty: "hard",
-    requirements: [
-      { resourceId: "resource-essence-pure", amount: 1 },
-      { resourceId: "resource-air-essence", amount: 3 },
-      { resourceId: "resource-storm-feather", amount: 2 },
-    ],
-  },
-
-  // Ожерелья
-  {
-    id: "craft-silver-necklace",
-    resultItemId: "necklace-2",
-    name: "Серебряная цепочка",
-    description: "Изящное ожерелье, улучшающее точность атак.",
-    difficulty: "easy",
-    requirements: [
-      { resourceId: "resource-water-essence", amount: 1 },
-      { resourceId: "resource-air-essence", amount: 1 },
-    ],
-  },
-  {
-    id: "craft-amulet",
-    resultItemId: "necklace-10",
-    name: "Амулет мудреца",
-    description: "Легендарный амулет с мощным усилением всех боевых качеств.",
-    difficulty: "hard",
-    requirements: [
-      { resourceId: "resource-essence-pure", amount: 2 },
-      { resourceId: "resource-ethereal-dust", amount: 2 },
-      { resourceId: "resource-golem-core", amount: 1 },
-    ],
+    id: "craft-slot-necklace",
+    slot: "necklace",
+    resultItemId: "necklace-5",
+    name: "Крафт ожерелья",
+    description: "Случайное ожерелье. Нужна водная жемчужина.",
+    requirements: [{ resourceId: "resource-aqua-pearl", amount: 1 }],
   },
 ];
 
-/** Возвращает отображаемый вид предмета крафта (уровень 1). */
-export const getCraftResultItem = (recipe: CraftRecipe): Item | null => {
-  const template = getTemplate(recipe.resultItemId);
-  if (!template) return null;
-  const instance = createItemInstance(recipe.resultItemId, 1);
-  return getDisplayItem(instance, getTemplate);
-};
-
+export function getRecipeById(id: string): CraftRecipe | undefined {
+  return CRAFT_RECIPES.find((r) => r.id === id);
+}

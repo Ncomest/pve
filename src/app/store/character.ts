@@ -16,12 +16,15 @@ interface CharacterState {
   inventory: (ItemInstance | null)[];
   /** Раздельный инвентарь под расходники (зелья/эликсиры). */
   consumables: (ItemInstance | null)[];
+  /** Крафтовые ресурсы (стаки, как у эликсиров). */
+  resources: (ItemInstance | null)[];
   equipped: Record<EquipmentSlot, ItemInstance | null>;
 }
 
 const MAX_INVENTORY_SIZE = 30;
 const MAX_CONSUMABLES_SIZE = 10;
-// Максимальный размер стака для расходников/эликсиров.
+const MAX_RESOURCES_SIZE = 10;
+// Максимальный размер стака для расходников/эликсиров и ресурсов.
 const MAX_CONSUMABLE_STACK_SIZE = 99;
 const STARTING_GOLD = 100;
 
@@ -68,6 +71,7 @@ export const useCharacterStore = defineStore("character", {
     gold: STARTING_GOLD,
     inventory: Array.from({ length: MAX_INVENTORY_SIZE }, () => null),
     consumables: Array.from({ length: MAX_CONSUMABLES_SIZE }, () => null),
+    resources: Array.from({ length: MAX_RESOURCES_SIZE }, () => null),
     equipped: {
       helmet: null,
       chest: null,
@@ -98,6 +102,10 @@ export const useCharacterStore = defineStore("character", {
 
     consumableItems(state) {
       return state.consumables.map((item, index) => ({ item, index }));
+    },
+
+    resourceItems(state) {
+      return state.resources.map((item, index) => ({ item, index }));
     },
 
     isEquipped: (state) => (instanceId: string) => {
@@ -131,6 +139,10 @@ export const useCharacterStore = defineStore("character", {
         );
       }
 
+      if (!this.resources || this.resources.length !== MAX_RESOURCES_SIZE) {
+        this.resources = Array.from({ length: MAX_RESOURCES_SIZE }, () => null);
+      }
+
       // Миграция инвентаря:
       // если в старом сохранении эликсиры лежали в основном `inventory`, переносим их в `consumables`.
       for (let i = 0; i < this.inventory.length; i++) {
@@ -145,6 +157,16 @@ export const useCharacterStore = defineStore("character", {
         if (emptyIndex === -1) continue; // если нет места — оставляем в inventory (мягкая деградация)
         this.consumables[emptyIndex] = inst;
         this.inventory[i] = null;
+      }
+
+      // Ресурсы из основного инвентаря — в сумку ресурсов.
+      for (let i = 0; i < this.inventory.length; i++) {
+        const inst = this.inventory[i];
+        if (!inst?.templateId.startsWith("resource-")) continue;
+        const added = this.addItemToResources(inst);
+        if (added) {
+          this.inventory[i] = null;
+        }
       }
 
       // Миграция экипировки
@@ -206,6 +228,52 @@ export const useCharacterStore = defineStore("character", {
       return true;
     },
 
+    addItemToResources(instance: ItemInstance): boolean {
+      const templateId = instance.templateId;
+      const initialCount = Math.max(0, instance.count ?? 1);
+      if (!templateId || !templateId.startsWith("resource-") || initialCount <= 0) {
+        return false;
+      }
+
+      let remainingToAdd = initialCount;
+
+      while (remainingToAdd > 0) {
+        const existingIndex = this.resources.findIndex(
+          (slot) =>
+            slot != null &&
+            slot.templateId === templateId &&
+            (slot.count ?? 1) < MAX_CONSUMABLE_STACK_SIZE,
+        );
+
+        if (existingIndex !== -1) {
+          const existing = this.resources[existingIndex];
+          if (!existing) break;
+
+          const existingCount = existing.count ?? 1;
+          const canAdd = Math.min(
+            MAX_CONSUMABLE_STACK_SIZE - existingCount,
+            remainingToAdd,
+          );
+          existing.count = existingCount + canAdd;
+          remainingToAdd -= canAdd;
+          continue;
+        }
+
+        const emptyIndex = this.resources.findIndex((slot) => slot === null);
+        if (emptyIndex === -1) return false;
+
+        const addCount = Math.min(MAX_CONSUMABLE_STACK_SIZE, remainingToAdd);
+        this.resources[emptyIndex] = {
+          ...instance,
+          instanceId: generateInstanceId(),
+          count: addCount,
+        };
+        remainingToAdd -= addCount;
+      }
+
+      return true;
+    },
+
     removeItemFromInventory(index: number) {
       if (index < 0 || index >= this.inventory.length) return;
       this.inventory[index] = null;
@@ -214,6 +282,11 @@ export const useCharacterStore = defineStore("character", {
     removeItemFromConsumables(index: number) {
       if (index < 0 || index >= this.consumables.length) return;
       this.consumables[index] = null;
+    },
+
+    removeItemFromResources(index: number) {
+      if (index < 0 || index >= this.resources.length) return;
+      this.resources[index] = null;
     },
 
     /**
@@ -235,6 +308,40 @@ export const useCharacterStore = defineStore("character", {
         this.consumables[index] = null;
       }
 
+      return true;
+    },
+
+    /**
+     * Списывает ресурсы по templateId с нескольких стаков при необходимости.
+     */
+    consumeResourceAmount(templateId: string, amount: number): boolean {
+      if (!templateId.startsWith("resource-") || amount <= 0) return false;
+      let total = 0;
+      for (const s of this.resources) {
+        if (s?.templateId === templateId) total += s.count ?? 1;
+      }
+      if (total < amount) return false;
+
+      let remaining = amount;
+      while (remaining > 0) {
+        const idx = this.resources.findIndex(
+          (s) =>
+            s != null &&
+            s.templateId === templateId &&
+            (s.count ?? 1) > 0,
+        );
+        if (idx === -1) return false;
+        const inst = this.resources[idx]!;
+        const cur = inst.count ?? 1;
+        const take = Math.min(cur, remaining);
+        const next = cur - take;
+        remaining -= take;
+        if (next > 0) {
+          inst.count = next;
+        } else {
+          this.resources[idx] = null;
+        }
+      }
       return true;
     },
 
@@ -304,6 +411,20 @@ export const useCharacterStore = defineStore("character", {
       const amount = amountPer * count;
       this.gold = (this.gold ?? 0) + amount;
       this.consumables[index] = null;
+      return amount;
+    },
+
+    sellItemFromResources(index: number): number {
+      const instance = this.resources[index];
+      if (!instance) return 0;
+      const displayItem = getDisplayItem(instance, getTemplate);
+      if (!displayItem) return 0;
+
+      const count = instance.count ?? 1;
+      const amountPer = getItemSellPrice(displayItem);
+      const amount = amountPer * count;
+      this.gold = (this.gold ?? 0) + amount;
+      this.resources[index] = null;
       return amount;
     },
 

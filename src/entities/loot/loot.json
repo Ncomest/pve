@@ -82,7 +82,7 @@
   },
   {
     "id": "resource-fire-essence",
-    "name": "Эссенция огня",
+    "name": "Эфир огня",
     "icon": "🔥",
     "slot": "resource",
     "rarity": "common",
@@ -130,7 +130,7 @@
   },
   {
     "id": "resource-earth-essence",
-    "name": "Эссенция земли",
+    "name": "Эфир земли",
     "icon": "🪨",
     "slot": "resource",
     "rarity": "common",

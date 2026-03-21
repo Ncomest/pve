@@ -44,7 +44,50 @@
         "description": "Получает больше урона от воды"
       }
     ],
-    "bossAbilities": [],
+    "bossAbilities": [
+      {
+        "id": "fe-fireball",
+        "name": "Огненный шар",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_3.png",
+        "cooldownMs": 14000,
+        "castTimeMs": 2200,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Бросок сгустка пламени в цель",
+        "baseDamageX": 1.15
+      },
+      {
+        "id": "fe-ignite-dot",
+        "name": "Поджог",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_1.png",
+        "cooldownMs": 18000,
+        "castTimeMs": 2800,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Накладывает горение на несколько секунд",
+        "baseDamageX": 0.75,
+        "dotDurationMs": 6000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 4
+      },
+      {
+        "id": "fe-blaze",
+        "name": "Жар пламени",
+        "type": "buff",
+        "icon": "/images/bosses/icons/special/poison_2.png",
+        "cooldownMs": 22000,
+        "castTimeMs": 2000,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "На время усиливает урон атак",
+        "selfBuffType": "damage",
+        "selfBuffValue": 0.2,
+        "selfBuffDurationMs": 8000,
+        "dispellable": true
+      }
+    ],
     "abilityConfig": {
       "startDelayMs": 5000,
       "minAbilityIntervalMs": 8000,
@@ -102,7 +145,47 @@
         "description": "Получает больше урона от огня"
       }
     ],
-    "bossAbilities": [],
+    "bossAbilities": [
+      {
+        "id": "we-tidal",
+        "name": "Прилив",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/strike_1.png",
+        "cooldownMs": 15000,
+        "castTimeMs": 2400,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Волна воды с силой прилива",
+        "baseDamageX": 1.2
+      },
+      {
+        "id": "we-spray",
+        "name": "Ледяная струя",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_1.png",
+        "cooldownMs": 17000,
+        "castTimeMs": 2600,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Замедляет и наносит урон со временем",
+        "baseDamageX": 0.7,
+        "dotDurationMs": 5000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 3
+      },
+      {
+        "id": "we-mend",
+        "name": "Водное восстановление",
+        "type": "heal",
+        "icon": "/images/bosses/icons/special/poison_2.png",
+        "cooldownMs": 24000,
+        "castTimeMs": 3000,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Восстанавливает часть здоровья",
+        "value": 45
+      }
+    ],
     "abilityConfig": {
       "startDelayMs": 5000,
       "minAbilityIntervalMs": 8000,
@@ -154,7 +237,47 @@
         "description": "Получает больше урона от земли"
       }
     ],
-    "bossAbilities": [],
+    "bossAbilities": [
+      {
+        "id": "ae-gust",
+        "name": "Порыв ветра",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/strike_1.png",
+        "cooldownMs": 13000,
+        "castTimeMs": 1800,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Быстрый режущий удар",
+        "baseDamageX": 1.1
+      },
+      {
+        "id": "ae-lightning",
+        "name": "Разряд",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_3.png",
+        "cooldownMs": 16000,
+        "castTimeMs": 2200,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Молния с высоким шансом крита",
+        "baseDamageX": 1.35
+      },
+      {
+        "id": "ae-haste",
+        "name": "Стремительность",
+        "type": "buff",
+        "icon": "/images/bosses/icons/special/rapidshot.png",
+        "cooldownMs": 21000,
+        "castTimeMs": 2000,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Усиливает уклонение и скорость атак",
+        "selfBuffType": "evasion",
+        "selfBuffValue": 0.12,
+        "selfBuffDurationMs": 9000,
+        "dispellable": true
+      }
+    ],
     "abilityConfig": {
       "startDelayMs": 5000,
       "minAbilityIntervalMs": 8000,
@@ -206,7 +329,50 @@
         "description": "Получает больше урона от воздуха"
       }
     ],
-    "bossAbilities": [],
+    "bossAbilities": [
+      {
+        "id": "ee-slam",
+        "name": "Удар земли",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/strike_1.png",
+        "cooldownMs": 16000,
+        "castTimeMs": 2800,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "description": "Тяжёлый удар, снижает уклонение цели",
+        "baseDamageX": 1.5
+      },
+      {
+        "id": "ee-quake",
+        "name": "Сотрясение",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_1.png",
+        "cooldownMs": 19000,
+        "castTimeMs": 3200,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "DoT от осколков камня",
+        "baseDamageX": 0.65,
+        "dotDurationMs": 8000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 5
+      },
+      {
+        "id": "ee-shell",
+        "name": "Каменная скорлупа",
+        "type": "buff",
+        "icon": "/images/bosses/icons/special/poison_2.png",
+        "cooldownMs": 23000,
+        "castTimeMs": 2500,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Временно повышает броню",
+        "selfBuffType": "armor",
+        "selfBuffValue": 8,
+        "selfBuffDurationMs": 10000,
+        "dispellable": true
+      }
+    ],
     "abilityConfig": {
       "startDelayMs": 5000,
       "minAbilityIntervalMs": 8000,
@@ -258,7 +424,51 @@
         "description": "Очень медленный"
       }
     ],
-    "bossAbilities": [],
+    "bossAbilities": [
+      {
+        "id": "eg-boulder",
+        "name": "Валун",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/strike_1.png",
+        "cooldownMs": 17000,
+        "castTimeMs": 3200,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "requiredDefensiveTag": "block",
+        "description": "Мощный бросок камня — блокируется щитом",
+        "baseDamageX": 2.2
+      },
+      {
+        "id": "eg-stomp",
+        "name": "Топот",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_1.png",
+        "cooldownMs": 14000,
+        "castTimeMs": 2600,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Землетрясение и осколки",
+        "baseDamageX": 0.9,
+        "dotDurationMs": 6000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 4
+      },
+      {
+        "id": "eg-fortify",
+        "name": "Укрепление",
+        "type": "buff",
+        "icon": "/images/bosses/icons/special/poison_2.png",
+        "cooldownMs": 26000,
+        "castTimeMs": 2800,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Сильно повышает броню",
+        "selfBuffType": "armor",
+        "selfBuffValue": 12,
+        "selfBuffDurationMs": 12000,
+        "dispellable": true
+      }
+    ],
     "abilityConfig": {
       "startDelayMs": 5000,
       "minAbilityIntervalMs": 10000,
@@ -316,7 +526,50 @@
         "description": "Получает больше урона от воды"
       }
     ],
-    "bossAbilities": [],
+    "bossAbilities": [
+      {
+        "id": "fg-molten",
+        "name": "Расплав",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_3.png",
+        "cooldownMs": 15000,
+        "castTimeMs": 2400,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Волна жара и жгучий урон",
+        "baseDamageX": 1.25
+      },
+      {
+        "id": "fg-magma",
+        "name": "Огненная лужа",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_1.png",
+        "cooldownMs": 18000,
+        "castTimeMs": 3000,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Оставляет зону горения",
+        "baseDamageX": 0.8,
+        "dotDurationMs": 7000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 5
+      },
+      {
+        "id": "fg-overheat",
+        "name": "Перегрев",
+        "type": "buff",
+        "icon": "/images/bosses/icons/special/rapidshot.png",
+        "cooldownMs": 22000,
+        "castTimeMs": 2200,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "На время усиливает урон",
+        "selfBuffType": "damage",
+        "selfBuffValue": 0.28,
+        "selfBuffDurationMs": 9000,
+        "dispellable": true
+      }
+    ],
     "abilityConfig": {
       "startDelayMs": 5000,
       "minAbilityIntervalMs": 10000,
@@ -374,7 +627,47 @@
         "description": "Получает больше урона от огня"
       }
     ],
-    "bossAbilities": [],
+    "bossAbilities": [
+      {
+        "id": "wg-torrent",
+        "name": "Поток",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/strike_1.png",
+        "cooldownMs": 14000,
+        "castTimeMs": 2600,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Мощная струя воды",
+        "baseDamageX": 1.18
+      },
+      {
+        "id": "wg-bubble",
+        "name": "Пузырь",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_1.png",
+        "cooldownMs": 17000,
+        "castTimeMs": 2800,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Замедляет и наносит урон со временем",
+        "baseDamageX": 0.72,
+        "dotDurationMs": 6000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 3
+      },
+      {
+        "id": "wg-tide",
+        "name": "Прилив сил",
+        "type": "heal",
+        "icon": "/images/bosses/icons/special/poison_2.png",
+        "cooldownMs": 25000,
+        "castTimeMs": 3200,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Восстанавливает здоровье",
+        "value": 55
+      }
+    ],
     "abilityConfig": {
       "startDelayMs": 5000,
       "minAbilityIntervalMs": 10000,
@@ -432,7 +725,50 @@
         "description": "Замедляет противника"
       }
     ],
-    "bossAbilities": [],
+    "bossAbilities": [
+      {
+        "id": "ee2-phase",
+        "name": "Фазовый удар",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/strike_1.png",
+        "cooldownMs": 15000,
+        "castTimeMs": 2400,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Удар сквозь защиту",
+        "baseDamageX": 1.3
+      },
+      {
+        "id": "ee2-curse",
+        "name": "Проклятие земли",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_1.png",
+        "cooldownMs": 18000,
+        "castTimeMs": 3000,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Снижает броню и наносит урон",
+        "baseDamageX": 0.8,
+        "dotDurationMs": 8000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 5
+      },
+      {
+        "id": "ee2-merge",
+        "name": "Слияние с камнем",
+        "type": "buff",
+        "icon": "/images/bosses/icons/special/poison_2.png",
+        "cooldownMs": 24000,
+        "castTimeMs": 2800,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Сильно повышает броню",
+        "selfBuffType": "armor",
+        "selfBuffValue": 10,
+        "selfBuffDurationMs": 11000,
+        "dispellable": true
+      }
+    ],
     "abilityConfig": {
       "startDelayMs": 5000,
       "minAbilityIntervalMs": 12000,
@@ -490,7 +826,50 @@
         "description": "Снижает сопротивление огню"
       }
     ],
-    "bossAbilities": [],
+    "bossAbilities": [
+      {
+        "id": "fe2-meteor",
+        "name": "Метеорит",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_3.png",
+        "cooldownMs": 14000,
+        "castTimeMs": 2600,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Мощный удар с небес",
+        "baseDamageX": 1.4
+      },
+      {
+        "id": "fe2-inferno",
+        "name": "Инферно",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_1.png",
+        "cooldownMs": 17000,
+        "castTimeMs": 3000,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Сильное горение",
+        "baseDamageX": 0.85,
+        "dotDurationMs": 9000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 6
+      },
+      {
+        "id": "fe2-brand",
+        "name": "Клеймо",
+        "type": "buff",
+        "icon": "/images/bosses/icons/special/rapidshot.png",
+        "cooldownMs": 21000,
+        "castTimeMs": 2200,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Усиливает крит и урон",
+        "selfBuffType": "damage",
+        "selfBuffValue": 0.25,
+        "selfBuffDurationMs": 10000,
+        "dispellable": true
+      }
+    ],
     "abilityConfig": {
       "startDelayMs": 5000,
       "minAbilityIntervalMs": 12000,
@@ -548,7 +927,50 @@
         "description": "Сбивает концентрацию"
       }
     ],
-    "bossAbilities": [],
+    "bossAbilities": [
+      {
+        "id": "ae2-chain",
+        "name": "Цепная молния",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_3.png",
+        "cooldownMs": 13000,
+        "castTimeMs": 2000,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Серия ударов молнией",
+        "baseDamageX": 1.25
+      },
+      {
+        "id": "ae2-vortex",
+        "name": "Вихрь",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/strike_1.png",
+        "cooldownMs": 16000,
+        "castTimeMs": 2800,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Вращающийся урон",
+        "baseDamageX": 0.8,
+        "dotDurationMs": 6000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 4
+      },
+      {
+        "id": "ae2-wind",
+        "name": "Покров ветра",
+        "type": "buff",
+        "icon": "/images/bosses/icons/special/rapidshot.png",
+        "cooldownMs": 20000,
+        "castTimeMs": 2000,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Резко повышает уклонение",
+        "selfBuffType": "evasion",
+        "selfBuffValue": 0.15,
+        "selfBuffDurationMs": 9000,
+        "dispellable": true
+      }
+    ],
     "abilityConfig": {
       "startDelayMs": 5000,
       "minAbilityIntervalMs": 12000,
@@ -606,7 +1028,50 @@
         "description": "Снижает сопротивления"
       }
     ],
-    "bossAbilities": [],
+    "bossAbilities": [
+      {
+        "id": "we2-deluge",
+        "name": "Потоп",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/strike_1.png",
+        "cooldownMs": 15000,
+        "castTimeMs": 2400,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Мощная волна воды",
+        "baseDamageX": 1.28
+      },
+      {
+        "id": "we2-chill",
+        "name": "Ледяная тюрьма",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_1.png",
+        "cooldownMs": 18000,
+        "castTimeMs": 3000,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Холодный DoT",
+        "baseDamageX": 0.8,
+        "dotDurationMs": 8000,
+        "dotTickIntervalMs": 2000,
+        "dotDamagePerTick": 5
+      },
+      {
+        "id": "we2-mirror",
+        "name": "Отражение воды",
+        "type": "buff",
+        "icon": "/images/bosses/icons/special/poison_2.png",
+        "cooldownMs": 23000,
+        "castTimeMs": 2600,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Усиливает устойчивость к урону",
+        "selfBuffType": "armor",
+        "selfBuffValue": 8,
+        "selfBuffDurationMs": 10000,
+        "dispellable": true
+      }
+    ],
     "abilityConfig": {
       "startDelayMs": 5000,
       "minAbilityIntervalMs": 12000,

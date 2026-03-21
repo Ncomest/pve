@@ -1,12 +1,53 @@
 <script setup lang="ts">
-  import { ref } from "vue";
+  import { computed, ref } from "vue";
   import type { Boss, BossAbility } from "@/entities/boss/model";
   import { rarityLabel } from "@/shared/lib/labels";
+  import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
+  import { getResourceDropTemplateId } from "@/entities/boss/lib/resourceBossDrops";
+  import { getTemplate } from "@/entities/item/items-db";
+  import lootData from "@/entities/loot/loot.json";
 
-  defineProps<{
+  const props = defineProps<{
     boss: Boss;
+    /** Босс из вкладки «Ресурсы»: уровень в бою = уровень героя, показываем лут. */
+    isResourceBoss?: boolean;
     isInfoOpen: boolean;
   }>();
+
+  const playerProgress = usePlayerProgress();
+
+  const displayLevel = computed(() =>
+    props.isResourceBoss ? playerProgress.level.value : props.boss.level,
+  );
+
+  interface LootPreview {
+    icon: string;
+    name: string;
+    rarity: string;
+  }
+
+  const lootEntryById = new Map(
+    (lootData as { id: string; icon?: string }[]).map((e) => [e.id, e]),
+  );
+
+  const resourceLootPreview = computed((): LootPreview | null => {
+    if (!props.isResourceBoss) return null;
+    const tid = getResourceDropTemplateId(props.boss.id);
+    if (!tid) return null;
+    const tmpl = getTemplate(tid);
+    const loot = lootEntryById.get(tid);
+    const rarity = tmpl?.rarity ?? "common";
+    return {
+      icon: loot?.icon ?? "📦",
+      name: tmpl?.name ?? tid,
+      rarity: rarity === "uncommon" ? "common" : rarity,
+    };
+  });
+
+  const showMetaRow = computed(
+    () =>
+      (props.boss.bossAbilities?.length ?? 0) > 0 || resourceLootPreview.value != null,
+  );
 
   const emit = defineEmits<{
     select: [boss: Boss];
@@ -79,7 +120,17 @@
             stroke-linecap="round"
           />
         </svg>
-        <div class="boss-select-entry__level">{{ boss.level }}</div>
+        <div
+          class="boss-select-entry__level"
+          :class="{ 'boss-select-entry__level--resource': isResourceBoss }"
+          :title="
+            isResourceBoss
+              ? 'В бою уровень босса совпадает с уровнем героя'
+              : undefined
+          "
+        >
+          {{ displayLevel }}
+        </div>
       </div>
 
       <div class="boss-select-entry__info">
@@ -89,31 +140,47 @@
         <span class="boss-select-entry__rarity">
           {{ rarityLabel(boss.rarity) }}
         </span>
-        <div
-          v-if="(boss.bossAbilities?.length ?? 0) > 0"
-          class="boss-select-entry__abilities-row"
-        >
+        <div v-if="showMetaRow" class="boss-select-entry__meta-row">
           <div
-            v-for="ability in boss.bossAbilities"
-            :key="ability.id"
-            class="boss-select-entry__ability-cell"
-            @mouseenter="showTooltip($event, ability)"
-            @mousemove="moveTooltip($event)"
-            @mouseleave="hideTooltip"
+            v-if="(boss.bossAbilities?.length ?? 0) > 0"
+            class="boss-select-entry__abilities-row"
           >
-            <img
-              v-if="ability.icon"
-              :src="ability.icon"
-              :alt="ability.name"
-              class="boss-select-entry__ability-icon"
-              width="18"
-              height="18"
-              loading="lazy"
-              decoding="async"
-            />
-            <span v-else class="boss-select-entry__ability-icon-fallback"
-              >?</span
+            <div
+              v-for="ability in boss.bossAbilities"
+              :key="ability.id"
+              class="boss-select-entry__ability-cell"
+              @mouseenter="showTooltip($event, ability)"
+              @mousemove="moveTooltip($event)"
+              @mouseleave="hideTooltip"
             >
+              <img
+                v-if="ability.icon"
+                :src="ability.icon"
+                :alt="ability.name"
+                class="boss-select-entry__ability-icon"
+                width="18"
+                height="18"
+                loading="lazy"
+                decoding="async"
+              />
+              <span v-else class="boss-select-entry__ability-icon-fallback"
+                >?</span
+              >
+            </div>
+          </div>
+          <div v-if="resourceLootPreview" class="boss-select-entry__loot-wrap">
+            <span class="boss-select-entry__loot-caption">Лут</span>
+            <div class="boss-select-entry__loot-row">
+              <div
+                class="boss-select-entry__loot-cell"
+                :class="`boss-select-entry__loot-cell--${resourceLootPreview.rarity}`"
+                :title="`${resourceLootPreview.name} ×1`"
+              >
+                <span class="boss-select-entry__loot-emoji" aria-hidden="true">{{
+                  resourceLootPreview.icon
+                }}</span>
+              </div>
+            </div>
           </div>
         </div>
 

@@ -166,6 +166,7 @@ onUnmounted(() => {
         v-for="boss in bosses"
         :key="boss.id"
         :boss="boss"
+        :is-resource-boss="activeTab === 'resources'"
         :is-info-open="selectedInfo?.id === boss.id"
         @select="handleSelectBoss"
         @toggle-info="openInfo"

@@ -27,11 +27,10 @@ import { usePlayerHp } from "@/features/character/model/usePlayerHp";
 import { useCharacterStore } from "@/app/store/character";
 import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
 import { SPIRIT_ELIXIR_BONUS_POINTS } from "@/features/elixirs/model/elixirs";
-import {
-  ALL_TEMPLATE_IDS,
-  RESOURCE_TEMPLATE_IDS,
-  getTemplate,
-} from "@/entities/item/items-db";
+import { ALL_TEMPLATE_IDS, getTemplate } from "@/entities/item/items-db";
+import { getResourceDropTemplateId } from "@/entities/boss/lib/resourceBossDrops";
+import { scaleResourceBossStats } from "@/entities/boss/lib/scaleResourceBossStats";
+import { itemLevelFromHeroLevel } from "@/shared/lib/item/itemLevelFromHero";
 import { getDisplayItem } from "@/entities/item/model";
 import { createItemInstance } from "@/entities/item/lib/createInstance";
 import type { ItemInstance } from "@/entities/item/model";
@@ -168,9 +167,19 @@ export function useBattle(bossId: () => string | undefined) {
     const next = selectedBoss.value;
     if (!next) return;
     boss.name = next.name;
-    boss.level = next.level;
     boss.image = next.image;
-    boss.stats = cloneStats(next.stats);
+    const heroLv = playerProgress.level.value;
+    if (resourceBossIdSet.value.has(next.id)) {
+      boss.level = heroLv;
+      boss.stats = scaleResourceBossStats(
+        cloneStats(next.stats),
+        next.level,
+        heroLv,
+      );
+    } else {
+      boss.level = next.level;
+      boss.stats = cloneStats(next.stats);
+    }
   };
 
   watch(selectedBoss, () => {
@@ -2600,7 +2609,11 @@ export function useBattle(bossId: () => string | undefined) {
   };
 
   const takeLootItem = (instance: ItemInstance) => {
-    const success = characterStore.addItemToInventory(instance);
+    const tmpl = getTemplate(instance.templateId);
+    const success =
+      tmpl?.slot === "resource"
+        ? characterStore.addItemToResources(instance)
+        : characterStore.addItemToInventory(instance);
     if (success) {
       loot.value = loot.value.filter((i) => i.instanceId !== instance.instanceId);
       const display = getDisplayItem(instance, getTemplate);
@@ -2659,14 +2672,18 @@ export function useBattle(bossId: () => string | undefined) {
           pushLog(`Ты получаешь ${xp} опыта.`);
         }
 
-        const bossLevel = selectedBoss.value?.level ?? 1;
-        const itemLevel = 1 + bossLevel * 3;
         const bossId = selectedBoss.value?.id ?? "";
+        const rawBossLevel = selectedBoss.value?.level ?? 1;
+        const isResourceBoss = resourceBossIdSet.value.has(bossId);
+        const itemLevel = itemLevelFromHeroLevel(
+          isResourceBoss ? playerProgress.level.value : rawBossLevel,
+        );
 
-        if (resourceBossIdSet.value.has(bossId) && RESOURCE_TEMPLATE_IDS.length > 0) {
-          const rIdx = Math.floor(rng() * RESOURCE_TEMPLATE_IDS.length);
-          const resId = RESOURCE_TEMPLATE_IDS[rIdx]!;
-          loot.value = [createItemInstance(resId, itemLevel)];
+        if (isResourceBoss) {
+          const resId = getResourceDropTemplateId(bossId);
+          if (resId) {
+            loot.value = [createItemInstance(resId, itemLevel)];
+          }
         } else {
           const pool = [...ALL_TEMPLATE_IDS];
           const chosen: string[] = [];
