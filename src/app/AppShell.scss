@@ -373,8 +373,25 @@
     margin-bottom: 16px;
   }
 
+  /* Колонка статуса занимает всё место слева от бургера — полоски HP/XP могут растягиваться */
+  .char-status-column {
+    flex: 1;
+    min-width: 0;
+    align-items: stretch;
+  }
+
+  .char-status {
+    width: 100%;
+  }
+
+  .char-status__bar-row {
+    width: 100%;
+  }
+
   .char-status__bar-track {
-    width: 140px;
+    width: auto;
+    flex: 1;
+    min-width: 0;
   }
 
   .app-nav--desktop {
@@ -416,8 +433,7 @@
   }
 
   .char-status {
-    width: auto;
-    flex: 1;
+    width: 100%;
   }
 
   .char-status__bars {
@@ -427,12 +443,13 @@
 
   .char-status__bar-row {
     gap: 6px;
+    width: 100%;
   }
 
   .char-status__bar-track {
     width: auto;
     flex: 1;
-    min-width: 90px;
+    min-width: 0;
   }
 
   .char-status__bar-text {
