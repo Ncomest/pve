@@ -4,6 +4,7 @@ import type { ItemInstance, ItemSlot } from "@/entities/item/model";
 import { getDisplayItem } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
 import { rarityColor } from "@/entities/item/lib/rarityColor";
+import { getResourceItemIconSrc } from "@/entities/item/lib/resourceItemIcon";
 import { useCharacterStore } from "@/app/store/character";
 import "./InventoryGrid.scss";
 
@@ -29,7 +30,7 @@ const displayByIndex = computed(() =>
 
 const characterStore = useCharacterStore();
 
-const SLOT_ICON_FILES: Record<ItemSlot, string> = {
+const SLOT_ICON_FILES: Record<Exclude<ItemSlot, "resource">, string> = {
   helmet: "helmet",
   chest: "chest",
   belt: "belt",
@@ -40,12 +41,22 @@ const SLOT_ICON_FILES: Record<ItemSlot, string> = {
   earring: "trinket",
   weapon: "sword",
   shield: "shield",
-  resource: "trinket",
 };
 
-function getSlotIconSrc(slot: ItemSlot) {
+function getEquipmentSlotIconSrc(slot: Exclude<ItemSlot, "resource">) {
   const file = SLOT_ICON_FILES[slot];
   return `/images/equipment/${file}.png`;
+}
+
+function getItemIconSrc(
+  item: ItemInstance | null,
+  display: ReturnType<typeof getDisplayItem>,
+) {
+  if (!item || !display) return "";
+  if (display.slot === "resource") {
+    return getResourceItemIconSrc(item.templateId);
+  }
+  return getEquipmentSlotIconSrc(display.slot);
 }
 
 const dragFromIndex = ref<number | null>(null);
@@ -127,7 +138,7 @@ function handleClick(item: ItemInstance | null, index: number) {
       <!-- Предмет: иконка по типу слота с цветом редкости и уровнем -->
       <template v-if="displayByIndex[index]">
         <img
-          :src="getSlotIconSrc(displayByIndex[index]!.slot)"
+          :src="getItemIconSrc(items[index]!.item, displayByIndex[index])"
           :alt="displayByIndex[index]!.name"
           class="inventory-grid__icon"
           width="32"

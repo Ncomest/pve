@@ -4,6 +4,7 @@ import type { ItemInstance } from "@/entities/item/model";
 import { SLOT_NAMES, getDisplayItem } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
 import { rarityColor } from "@/entities/item/lib/rarityColor";
+import { getResourceItemIconSrc } from "@/entities/item/lib/resourceItemIcon";
 import "./LootPanel.scss";
 
 const props = defineProps<{
@@ -42,10 +43,26 @@ const slotIconSrc = (slot: string | undefined) => {
       return "/images/equipment/boots.png";
     case "necklace":
       return "/images/equipment/neck.png";
+    case "resource":
+      return "/images/resources/resource-default.svg";
     default:
       return "/images/equipment/trinket.png";
   }
 };
+
+/** Иконка строки лута: ресурсы — по templateId (SVG), экипировка — по слоту (PNG). */
+function lootItemIconSrc(
+  display: { slot: string } | null | undefined,
+  instance: ItemInstance | undefined,
+): string {
+  if (!display || !instance) {
+    return "/images/equipment/trinket.png";
+  }
+  if (display.slot === "resource") {
+    return getResourceItemIconSrc(instance.templateId);
+  }
+  return slotIconSrc(display.slot);
+}
 </script>
 
 <template>
@@ -62,7 +79,7 @@ const slotIconSrc = (slot: string | undefined) => {
             <img
               v-if="display"
               class="loot-panel__item-icon"
-              :src="slotIconSrc(display.slot)"
+              :src="lootItemIconSrc(display, props.items[idx])"
               alt=""
               width="32"
               height="32"

@@ -472,20 +472,7 @@ onUnmounted(() => {
           Выберите предмет и нажмите «Продать», чтобы получить золото.
         </p>
         <div class="merchant-page__inventory-body">
-          <div class="merchant-page__inventory-left">
-            <InventoryGrid
-              :items="inventoryItems"
-              :selected-index="selectedIndex"
-              @select="selectSlot"
-            />
-            <h3 class="merchant-page__consumables-title">Зелья и эликсиры</h3>
-            <ConsumablesGrid
-              :items="consumableItems"
-              :selected-index="selectedConsumableIndex"
-              @select="selectConsumableSlot"
-            />
-          </div>
-          <div v-if="selectedDisplayItem" class="merchant-page__sell-card">
+          <div v-if="selectedDisplayItem" class="merchant-page__sell-card merchant-page__inventory-panel--sell-equipment">
             <h3
               class="merchant-page__item-name"
               :style="{ color: rarityColor(selectedDisplayItem.rarity) }"
@@ -549,7 +536,14 @@ onUnmounted(() => {
               Продать
             </button>
           </div>
-          <div v-else-if="selectedElixirDef" class="merchant-page__sell-card">
+          <div class="merchant-page__inventory-panel--equipment-grid">
+            <InventoryGrid
+              :items="inventoryItems"
+              :selected-index="selectedIndex"
+              @select="selectSlot"
+            />
+          </div>
+          <div v-if="selectedElixirDef" class="merchant-page__sell-card merchant-page__inventory-panel--sell-elixir">
             <h3 class="merchant-page__item-name">{{ selectedElixirDef.name }}</h3>
             <div class="merchant-page__elixir-description">{{ selectedElixirDescription }}</div>
             <div class="merchant-page__sell-price">
@@ -579,6 +573,14 @@ onUnmounted(() => {
                 Продать
               </button>
             </div>
+          </div>
+          <div class="merchant-page__inventory-panel--consumables">
+            <h3 class="merchant-page__consumables-title">Зелья и эликсиры</h3>
+            <ConsumablesGrid
+              :items="consumableItems"
+              :selected-index="selectedConsumableIndex"
+              @select="selectConsumableSlot"
+            />
           </div>
         </div>
       </section>

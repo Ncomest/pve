@@ -130,17 +130,60 @@
   &__inventory-body {
     display: grid;
     grid-template-columns: 1fr 260px;
+    grid-template-areas:
+      "inv sell"
+      "cons sell";
     gap: 16px;
+    align-items: start;
 
     @media (max-width: 600px) {
-      grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
   }
 
-  &__inventory-left {
+  &__inventory-panel--equipment-grid {
+    grid-area: inv;
     display: flex;
     flex-direction: column;
     gap: 12px;
+
+    @media (max-width: 600px) {
+      order: 2;
+    }
+  }
+
+  &__inventory-panel--sell-equipment,
+  &__inventory-panel--sell-elixir {
+    grid-area: sell;
+
+    @media (max-width: 600px) {
+      grid-area: unset;
+    }
+  }
+
+  &__inventory-panel--sell-equipment {
+    @media (max-width: 600px) {
+      order: 1;
+    }
+  }
+
+  &__inventory-panel--sell-elixir {
+    @media (max-width: 600px) {
+      order: 3;
+    }
+  }
+
+  &__inventory-panel--consumables {
+    grid-area: cons;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    @media (max-width: 600px) {
+      order: 4;
+    }
   }
 
   &__consumables-title {
