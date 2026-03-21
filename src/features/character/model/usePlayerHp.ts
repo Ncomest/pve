@@ -36,12 +36,19 @@ const countRegenTicksInWindow = (args: {
   return Math.max(0, count);
 };
 
+/** Базовый реген 1 HP / 10с + 1 HP за каждые 50 очков духа (суммарно за тик). */
+export function hpPerTickFromSpirit(spiritPoints: number): number {
+  return 1 + Math.floor(Math.max(0, spiritPoints) / 50);
+}
+
 const calcRegeneratedWithOptions = (args: {
   snapshot: HpSnapshot;
   now: number;
   maxHpCap: number;
   regenWindow?: RegenWindow | null;
   regenElixirExtraPerTick?: number;
+  /** Очки духа с экипировки + база (пассивный реген вне боя). */
+  spiritPoints?: number;
 }): number => {
   const {
     snapshot,
@@ -49,6 +56,7 @@ const calcRegeneratedWithOptions = (args: {
     maxHpCap,
     regenWindow = null,
     regenElixirExtraPerTick = REGEN_ELIXIR_EXTRA_PER_TICK,
+    spiritPoints = 0,
   } = args;
 
   const elapsedMs = Math.max(0, now - snapshot.savedAt);
@@ -64,11 +72,16 @@ const calcRegeneratedWithOptions = (args: {
     });
   }
 
-  const totalRegen = baseTicks + extraTicks * regenElixirExtraPerTick;
+  const perTick = hpPerTickFromSpirit(spiritPoints);
+  const totalRegen = baseTicks * perTick + extraTicks * regenElixirExtraPerTick;
   return Math.min(maxHpCap, snapshot.hp + totalRegen);
 };
 
-const loadHp = (maxHp: number, regenWindow?: RegenWindow | null): number => {
+const loadHp = (
+  maxHp: number,
+  regenWindow?: RegenWindow | null,
+  spiritPoints: number = 0,
+): number => {
   if (typeof window === "undefined") return maxHp;
 
   try {
@@ -89,6 +102,7 @@ const loadHp = (maxHp: number, regenWindow?: RegenWindow | null): number => {
       now: Date.now(),
       maxHpCap: maxHp,
       regenWindow: regenWindow ?? null,
+      spiritPoints,
     });
   } catch {
     return maxHp;
@@ -138,6 +152,7 @@ export const calcCurrentHp = (
   maxHpCap: number = snapshot.maxHp,
   regenWindow?: RegenWindow | null,
   regenElixirExtraPerTick: number = REGEN_ELIXIR_EXTRA_PER_TICK,
+  spiritPoints: number = 0,
 ): number =>
   calcRegeneratedWithOptions({
     snapshot,
@@ -145,6 +160,7 @@ export const calcCurrentHp = (
     maxHpCap,
     regenWindow: regenWindow ?? null,
     regenElixirExtraPerTick,
+    spiritPoints,
   });
 
 export const saveHpSnapshot = (hp: number, maxHp: number, savedAt: number = Date.now()) => {
@@ -152,7 +168,7 @@ export const saveHpSnapshot = (hp: number, maxHp: number, savedAt: number = Date
 };
 
 export function usePlayerHp() {
-  const init = (maxHp: number, regenWindow?: RegenWindow | null) => {
+  const init = (maxHp: number, regenWindow?: RegenWindow | null, spiritPoints: number = 0) => {
     // Вотч навешиваем только один раз, но HP всегда перечитываем из localStorage,
     // чтобы при повторном входе в бой не получить старое (возможно нулевое) значение
     if (!isWatchAttached) {
@@ -165,7 +181,7 @@ export function usePlayerHp() {
     }
 
     state.maxHp = maxHp;
-    state.hp = loadHp(maxHp, regenWindow ?? null);
+    state.hp = loadHp(maxHp, regenWindow ?? null, spiritPoints);
   };
 
   /** Вызывать при смене уровня / экипировки, чтобы пересчитать maxHp */
@@ -202,6 +218,7 @@ export function usePlayerHp() {
   const useRealtimeHp = (
     getMaxHp: () => number,
     getRegenWindow?: () => RegenWindow | null,
+    getSpiritPoints?: () => number,
   ) => {
     const currentHp = ref(0);
     const currentMaxHp = ref(0);
@@ -220,7 +237,8 @@ export function usePlayerHp() {
       currentMaxHp.value = actualMaxHp;
       // HP ограничиваем актуальным maxHp
       const regenWindow = getRegenWindow ? getRegenWindow() : null;
-      currentHp.value = calcCurrentHp(snapshot, Date.now(), actualMaxHp, regenWindow);
+      const spirit = getSpiritPoints ? getSpiritPoints() : 0;
+      currentHp.value = calcCurrentHp(snapshot, Date.now(), actualMaxHp, regenWindow, REGEN_ELIXIR_EXTRA_PER_TICK, spirit);
     };
 
     let timer: number | null = null;

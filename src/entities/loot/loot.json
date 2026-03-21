@@ -167,5 +167,29 @@
     "slot": "resource",
     "rarity": "epic",
     "description": "Кристаллизованная чистая магия. Крайне редкий и ценный материал."
+  },
+  {
+    "id": "resource-dust-fire",
+    "name": "Пыль огня",
+    "icon": "🔥",
+    "slot": "resource",
+    "rarity": "common",
+    "description": "Базовая пыль элементаля огня. Используется в крафте."
+  },
+  {
+    "id": "resource-ether-air",
+    "name": "Эфир воздуха",
+    "icon": "💨",
+    "slot": "resource",
+    "rarity": "common",
+    "description": "Базовый эфир элементаля воздуха. Используется в крафте."
+  },
+  {
+    "id": "resource-crystal-water",
+    "name": "Кристалл воды",
+    "icon": "💎",
+    "slot": "resource",
+    "rarity": "common",
+    "description": "Базовый кристалл элементаля воды. Используется в крафте."
   }
 ]

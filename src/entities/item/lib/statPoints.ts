@@ -16,6 +16,12 @@ export const CRIT_POINTS_TO_FRACTION = 0.0025 / 50; // 50 очков ≈ 0.25%
 export const EVASION_POINTS_TO_FRACTION = 0.0001; // 25 очков ≈ 0.25%
 export const SPEED_POINTS_TO_FRACTION = 0.0025 / 50; // 50 очков скорости ≈ 0.25%
 export const ARMOR_POINTS_TO_FRACTION = 0.01 / 50; // 50 очков брони ≈ 1% снижения урона
+/** 50 очков меткости ≈ 0.25% (как крит) */
+export const ACCURACY_POINTS_TO_FRACTION = 0.0025 / 50;
+/** 50 очков защиты от крита ≈ 0.25% */
+export const CRIT_DEFENSE_POINTS_TO_FRACTION = 0.0025 / 50;
+/** 50 очков самоисцеления ≈ 0.25% урона в лечение */
+export const LIFESTEAL_POINTS_TO_FRACTION = 0.0025 / 50;
 
 /** Переводит очки крита в долю (для статов персонажа/боя). */
 export function critPointsToFraction(points: number): number {
@@ -35,4 +41,16 @@ export function speedPointsToFraction(points: number): number {
 /** Переводит очки брони в долю снижения урона (0..1). */
 export function armorPointsToFraction(points: number): number {
   return Math.min(0.9, Math.max(0, points * ARMOR_POINTS_TO_FRACTION));
+}
+
+export function accuracyPointsToFraction(points: number): number {
+  return Math.min(1, Math.max(0, points * ACCURACY_POINTS_TO_FRACTION));
+}
+
+export function critDefensePointsToFraction(points: number): number {
+  return Math.min(1, Math.max(0, points * CRIT_DEFENSE_POINTS_TO_FRACTION));
+}
+
+export function lifestealPointsToFraction(points: number): number {
+  return Math.min(1, Math.max(0, points * LIFESTEAL_POINTS_TO_FRACTION));
 }

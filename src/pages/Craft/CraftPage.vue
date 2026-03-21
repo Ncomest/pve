@@ -9,7 +9,7 @@
     CRAFT_RECIPES,
     getCraftResultItem,
   } from "@/entities/craft/model/craft-recipes";
-  import type { EquipmentSlot } from "@/entities/item/model";
+  import type { ItemSlot } from "@/entities/item/model";
   import "./CraftPage.scss";
 
   interface LootEntry {
@@ -17,7 +17,7 @@
     name: string;
     icon?: string;
     slot: string;
-    rarity: "common" | "rare" | "epic" | "legendary";
+    rarity: "common" | "uncommon" | "rare" | "epic" | "unique" | "legendary";
     description?: string;
   }
 
@@ -58,7 +58,7 @@
     })),
   );
 
-  const SLOT_ICON_FILES: Record<EquipmentSlot, string> = {
+  const SLOT_ICON_FILES: Record<ItemSlot, string> = {
     helmet: "helmet",
     chest: "chest",
     belt: "belt",
@@ -69,9 +69,10 @@
     earring: "trinket",
     weapon: "sword",
     shield: "shield",
+    resource: "trinket",
   };
 
-  function getSlotIconSrc(slot: EquipmentSlot) {
+  function getSlotIconSrc(slot: ItemSlot) {
     const file = SLOT_ICON_FILES[slot];
     return `/images/equipment/${file}.png`;
   }
@@ -134,7 +135,7 @@
               <div class="craft-page__recipe-icon">
                 <img
                   v-if="entry.resultItem"
-                  :src="getSlotIconSrc(entry.resultItem.slot as EquipmentSlot)"
+                  :src="getSlotIconSrc(entry.resultItem.slot as ItemSlot)"
                   :alt="entry.resultItem.name"
                   class="craft-page__recipe-icon-img"
                 />

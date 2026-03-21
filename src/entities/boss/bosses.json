@@ -12,8 +12,9 @@
       "power": 8,
       "chanceCrit": 0.05,
       "evasion": 0.02,
-      "speed": 1,
-      "armor": 0
+      "armor": 0,
+      "accuracy": 0.045,
+      "critDefense": 0.034999999999999996
     },
     "buffs": [
       {
@@ -91,8 +92,9 @@
       "power": 14,
       "chanceCrit": 0.12,
       "evasion": 0.08,
-      "speed": 2,
-      "armor": 4
+      "armor": 4,
+      "accuracy": 0.066,
+      "critDefense": 0.05
     },
     "bossAbilities": [
       {
@@ -198,8 +200,9 @@
       "power": 18,
       "chanceCrit": 0.12,
       "evasion": 0.1,
-      "speed": 4,
-      "armor": 1
+      "armor": 1,
+      "accuracy": 0.066,
+      "critDefense": 0.055
     },
     "buffs": [
       {
@@ -293,8 +296,9 @@
       "power": 16,
       "chanceCrit": 0.1,
       "evasion": 0.08,
-      "speed": 3,
-      "armor": 2
+      "armor": 2,
+      "accuracy": 0.06,
+      "critDefense": 0.05
     },
     "buffs": [
       {
@@ -380,8 +384,9 @@
       "power": 22,
       "chanceCrit": 0.18,
       "evasion": 0.12,
-      "speed": 3,
-      "armor": 3
+      "armor": 3,
+      "accuracy": 0.08399999999999999,
+      "critDefense": 0.06
     },
     "buffs": [
       {
@@ -494,8 +499,9 @@
       "power": 28,
       "chanceCrit": 0.2,
       "evasion": 0.15,
-      "speed": 2,
-      "armor": 4
+      "armor": 4,
+      "accuracy": 0.09,
+      "critDefense": 0.0675
     },
     "buffs": [
       {
@@ -610,8 +616,9 @@
       "power": 30,
       "chanceCrit": 0.14,
       "evasion": 0.05,
-      "speed": 2,
-      "armor": 8
+      "armor": 8,
+      "accuracy": 0.07200000000000001,
+      "critDefense": 0.042499999999999996
     },
     "buffs": [
       {
@@ -718,8 +725,9 @@
       "power": 40,
       "chanceCrit": 0.25,
       "evasion": 0.18,
-      "speed": 4,
-      "armor": 10
+      "armor": 10,
+      "accuracy": 0.105,
+      "critDefense": 0.075
     },
     "buffs": [
       {
@@ -848,8 +856,9 @@
       "power": 25,
       "chanceCrit": 0.1,
       "evasion": 0.03,
-      "speed": 1,
-      "armor": 15
+      "armor": 15,
+      "accuracy": 0.06,
+      "critDefense": 0.0375
     },
     "buffs": [
       {
@@ -971,8 +980,9 @@
       "power": 55,
       "chanceCrit": 0.25,
       "evasion": 0.12,
-      "speed": 3,
-      "armor": 12
+      "armor": 12,
+      "accuracy": 0.105,
+      "critDefense": 0.06
     },
     "buffs": [
       {

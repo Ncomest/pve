@@ -42,6 +42,8 @@ export interface BattleEffectContext {
   startPowerBoost(value: number, durationMs: number): void;
   spawnBossDmg(value: number | string, type: "damage" | "dodge", isCrit?: boolean): void;
   spawnPlayerDmg(value: number | string, type: "player-damage" | "heal" | "dodge", isCrit?: boolean): void;
+  /** Урон игрока по боссу: множитель уровня + самоисцеление */
+  applyDamageToBoss(rawDamage: number): number;
   /** Для финишера: количество потраченных комбо (заполняется после spend_combo) */
   turnState: { spentCombo?: number; cunningConsumed?: boolean };
 }
@@ -149,12 +151,11 @@ function applyOneEffect(
       }
       const cunningMult = ctx.turnState.cunningConsumed ? 2 : 1;
       const finalDamage = damage * cunningMult;
-      ctx.boss.stats.hp -= finalDamage;
-      ctx.clampHp(ctx.boss.stats);
-      ctx.spawnBossDmg(finalDamage, "damage", isCrit);
+      const applied = ctx.applyDamageToBoss(finalDamage);
+      ctx.spawnBossDmg(applied, "damage", isCrit);
       const cunningNote = ctx.turnState.cunningConsumed ? " (×2 Коварство)" : "";
       const stackNote = stackBonus > 0 ? ` (+${Math.round(stackBonus * 100)}% от стак.)` : "";
-      ctx.pushLog(`${meta.name}: ${finalDamage} урона${isCrit ? " (крит)" : ""}${cunningNote}${stackNote}.`);
+      ctx.pushLog(`${meta.name}: ${applied} урона${isCrit ? " (крит)" : ""}${cunningNote}${stackNote}.`);
       break;
     }
 
@@ -384,9 +385,8 @@ function applyOneEffect(
       if (effect.instantDamageRatio != null && effect.instantDamageRatio > 0) {
         const instantDmg = Math.round(power * effect.instantDamageRatio * n);
         if (instantDmg > 0) {
-          ctx.boss.stats.hp -= instantDmg;
-          ctx.clampHp(ctx.boss.stats);
-          ctx.spawnBossDmg(instantDmg, "damage");
+          const instAp = ctx.applyDamageToBoss(instantDmg);
+          ctx.spawnBossDmg(instAp, "damage");
         }
       }
       const tickDmg = effect.damagePerTick != null
@@ -407,9 +407,8 @@ function applyOneEffect(
         if (ctx.isBattleOver() || Date.now() >= endTime) {
           return;
         }
-        ctx.boss.stats.hp -= tickDmg;
-        ctx.clampHp(ctx.boss.stats);
-        ctx.spawnBossDmg(tickDmg, "damage");
+        const tickAp = ctx.applyDamageToBoss(tickDmg);
+        ctx.spawnBossDmg(tickAp, "damage");
         if (procChance > 0 && rng() < procChance && effect.procBuffId === "cunning") {
           ctx.setCunningBuffActive(true);
           const procEndTime = Date.now() + procBuffDurationMs;
@@ -425,9 +424,9 @@ function applyOneEffect(
             removePlayerBuff(ctx, "cunning-buff");
           }, procBuffDurationMs);
           ctx.addTimeoutId(procTimerId);
-          ctx.pushLog(`Яд (${meta.name}): −${tickDmg} HP. Сработало «Коварство»!`);
+          ctx.pushLog(`Яд (${meta.name}): −${tickAp} HP. Сработало «Коварство»!`);
         } else {
-          ctx.pushLog(`Яд (${meta.name}): −${tickDmg} HP у босса.`);
+          ctx.pushLog(`Яд (${meta.name}): −${tickAp} HP у босса.`);
         }
       }, effect.tickIntervalMs);
       ctx.addIntervalId(intervalId);

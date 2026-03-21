@@ -6,8 +6,17 @@ export interface Stats {
   power: number;
   chanceCrit: number;
   evasion: number;
-  speed: number; // скорость атаки (1–5; влияет на интервал авто-атаки)
-  armor: number; // броня (снижает входящий урон на N единиц, минимум 1)
+  /** Скорость героя (GCD); у боссов не задаётся */
+  speed?: number;
+  armor: number; // броня (очки; снижение урона через формулу)
+  /** Меткость 0..1: снижает эффективное уклонение цели */
+  accuracy?: number;
+  /** Защита от крита 0..1: снижает шанс крита по цели */
+  critDefense?: number;
+  /** Очки духа (герой): пассивный реген вне боя */
+  spirit?: number;
+  /** Самоисцеление 0..1: доля урона по боссу → лечение героя */
+  lifesteal?: number;
 }
 
 export interface Buff {

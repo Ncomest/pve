@@ -10,6 +10,12 @@ export type EquipmentSlot =
   | "boots"
   | "necklace";
 
+/** Слот предмета: экипировка или ресурс (крафт). */
+export type ItemSlot = EquipmentSlot | "resource";
+
+/** Пять редкостей: белая / зелёная / синяя / фиолетовая / жёлтая */
+export type ItemRarity = "common" | "uncommon" | "rare" | "epic" | "unique";
+
 export interface ItemStats {
   hp?: number;
   power?: number;
@@ -17,14 +23,20 @@ export interface ItemStats {
   evasion?: number;
   speed?: number;
   armor?: number;
+  /** Очки, как крит/уклонение */
+  accuracy?: number;
+  critDefense?: number;
+  spirit?: number;
+  /** Очки самоисцеления, как крит */
+  lifesteal?: number;
 }
 
 /** Шаблон вещи: слот, название, редкость, базовые статы (обычно 3 характеристики). */
 export interface ItemTemplate {
   id: string;
   name: string;
-  slot: EquipmentSlot;
-  rarity: "common" | "rare" | "epic" | "legendary";
+  slot: ItemSlot;
+  rarity: ItemRarity;
   baseStats: ItemStats;
 }
 
@@ -43,20 +55,24 @@ export interface ItemInstance {
    * Хранятся как множители (например, 0.8–1.2), которые применяются к baseStats * level.
    */
   rolls?: ItemStats;
+  /** Редкость с дропа/магазина (процедурная генерация перекрывает шаблон). */
+  rarityOverride?: ItemRarity;
+  /** Если задано — базовые статы с дропа вместо template.baseStats. */
+  generatedBaseStats?: ItemStats;
 }
 
 /** Отображаемый вид вещи (для UI): id = instanceId, stats уже эффективные. */
 export interface Item {
   id: string;
   name: string;
-  slot: EquipmentSlot;
+  slot: ItemSlot;
   stats: ItemStats;
-  rarity: "common" | "rare" | "epic" | "legendary";
+  rarity: ItemRarity;
   /** Уровень вещи (для отображения в UI). */
   itemLevel?: number;
 }
 
-export const SLOT_NAMES: Record<EquipmentSlot, string> = {
+export const SLOT_NAMES: Record<ItemSlot, string> = {
   helmet: "Шлем",
   chest: "Грудь",
   earring: "Серьга",
@@ -67,6 +83,7 @@ export const SLOT_NAMES: Record<EquipmentSlot, string> = {
   pants: "Штаны",
   boots: "Ботинки",
   necklace: "Шея",
+  resource: "Ресурс",
 };
 
 export { getStatMultiplier, getEffectiveStats, getDisplayItem } from "./lib/itemLevel";

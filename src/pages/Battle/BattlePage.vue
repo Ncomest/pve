@@ -270,8 +270,12 @@ onUnmounted(() => {
             <dd>{{ (boss.stats.evasion * 100).toFixed(0) }}%</dd>
           </div>
           <div class="battle-page__stats-row">
-            <dt>Скорость</dt>
-            <dd>{{ (boss.stats.speed ?? 2).toFixed(1) }}</dd>
+            <dt>Меткость</dt>
+            <dd>{{ ((boss.stats.accuracy ?? 0) * 100).toFixed(0) }}%</dd>
+          </div>
+          <div class="battle-page__stats-row">
+            <dt>Защита от крита</dt>
+            <dd>{{ ((boss.stats.critDefense ?? 0) * 100).toFixed(0) }}%</dd>
           </div>
           <div class="battle-page__stats-row">
             <dt>Броня</dt>
@@ -332,8 +336,12 @@ onUnmounted(() => {
               <dd>{{ (boss.stats.evasion * 100).toFixed(0) }}%</dd>
             </div>
             <div class="battle-page__stats-row">
-              <dt>Скорость</dt>
-              <dd>{{ (boss.stats.speed ?? 2).toFixed(1) }}</dd>
+              <dt>Меткость</dt>
+              <dd>{{ ((boss.stats.accuracy ?? 0) * 100).toFixed(0) }}%</dd>
+            </div>
+            <div class="battle-page__stats-row">
+              <dt>Защита от крита</dt>
+              <dd>{{ ((boss.stats.critDefense ?? 0) * 100).toFixed(0) }}%</dd>
             </div>
             <div class="battle-page__stats-row">
               <dt>Броня</dt>

@@ -21,40 +21,62 @@ export function getEffectiveStats(
   baseStats: ItemStats,
   itemLevel: number,
   rolls?: ItemInstance["rolls"],
+  generatedOverride?: ItemStats,
 ): ItemStats {
+  const source = generatedOverride && Object.keys(generatedOverride).length > 0 ? generatedOverride : baseStats;
   const mult = getStatMultiplier(itemLevel);
   const result: ItemStats = {};
 
-  if (baseStats.hp != null) {
-    const base = baseStats.hp * mult;
+  if (source.hp != null) {
+    const base = source.hp * mult;
     const factor = rolls?.hp ?? 1;
     result.hp = Math.round(base * factor);
   }
-  if (baseStats.power != null) {
-    const base = baseStats.power * mult;
+  if (source.power != null) {
+    const base = source.power * mult;
     const factor = rolls?.power ?? 1;
     result.power = Math.round(base * factor);
   }
-  if (baseStats.speed != null) {
-    const base = baseStats.speed * mult;
+  if (source.speed != null) {
+    const base = source.speed * mult;
     const factor = rolls?.speed ?? 1;
     result.speed = Math.round(base * factor);
   }
-  if (baseStats.armor != null) {
-    const base = baseStats.armor * mult;
+  if (source.armor != null) {
+    const base = source.armor * mult;
     const factor = rolls?.armor ?? 1;
     result.armor = Math.round(base * factor);
   }
 
-  if (baseStats.chanceCrit != null) {
-    const base = baseStats.chanceCrit * mult;
+  if (source.chanceCrit != null) {
+    const base = source.chanceCrit * mult;
     const factor = rolls?.chanceCrit ?? 1;
     result.chanceCrit = Math.round(base * factor);
   }
-  if (baseStats.evasion != null) {
-    const base = baseStats.evasion * mult;
+  if (source.evasion != null) {
+    const base = source.evasion * mult;
     const factor = rolls?.evasion ?? 1;
     result.evasion = Math.round(base * factor);
+  }
+  if (source.accuracy != null) {
+    const base = source.accuracy * mult;
+    const factor = rolls?.accuracy ?? 1;
+    result.accuracy = Math.round(base * factor);
+  }
+  if (source.critDefense != null) {
+    const base = source.critDefense * mult;
+    const factor = rolls?.critDefense ?? 1;
+    result.critDefense = Math.round(base * factor);
+  }
+  if (source.spirit != null) {
+    const base = source.spirit * mult;
+    const factor = rolls?.spirit ?? 1;
+    result.spirit = Math.round(base * factor);
+  }
+  if (source.lifesteal != null) {
+    const base = source.lifesteal * mult;
+    const factor = rolls?.lifesteal ?? 1;
+    result.lifesteal = Math.round(base * factor);
   }
 
   return result;
@@ -71,12 +93,17 @@ export function getDisplayItem(
   const template = getTemplate(instance.templateId);
   if (!template) return null;
 
-  const stats = getEffectiveStats(template.baseStats, instance.itemLevel, instance.rolls);
+  const stats = getEffectiveStats(
+    template.baseStats,
+    instance.itemLevel,
+    instance.rolls,
+    instance.generatedBaseStats,
+  );
   return {
     id: instance.instanceId,
     name: template.name,
     slot: template.slot,
-    rarity: template.rarity,
+    rarity: instance.rarityOverride ?? template.rarity,
     stats,
     itemLevel: instance.itemLevel,
   };

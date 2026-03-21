@@ -1,10 +1,12 @@
 import type { Item } from "@/entities/item/model";
 
 /** Базовая цена продажи по редкости (для вещи уровня 1). */
-const SELL_PRICE_BY_RARITY: Record<Item["rarity"], number> = {
+const SELL_PRICE_BY_RARITY: Record<string, number> = {
   common: 15,
+  uncommon: 25,
   rare: 45,
   epic: 120,
+  unique: 300,
   legendary: 300,
 };
 

@@ -21,6 +21,10 @@ export const PLAYER_CHARACTER: Character = {
     evasion: 0.05,
     speed: 2,
     armor: 5,
+    accuracy: 0,
+    critDefense: 0,
+    spirit: 0,
+    lifesteal: 0,
   },
 };
 

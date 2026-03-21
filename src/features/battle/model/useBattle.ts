@@ -19,7 +19,11 @@ import { usePlayerProgress } from "@/features/character/model/usePlayerProgress"
 import { usePlayerHp } from "@/features/character/model/usePlayerHp";
 import { useCharacterStore } from "@/app/store/character";
 import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
-import { ALL_TEMPLATE_IDS, getTemplate } from "@/entities/item/items-db";
+import {
+  ALL_TEMPLATE_IDS,
+  RESOURCE_TEMPLATE_IDS,
+  getTemplate,
+} from "@/entities/item/items-db";
 import { getDisplayItem } from "@/entities/item/model";
 import { createItemInstance } from "@/entities/item/lib/createInstance";
 import type { ItemInstance } from "@/entities/item/model";
@@ -48,6 +52,10 @@ const cloneStats = (stats: Stats): Stats => ({
   evasion: stats.evasion,
   speed: stats.speed ?? 2,
   armor: stats.armor ?? 0,
+  accuracy: stats.accuracy ?? 0,
+  critDefense: stats.critDefense ?? 0,
+  spirit: stats.spirit ?? 0,
+  lifesteal: stats.lifesteal ?? 0,
 });
 
 const clampHp = (stats: Stats) => {
@@ -58,12 +66,20 @@ const clampHp = (stats: Stats) => {
 const DEFAULT_CRIT_MULTIPLIER = 1.5;
 
 const calcHit = (attacker: Stats, defender: Stats, critMultiplier: number = DEFAULT_CRIT_MULTIPLIER) => {
-  const isDodged = rng() < defender.evasion;
+  const dodgeChance = Math.max(
+    0,
+    (defender.evasion ?? 0) - (attacker.accuracy ?? 0),
+  );
+  const isDodged = rng() < dodgeChance;
   if (isDodged) {
     return { damage: 0, isCrit: false, isDodged: true };
   }
 
-  const isCrit = rng() < attacker.chanceCrit;
+  const critChance = Math.max(
+    0,
+    (attacker.chanceCrit ?? 0) - (defender.critDefense ?? 0),
+  );
+  const isCrit = rng() < critChance;
   const base = Math.floor(attacker.power * (0.9 + Math.random() * 0.2));
   // Бонус от силы: каждые 25 ед. power дают +1 урона (плоско)
   const flatFromPower = Math.floor((attacker.power ?? 0) / 25);
@@ -82,6 +98,7 @@ const formatCooldown = (ms: number) => {
 
 export function useBattle(bossId: () => string | undefined) {
   const allBosses = [...(bossesData as Boss[]), ...(resourcesData as Boss[])];
+  const resourceBossIdSet = new Set((resourcesData as Boss[]).map((b) => b.id));
   const playerProgress = usePlayerProgress();
   const characterStore = useCharacterStore();
   const playerHp = usePlayerHp();
@@ -97,6 +114,7 @@ export function useBattle(bossId: () => string | undefined) {
     const bonusPower = (level - 1) * 2;
     const equipStats = characterStore.equipmentStats;
 
+    const baseSpirit = basePlayerStats.spirit ?? 0;
     return {
       hp: basePlayerStats.maxHp + bonusHp + equipStats.hp,
       maxHp: basePlayerStats.maxHp + bonusHp + equipStats.hp,
@@ -105,6 +123,10 @@ export function useBattle(bossId: () => string | undefined) {
       evasion: Math.min(1, basePlayerStats.evasion + equipStats.evasion),
       speed: (basePlayerStats.speed ?? 2) + (equipStats.speed ?? 0),
       armor: (basePlayerStats.armor ?? 0) + (equipStats.armor ?? 0),
+      accuracy: Math.min(1, (basePlayerStats.accuracy ?? 0) + (equipStats.accuracy ?? 0)),
+      critDefense: Math.min(1, (basePlayerStats.critDefense ?? 0) + (equipStats.critDefense ?? 0)),
+      spirit: baseSpirit + (equipStats.spirit ?? 0),
+      lifesteal: Math.min(1, (basePlayerStats.lifesteal ?? 0) + (equipStats.lifesteal ?? 0)),
     };
   };
 
@@ -129,7 +151,7 @@ export function useBattle(bossId: () => string | undefined) {
     maxHp: basePlayerStatsForRevert.maxHp + healthPercentBonus,
     hp: basePlayerStatsForRevert.hp + healthPercentBonus,
   };
-  playerHp.init(initialStats.maxHp, regenWindow);
+  playerHp.init(initialStats.maxHp, regenWindow, initialStats.spirit ?? 0);
 
   const player = reactive({
     name: PLAYER_CHARACTER.name,
@@ -198,6 +220,10 @@ export function useBattle(bossId: () => string | undefined) {
       player.stats.chanceCrit = basePlayerStatsForRevert.chanceCrit;
       player.stats.evasion = basePlayerStatsForRevert.evasion;
       player.stats.speed = basePlayerStatsForRevert.speed;
+      player.stats.accuracy = basePlayerStatsForRevert.accuracy;
+      player.stats.critDefense = basePlayerStatsForRevert.critDefense;
+      player.stats.spirit = basePlayerStatsForRevert.spirit;
+      player.stats.lifesteal = basePlayerStatsForRevert.lifesteal;
       player.stats.maxHp = basePlayerStatsForRevert.maxHp;
       player.stats.hp = Math.min(player.stats.hp, player.stats.maxHp);
       playerBuffs.value = playerBuffs.value.filter((e) => e.id !== effectId);
@@ -360,18 +386,53 @@ export function useBattle(bossId: () => string | undefined) {
     battleLog.value = [{ text: line, type }, ...battleLog.value].slice(0, 12);
   };
 
+  /** Разница уровней: босс выше героя → штраф урона героя по боссу и бонус урона босса по герою. */
+  const getBossLevelDelta = () =>
+    Math.max(0, boss.level - playerProgress.level.value);
+
+  const getDamageToBossMultiplier = (): number => {
+    const d = getBossLevelDelta();
+    if (d >= 2) return 0.6;
+    if (d === 1) return 0.75;
+    return 1;
+  };
+
+  const getDamageFromBossMultiplier = (): number => {
+    const d = getBossLevelDelta();
+    if (d >= 2) return 1.4;
+    if (d === 1) return 1.25;
+    return 1;
+  };
+
   const applyDamageToBoss = (rawDamage: number): number => {
+    const mult = getDamageToBossMultiplier();
+    const scaled = Math.max(1, Math.round(rawDamage * mult));
     const before = boss.stats.hp;
-    boss.stats.hp -= rawDamage;
+    boss.stats.hp -= scaled;
     clampHp(boss.stats);
     const applied = Math.max(0, before - boss.stats.hp);
     totalDamageDealtToBoss.value += applied;
+
+    const ls = player.stats.lifesteal ?? 0;
+    if (ls > 0 && applied > 0) {
+      const heal = Math.floor(applied * ls);
+      if (heal > 0) {
+        const hpBefore = player.stats.hp;
+        player.stats.hp = Math.min(player.stats.maxHp, player.stats.hp + heal);
+        const gained = player.stats.hp - hpBefore;
+        if (gained > 0) {
+          spawnPlayerDmg(gained, "heal");
+        }
+      }
+    }
     return applied;
   };
 
   const applyDamageFromBoss = (rawDamage: number): number => {
+    const mult = getDamageFromBossMultiplier();
+    const scaled = Math.max(1, Math.round(rawDamage * mult));
     const before = player.stats.hp;
-    player.stats.hp -= rawDamage;
+    player.stats.hp -= scaled;
     clampHp(player.stats);
     const applied = Math.max(0, before - player.stats.hp);
     totalDamageTakenFromBoss.value += applied;
@@ -810,7 +871,8 @@ export function useBattle(bossId: () => string | undefined) {
     if (
       ability.interrupt &&
       bossCastState.value === "casting" &&
-      currentBossAbility.value?.canBeInterrupted
+      currentBossAbility.value?.canBeInterrupted &&
+      currentBossAbility.value?.category !== "uninterruptible"
     ) {
       interruptBossCast(ability.name);
     }
@@ -873,6 +935,7 @@ export function useBattle(bossId: () => string | undefined) {
         startPowerBoost,
         spawnBossDmg,
         spawnPlayerDmg,
+        applyDamageToBoss,
         turnState: effectTurnState,
       };
       applyEffects(ctx, { id: ability.id, name: ability.name, icon: ability.icon }, ability.effects);
@@ -908,12 +971,12 @@ export function useBattle(bossId: () => string | undefined) {
           cunningNote = " (×2 Коварство)";
         }
 
-        applyDamageToBoss(finalDamage);
-        spawnBossDmg(finalDamage, "damage", isCrit);
+        const appliedToBoss = applyDamageToBoss(finalDamage);
+        spawnBossDmg(appliedToBoss, "damage", isCrit);
         const gain = ability.comboGain ?? 1;
         gainCombo(gain);
 
-        const logParts: string[] = [`${ability.name}: ${finalDamage} урона${isCrit ? " (крит)" : ""}${cunningNote}. Комбо: ${comboPoints.value}/${COMBO_POINTS_MAX}`];
+        const logParts: string[] = [`${ability.name}: ${appliedToBoss} урона${isCrit ? " (крит)" : ""}${cunningNote}. Комбо: ${comboPoints.value}/${COMBO_POINTS_MAX}`];
 
         // «Размашистый удар»: стак Потрошения + бафф крита
         if (ability.eviscerateStacksGain) {
@@ -983,9 +1046,10 @@ export function useBattle(bossId: () => string | undefined) {
       if (ability.dotDurationMs !== undefined && ability.dotTickIntervalMs !== undefined && ability.dotTickDamageMultiplier !== undefined) {
         const instantRatio = ability.dotInstantDamageRatio ?? 0.5;
         const instantDmg = Math.round(ability.baseDamageX * playerPower.value * instantRatio);
+        let instAppliedLog = 0;
         if (instantDmg > 0) {
-          applyDamageToBoss(instantDmg);
-          spawnBossDmg(instantDmg, "damage");
+          instAppliedLog = applyDamageToBoss(instantDmg);
+          spawnBossDmg(instAppliedLog, "damage");
         }
 
         const tickDmg = Math.round(ability.baseDamageX * ability.dotTickDamageMultiplier * playerPower.value * n);
@@ -1012,8 +1076,8 @@ export function useBattle(bossId: () => string | undefined) {
           if (isBattleOver.value || Date.now() >= endTime) {
             return;
           }
-          applyDamageToBoss(tickDmg);
-          spawnBossDmg(tickDmg, "damage");
+          const tickApplied = applyDamageToBoss(tickDmg);
+          spawnBossDmg(tickApplied, "damage");
 
           // 15% шанс получить бафф «Коварство» (следующий Коварный удар +100% урона)
           if (procChance > 0 && rng() < procChance) {
@@ -1036,9 +1100,9 @@ export function useBattle(bossId: () => string | undefined) {
               cunningBuffTimerId = null;
             }, procBuffDurationMs);
 
-            pushLog(`Яд (${ability.name}): −${tickDmg} HP. Сработало «Коварство»!`, "player-damage");
+            pushLog(`Яд (${ability.name}): −${tickApplied} HP. Сработало «Коварство»!`, "player-damage");
           } else {
-            pushLog(`Яд (${ability.name}): −${tickDmg} HP у босса.`, "player-damage");
+            pushLog(`Яд (${ability.name}): −${tickApplied} HP у босса.`, "player-damage");
           }
         }, ability.dotTickIntervalMs);
 
@@ -1051,7 +1115,10 @@ export function useBattle(bossId: () => string | undefined) {
           bossDebuffs.value = bossDebuffs.value.filter((e) => e.id !== ability.id);
         }, ability.dotDurationMs);
 
-        pushLog(`${ability.name}: ${instantDmg} урона мгновенно + яд ${Math.round(ability.dotDurationMs / 1000)}с (${n} комбо). Комбо сброшено.`, "player-damage");
+        pushLog(
+          `${ability.name}: ${instAppliedLog} урона мгновенно + яд ${Math.round(ability.dotDurationMs / 1000)}с (${n} комбо). Комбо сброшено.`,
+          "player-damage",
+        );
         triggerCooldowns(ability.id, ability.cooldownMs);
         return;
       }
@@ -1060,13 +1127,13 @@ export function useBattle(bossId: () => string | undefined) {
       const stackBonus = eviscerateStacks.value * (ability.eviscerateStackBonusPercent ?? 0.15);
       const baseDmg = Math.round(ability.baseDamageX * playerPower.value * n * (1 + stackBonus));
 
-      applyDamageToBoss(baseDmg);
-      spawnBossDmg(baseDmg, "damage");
+      const finisherApplied = applyDamageToBoss(baseDmg);
+      spawnBossDmg(finisherApplied, "damage");
 
       const stackNote = eviscerateStacks.value > 0
         ? ` (+${Math.round(stackBonus * 100)}% от ${eviscerateStacks.value} стак.)`
         : "";
-      pushLog(`${ability.name}: ${baseDmg} урона${stackNote} (${n} комбо). Комбо сброшено.`, "player-damage");
+      pushLog(`${ability.name}: ${finisherApplied} урона${stackNote} (${n} комбо). Комбо сброшено.`, "player-damage");
 
       // Тратим все стаки «Потрошение»
       eviscerateStacks.value = 0;
@@ -1085,9 +1152,9 @@ export function useBattle(bossId: () => string | undefined) {
       // Способность с кровотечением: плоский урон + DoT
       if (ability.bleedDamage !== undefined && ability.bleedDurationMs !== undefined && ability.bleedTickIntervalMs !== undefined) {
         const dmg = ability.value;
-        applyDamageToBoss(dmg);
-        spawnBossDmg(dmg, "damage");
-        pushLog(`Ты нанёс ${dmg} урона и наложил кровотечение.`, "player-damage");
+        const bleedFirst = applyDamageToBoss(dmg);
+        spawnBossDmg(bleedFirst, "damage");
+        pushLog(`Ты нанёс ${bleedFirst} урона и наложил кровотечение.`, "player-damage");
 
         clearBossBleed();
         const endTime = Date.now() + ability.bleedDurationMs;
@@ -1103,9 +1170,9 @@ export function useBattle(bossId: () => string | undefined) {
             return;
           }
           const tickDmg = bossBleed.value!.damagePerTick;
-          applyDamageToBoss(tickDmg);
-          spawnBossDmg(tickDmg, "damage");
-          pushLog(`Кровотечение: −${tickDmg} HP у босса.`, "player-damage");
+          const bleedTickApplied = applyDamageToBoss(tickDmg);
+          spawnBossDmg(bleedTickApplied, "damage");
+          pushLog(`Кровотечение: −${bleedTickApplied} HP у босса.`, "player-damage");
         }, ability.bleedTickIntervalMs);
         bleedEndTimeoutId = setTimeout(clearBossBleed, ability.bleedDurationMs);
         triggerCooldowns(ability.id, ability.cooldownMs);
@@ -1115,9 +1182,9 @@ export function useBattle(bossId: () => string | undefined) {
       // Способность с дебаффом брони: плоский урон + снижение брони
       if (ability.armorDebuff !== undefined && ability.armorDebuffDurationMs !== undefined) {
         const dmg = ability.value;
-        applyDamageToBoss(dmg);
-        spawnBossDmg(dmg, "damage");
-        pushLog(`Ты нанёс ${dmg} урона и снизил броню босса на ${ability.armorDebuff}.`, "player-damage");
+        const armorBreakApplied = applyDamageToBoss(dmg);
+        spawnBossDmg(armorBreakApplied, "damage");
+        pushLog(`Ты нанёс ${armorBreakApplied} урона и снизил броню босса на ${ability.armorDebuff}.`, "player-damage");
 
         clearBossArmorDebuff();
         const endTime = Date.now() + ability.armorDebuffDurationMs;
@@ -1144,9 +1211,9 @@ export function useBattle(bossId: () => string | undefined) {
         spawnBossDmg("Уклон", "dodge");
         pushLog("Ты атаковал, но босс уклонился.", "boss-dodge");
       } else {
-        applyDamageToBoss(damage);
-        spawnBossDmg(damage, "damage", isCrit);
-        pushLog(`Ты нанёс ${damage} урона${isCrit ? " (крит)" : ""}.`, "player-damage");
+        const atkApplied = applyDamageToBoss(damage);
+        spawnBossDmg(atkApplied, "damage", isCrit);
+        pushLog(`Ты нанёс ${atkApplied} урона${isCrit ? " (крит)" : ""}.`, "player-damage");
       }
       triggerCooldowns(ability.id, ability.cooldownMs);
       return;
@@ -2614,14 +2681,22 @@ export function useBattle(bossId: () => string | undefined) {
 
         const bossLevel = selectedBoss.value?.level ?? 1;
         const itemLevel = 1 + bossLevel * 3;
-        const pool = [...ALL_TEMPLATE_IDS];
-        const chosen: string[] = [];
-        for (let i = 0; i < 2 && pool.length > 0; i++) {
-          const idx = Math.floor(rng() * pool.length);
-          chosen.push(pool[idx]!);
-          pool.splice(idx, 1);
+        const bossId = selectedBoss.value?.id ?? "";
+
+        if (resourceBossIdSet.has(bossId) && RESOURCE_TEMPLATE_IDS.length > 0) {
+          const rIdx = Math.floor(rng() * RESOURCE_TEMPLATE_IDS.length);
+          const resId = RESOURCE_TEMPLATE_IDS[rIdx]!;
+          loot.value = [createItemInstance(resId, itemLevel)];
+        } else {
+          const pool = [...ALL_TEMPLATE_IDS];
+          const chosen: string[] = [];
+          for (let i = 0; i < 2 && pool.length > 0; i++) {
+            const idx = Math.floor(rng() * pool.length);
+            chosen.push(pool[idx]!);
+            pool.splice(idx, 1);
+          }
+          loot.value = chosen.map((templateId) => createItemInstance(templateId, itemLevel));
         }
-        loot.value = chosen.map((templateId) => createItemInstance(templateId, itemLevel));
 
         if (loot.value.length > 0) {
           showLoot.value = true;

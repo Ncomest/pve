@@ -287,7 +287,12 @@
           <span>Броня</span><span>{{ boss.stats.armor }}</span>
         </div>
         <div class="boss-select-entry__stat-row">
-          <span>Скорость</span><span>{{ boss.stats.speed }}</span>
+          <span>Меткость</span
+          ><span>{{ Math.round((boss.stats.accuracy ?? 0) * 100) }}%</span>
+        </div>
+        <div class="boss-select-entry__stat-row">
+          <span>Защита от крита</span
+          ><span>{{ Math.round((boss.stats.critDefense ?? 0) * 100) }}%</span>
         </div>
         <div class="boss-select-entry__stat-row">
           <span>Крит</span

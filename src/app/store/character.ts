@@ -3,7 +3,13 @@ import type { EquipmentSlot, ItemInstance } from "@/entities/item/model";
 import { getEffectiveStats } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
 import { getDisplayItem } from "@/entities/item/model";
-import { critPointsToFraction, evasionPointsToFraction } from "@/entities/item/lib/statPoints";
+import {
+  critPointsToFraction,
+  evasionPointsToFraction,
+  accuracyPointsToFraction,
+  critDefensePointsToFraction,
+  lifestealPointsToFraction,
+} from "@/entities/item/lib/statPoints";
 import { getItemSellPrice } from "@/shared/lib/merchant/getItemSellPrice";
 import type { MerchantOffer } from "@/entities/merchant/model/merchant-stock";
 import { generateInstanceId } from "@/entities/item/lib/createInstance";
@@ -61,23 +67,49 @@ export const useCharacterStore = defineStore("character", {
 
   getters: {
     equipmentStats(state) {
-      const stats = { hp: 0, power: 0, chanceCrit: 0, evasion: 0, speed: 0, armor: 0 };
+      const stats = {
+        hp: 0,
+        power: 0,
+        chanceCrit: 0,
+        evasion: 0,
+        speed: 0,
+        armor: 0,
+        accuracy: 0,
+        critDefense: 0,
+        spirit: 0,
+        lifesteal: 0,
+      };
       let critPoints = 0;
       let evasionPoints = 0;
+      let accuracyPoints = 0;
+      let critDefensePoints = 0;
+      let lifestealPoints = 0;
       for (const instance of Object.values(state.equipped)) {
         if (!instance) continue;
         const template = getTemplate(instance.templateId);
         if (!template) continue;
-        const effective = getEffectiveStats(template.baseStats, instance.itemLevel, instance.rolls);
+        const effective = getEffectiveStats(
+          template.baseStats,
+          instance.itemLevel,
+          instance.rolls,
+          instance.generatedBaseStats,
+        );
         stats.hp += effective.hp ?? 0;
         stats.power += effective.power ?? 0;
         critPoints += effective.chanceCrit ?? 0;
         evasionPoints += effective.evasion ?? 0;
         stats.speed += effective.speed ?? 0;
         stats.armor += effective.armor ?? 0;
+        accuracyPoints += effective.accuracy ?? 0;
+        critDefensePoints += effective.critDefense ?? 0;
+        stats.spirit += effective.spirit ?? 0;
+        lifestealPoints += effective.lifesteal ?? 0;
       }
       stats.chanceCrit = critPointsToFraction(critPoints);
       stats.evasion = evasionPointsToFraction(evasionPoints);
+      stats.accuracy = accuracyPointsToFraction(accuracyPoints);
+      stats.critDefense = critDefensePointsToFraction(critDefensePoints);
+      stats.lifesteal = lifestealPointsToFraction(lifestealPoints);
       return stats;
     },
 
@@ -223,6 +255,7 @@ export const useCharacterStore = defineStore("character", {
       if (!instance) return false;
       const template = getTemplate(instance.templateId);
       if (!template) return false;
+      if (template.slot === "resource") return false;
       const slot = template.slot;
       const currentlyEquipped = this.equipped[slot];
 

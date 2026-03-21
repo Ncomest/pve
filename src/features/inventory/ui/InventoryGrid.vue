@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import type { ItemInstance, EquipmentSlot } from "@/entities/item/model";
+import type { ItemInstance, ItemSlot } from "@/entities/item/model";
 import { getDisplayItem } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
 import { rarityColor } from "@/entities/item/lib/rarityColor";
@@ -29,7 +29,7 @@ const displayByIndex = computed(() =>
 
 const characterStore = useCharacterStore();
 
-const SLOT_ICON_FILES: Record<EquipmentSlot, string> = {
+const SLOT_ICON_FILES: Record<ItemSlot, string> = {
   helmet: "helmet",
   chest: "chest",
   belt: "belt",
@@ -40,9 +40,10 @@ const SLOT_ICON_FILES: Record<EquipmentSlot, string> = {
   earring: "trinket",
   weapon: "sword",
   shield: "shield",
+  resource: "trinket",
 };
 
-function getSlotIconSrc(slot: EquipmentSlot) {
+function getSlotIconSrc(slot: ItemSlot) {
   const file = SLOT_ICON_FILES[slot];
   return `/images/equipment/${file}.png`;
 }

@@ -1,4 +1,4 @@
-import type { ItemTemplate, EquipmentSlot } from "@/entities/item/model";
+import type { ItemTemplate, EquipmentSlot, ItemSlot } from "@/entities/item/model";
 
 /**
  * База шаблонов вещей и их статов.
@@ -182,7 +182,7 @@ function buildBaseStats(combo: (keyof typeof BASE)[]): ItemTemplate["baseStats"]
 function buildTemplates(): Record<string, ItemTemplate> {
   const out: Record<string, ItemTemplate> = {};
   let rarityIndex = 0;
-  const rarities: Rarity[] = ["common", "rare", "epic", "legendary"];
+  const rarities: Rarity[] = ["common", "uncommon", "rare", "epic", "unique"];
 
   for (const slot of SLOTS) {
     const names = SLOT_NAMES_RU[slot];
@@ -268,15 +268,123 @@ const ELIXIR_TEMPLATES: Record<string, ItemTemplate> = {
   },
 };
 
+const RESOURCE_TEMPLATE_SLOT: ItemSlot = "resource";
+
+/** Крафтовые ресурсы (стек в инвентаре). */
+const RESOURCE_TEMPLATES: Record<string, ItemTemplate> = {
+  "resource-fire-essence": {
+    id: "resource-fire-essence",
+    name: "Эссенция огня",
+    slot: RESOURCE_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+  "resource-flame-crystal": {
+    id: "resource-flame-crystal",
+    name: "Пламенный кристалл",
+    slot: RESOURCE_TEMPLATE_SLOT,
+    rarity: "rare",
+    baseStats: {},
+  },
+  "resource-water-essence": {
+    id: "resource-water-essence",
+    name: "Эссенция воды",
+    slot: RESOURCE_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+  "resource-aqua-pearl": {
+    id: "resource-aqua-pearl",
+    name: "Водная жемчужина",
+    slot: RESOURCE_TEMPLATE_SLOT,
+    rarity: "rare",
+    baseStats: {},
+  },
+  "resource-air-essence": {
+    id: "resource-air-essence",
+    name: "Эссенция воздуха",
+    slot: RESOURCE_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+  "resource-storm-feather": {
+    id: "resource-storm-feather",
+    name: "Грозовое перо",
+    slot: RESOURCE_TEMPLATE_SLOT,
+    rarity: "rare",
+    baseStats: {},
+  },
+  "resource-earth-essence": {
+    id: "resource-earth-essence",
+    name: "Эссенция земли",
+    slot: RESOURCE_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+  "resource-stone-shard": {
+    id: "resource-stone-shard",
+    name: "Каменный осколок",
+    slot: RESOURCE_TEMPLATE_SLOT,
+    rarity: "rare",
+    baseStats: {},
+  },
+  "resource-golem-core": {
+    id: "resource-golem-core",
+    name: "Ядро голема",
+    slot: RESOURCE_TEMPLATE_SLOT,
+    rarity: "epic",
+    baseStats: {},
+  },
+  "resource-ethereal-dust": {
+    id: "resource-ethereal-dust",
+    name: "Эфирная пыль",
+    slot: RESOURCE_TEMPLATE_SLOT,
+    rarity: "epic",
+    baseStats: {},
+  },
+  "resource-essence-pure": {
+    id: "resource-essence-pure",
+    name: "Чистая эссенция",
+    slot: RESOURCE_TEMPLATE_SLOT,
+    rarity: "epic",
+    baseStats: {},
+  },
+  "resource-dust-fire": {
+    id: "resource-dust-fire",
+    name: "Пыль огня",
+    slot: RESOURCE_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+  "resource-ether-air": {
+    id: "resource-ether-air",
+    name: "Эфир воздуха",
+    slot: RESOURCE_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+  "resource-crystal-water": {
+    id: "resource-crystal-water",
+    name: "Кристалл воды",
+    slot: RESOURCE_TEMPLATE_SLOT,
+    rarity: "common",
+    baseStats: {},
+  },
+};
+
 export const ITEMS_TEMPLATES: Record<string, ItemTemplate> = {
   ...buildTemplates(),
   ...ELIXIR_TEMPLATES,
+  ...RESOURCE_TEMPLATES,
 };
 
-/** Все id шаблонов для пула дропа (эликсиры исключаем). */
+/** Пул экипировки для дропа с обычных боссов и витрины торговца. */
 export const ALL_TEMPLATE_IDS: string[] = Object.keys(ITEMS_TEMPLATES).filter(
-  (id) => !id.startsWith("elixir-"),
+  (id) => !id.startsWith("elixir-") && !id.startsWith("resource-"),
 );
+
+/** Пул ресурсов для дропа с боссов-ресурсов. */
+export const RESOURCE_TEMPLATE_IDS: string[] = Object.keys(RESOURCE_TEMPLATES);
 
 export function getTemplate(id: string): ItemTemplate | null {
   return ITEMS_TEMPLATES[id] ?? null;

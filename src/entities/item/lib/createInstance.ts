@@ -1,5 +1,6 @@
 import type { ItemInstance, ItemStats } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
+import { generateBaseStatsForRarity, rollItemRarity } from "@/entities/item/lib/itemGeneration";
 
 /** Генерирует уникальный id экземпляра вещи. */
 export function generateInstanceId(): string {
@@ -8,18 +9,49 @@ export function generateInstanceId(): string {
 
 /**
  * Создаёт экземпляр вещи по шаблону и уровню.
+ * Экипировка: случайная редкость и процедурные статы; эликсиры/ресурсы — без генерации.
  */
 export function createItemInstance(
   templateId: string,
   itemLevel: number,
-  instanceId?: string
+  instanceId?: string,
 ): ItemInstance {
-  const rolls = rollStatsForTemplate(templateId);
+  const template = getTemplate(templateId);
+  if (!template) {
+    return {
+      instanceId: instanceId ?? generateInstanceId(),
+      templateId,
+      itemLevel,
+    };
+  }
+
+  if (templateId.startsWith("elixir-")) {
+    const rolls = rollStatsForTemplate(templateId);
+    return {
+      instanceId: instanceId ?? generateInstanceId(),
+      templateId,
+      itemLevel,
+      rolls,
+    };
+  }
+
+  if (template.slot === "resource") {
+    return {
+      instanceId: instanceId ?? generateInstanceId(),
+      templateId,
+      itemLevel,
+      count: 1,
+    };
+  }
+
+  const rarity = rollItemRarity();
+  const generatedBaseStats = generateBaseStatsForRarity(rarity);
   return {
     instanceId: instanceId ?? generateInstanceId(),
     templateId,
     itemLevel,
-    rolls,
+    rarityOverride: rarity,
+    generatedBaseStats,
   };
 }
 

@@ -11,6 +11,7 @@ import {
   SPEED_POINTS_TO_FRACTION,
   ARMOR_POINTS_TO_FRACTION,
 } from "@/entities/item/lib/statPoints";
+import { hpPerTickFromSpirit } from "@/features/character/model/usePlayerHp";
 import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
 import "./HeroStats.scss";
 
@@ -48,6 +49,10 @@ const statRows = computed<StatRow[]>(() => {
   const equipSpeed = eq.value.speed ?? 0;
   const equipEvasion = eq.value.evasion ?? 0;
   const equipArmor = eq.value.armor ?? 0;
+  const equipAccuracy = eq.value.accuracy ?? 0;
+  const equipCritDef = eq.value.critDefense ?? 0;
+  const equipSpirit = eq.value.spirit ?? 0;
+  const equipLifesteal = eq.value.lifesteal ?? 0;
 
   const powerBonusFromElixir = elixirPowerDelta;
 
@@ -114,6 +119,30 @@ const statRows = computed<StatRow[]>(() => {
       bonus: equipEvasion + evasionDeltaFromElixir,
       fmt: (v) => (v * 100).toFixed(2) + "%",
     },
+    {
+      label: "Меткость",
+      base: base.accuracy ?? 0,
+      bonus: equipAccuracy,
+      fmt: (v) => (v * 100).toFixed(2) + "%",
+    },
+    {
+      label: "Защита от крита",
+      base: base.critDefense ?? 0,
+      bonus: equipCritDef,
+      fmt: (v) => (v * 100).toFixed(2) + "%",
+    },
+    {
+      label: "Дух",
+      base: base.spirit ?? 0,
+      bonus: equipSpirit,
+      fmt: (v) => String(Math.round(v)),
+    },
+    {
+      label: "Самоисцеление",
+      base: base.lifesteal ?? 0,
+      bonus: equipLifesteal,
+      fmt: (v) => (v * 100).toFixed(2) + "%",
+    },
   ];
 });
 
@@ -127,13 +156,22 @@ const getMaxHp = () => {
   );
 };
 
+const getSpiritPoints = () =>
+  (PLAYER_CHARACTER.stats.spirit ?? 0) + (characterStore.equipmentStats.spirit ?? 0);
+
 const { useRealtimeHp } = usePlayerHp();
-const { currentHp, currentMaxHp, hpPct } = useRealtimeHp(getMaxHp, () => elixirsStore.activeRegenWindow);
+const { currentHp, currentMaxHp, hpPct } = useRealtimeHp(
+  getMaxHp,
+  () => elixirsStore.activeRegenWindow,
+  getSpiritPoints,
+);
 
 const isFullHp = computed(() => currentHp.value >= currentMaxHp.value);
 const regenHintText = computed(() => {
   if (isFullHp.value) return "";
-  return elixirsStore.activeRegenWindow ? "+4/10с" : "+1/10с";
+  const perTick = hpPerTickFromSpirit(getSpiritPoints());
+  const base = elixirsStore.activeRegenWindow ? perTick + 3 : perTick;
+  return `+${base}/10с`;
 });
 
 const { avatars, selectedAvatarId, selectedSrc, selectAvatar } = useHeroAvatar();

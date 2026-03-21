@@ -10,7 +10,7 @@ import {
 import { getDisplayItem } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
 import { rarityColor } from "@/entities/item/lib/rarityColor";
-import { SLOT_NAMES, type EquipmentSlot } from "@/entities/item/model";
+import { SLOT_NAMES, type ItemSlot } from "@/entities/item/model";
 import InventoryGrid from "@/features/inventory/ui/InventoryGrid.vue";
 import ConsumablesGrid from "@/features/inventory/ui/ConsumablesGrid.vue";
 import { ELIXIRS, getElixirDefinition } from "@/features/elixirs/model/elixirs";
@@ -187,6 +187,10 @@ function getEquipmentOfferTooltip(offer: MerchantOffer): string {
   if (item.stats.evasion != null) lines.push(`Уклонение: +${item.stats.evasion} уклонения`);
   if (item.stats.speed != null) lines.push(`Скорость: +${item.stats.speed}`);
   if (item.stats.armor != null) lines.push(`Броня: +${item.stats.armor}`);
+  if (item.stats.accuracy != null) lines.push(`Меткость: +${item.stats.accuracy} меткости`);
+  if (item.stats.critDefense != null) lines.push(`Защита от крита: +${item.stats.critDefense}`);
+  if (item.stats.spirit != null) lines.push(`Дух: +${item.stats.spirit}`);
+  if (item.stats.lifesteal != null) lines.push(`Самоисцеление: +${item.stats.lifesteal}`);
   lines.push(`Цена торговца: ${offer.price} зол.`);
   return lines.join("\n");
 }
@@ -201,6 +205,10 @@ function getEquipmentOfferStatsLines(offer: MerchantOffer): string[] {
   if (item.stats.evasion != null) lines.push(`Уклонение: +${item.stats.evasion} уклонения`);
   if (item.stats.speed != null) lines.push(`Скорость: +${item.stats.speed}`);
   if (item.stats.armor != null) lines.push(`Броня: +${item.stats.armor}`);
+  if (item.stats.accuracy != null) lines.push(`Меткость: +${item.stats.accuracy}`);
+  if (item.stats.critDefense != null) lines.push(`Защита от крита: +${item.stats.critDefense}`);
+  if (item.stats.spirit != null) lines.push(`Дух: +${item.stats.spirit}`);
+  if (item.stats.lifesteal != null) lines.push(`Самоисцеление: +${item.stats.lifesteal}`);
   return lines;
 }
 
@@ -291,7 +299,7 @@ function buyElixir(elixirId: string) {
   showMessage(`${def?.name ?? "Эликсир"} куплен.`);
 }
 
-const SLOT_ICON_FILES: Record<EquipmentSlot, string> = {
+const SLOT_ICON_FILES: Record<ItemSlot, string> = {
   helmet: "helmet",
   chest: "chest",
   belt: "belt",
@@ -302,9 +310,10 @@ const SLOT_ICON_FILES: Record<EquipmentSlot, string> = {
   earring: "trinket",
   weapon: "sword",
   shield: "shield",
+  resource: "trinket",
 };
 
-function getSlotIconSrc(slot: EquipmentSlot) {
+function getSlotIconSrc(slot: ItemSlot) {
   const file = SLOT_ICON_FILES[slot];
   return `/images/equipment/${file}.png`;
 }
@@ -471,6 +480,18 @@ onUnmounted(() => {
               </div>
               <div v-if="selectedDisplayItem.stats.armor != null" class="merchant-page__item-stat">
                 Броня: +{{ selectedDisplayItem.stats.armor }}
+              </div>
+              <div v-if="selectedDisplayItem.stats.accuracy != null" class="merchant-page__item-stat">
+                Меткость: +{{ selectedDisplayItem.stats.accuracy }}
+              </div>
+              <div v-if="selectedDisplayItem.stats.critDefense != null" class="merchant-page__item-stat">
+                Защита от крита: +{{ selectedDisplayItem.stats.critDefense }}
+              </div>
+              <div v-if="selectedDisplayItem.stats.spirit != null" class="merchant-page__item-stat">
+                Дух: +{{ selectedDisplayItem.stats.spirit }}
+              </div>
+              <div v-if="selectedDisplayItem.stats.lifesteal != null" class="merchant-page__item-stat">
+                Самоисцеление: +{{ selectedDisplayItem.stats.lifesteal }}
               </div>
             </div>
             <div class="merchant-page__sell-price">

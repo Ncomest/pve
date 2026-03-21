@@ -56,6 +56,21 @@ const emit = defineEmits<{
       <div v-if="item.stats.armor" class="item-details__stat">
         Броня: <span class="item-details__stat-value">+{{ item.stats.armor }}</span>
       </div>
+      <div v-if="item.stats.accuracy" class="item-details__stat">
+        Меткость:
+        <span class="item-details__stat-value">+{{ item.stats.accuracy }} меткости</span>
+      </div>
+      <div v-if="item.stats.critDefense" class="item-details__stat">
+        Защита от крита:
+        <span class="item-details__stat-value">+{{ item.stats.critDefense }}</span>
+      </div>
+      <div v-if="item.stats.spirit" class="item-details__stat">
+        Дух: <span class="item-details__stat-value">+{{ item.stats.spirit }}</span>
+      </div>
+      <div v-if="item.stats.lifesteal" class="item-details__stat">
+        Самоисцеление:
+        <span class="item-details__stat-value">+{{ item.stats.lifesteal }}</span>
+      </div>
     </div>
 
     <div class="item-details__actions">
@@ -70,7 +85,7 @@ const emit = defineEmits<{
       </template>
       <template v-else>
         <button
-          v-if="!isEquipped"
+          v-if="!isEquipped && item.slot !== 'resource'"
           type="button"
           class="item-details__btn item-details__btn--primary"
           @click="emit('equip')"
