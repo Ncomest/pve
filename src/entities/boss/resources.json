@@ -244,7 +244,7 @@
         "type": "damage",
         "icon": "/images/bosses/icons/special/strike_1.png",
         "cooldownMs": 13000,
-        "castTimeMs": 1800,
+        "castTimeMs": 3000,
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Быстрый режущий удар",
@@ -256,7 +256,7 @@
         "type": "damage",
         "icon": "/images/bosses/icons/special/poison_3.png",
         "cooldownMs": 16000,
-        "castTimeMs": 2200,
+        "castTimeMs": 3000,
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Молния с высоким шансом крита",
@@ -268,7 +268,7 @@
         "type": "buff",
         "icon": "/images/bosses/icons/special/rapidshot.png",
         "cooldownMs": 21000,
-        "castTimeMs": 2000,
+        "castTimeMs": 3000,
         "category": "self_buff",
         "canBeInterrupted": true,
         "description": "Усиливает уклонение и скорость атак",
@@ -279,8 +279,8 @@
       }
     ],
     "abilityConfig": {
-      "startDelayMs": 5000,
-      "minAbilityIntervalMs": 8000,
+      "startDelayMs": 8000,
+      "minAbilityIntervalMs": 10000,
       "preventConsecutiveRepeat": false
     }
   },
