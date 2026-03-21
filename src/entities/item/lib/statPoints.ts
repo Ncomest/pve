@@ -22,7 +22,7 @@ export const ACCURACY_POINTS_TO_FRACTION = 0.0025 / 50;
 /** 50 очков защиты от крита ≈ 0.25% */
 export const CRIT_DEFENSE_POINTS_TO_FRACTION = 0.0025 / 50;
 /** 50 очков самоисцеления ≈ 0.25% урона в лечение */
-export const LIFESTEAL_POINTS_TO_FRACTION = 0.0025 / 50;
+export const LIFESTEAL_POINTS_TO_FRACTION = 0.0005 / 50;
 
 /** Переводит очки крита в долю (для статов персонажа/боя). */
 export function critPointsToFraction(points: number): number {
