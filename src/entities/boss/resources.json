@@ -55,7 +55,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Бросок сгустка пламени в цель",
-        "baseDamageX": 1.15
+        "baseDamageX": 9.2
       },
       {
         "id": "fe-ignite-dot",
@@ -67,10 +67,10 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Накладывает горение на несколько секунд",
-        "baseDamageX": 0.75,
+        "baseDamageX": 6,
         "dotDurationMs": 6000,
         "dotTickIntervalMs": 2000,
-        "dotDamagePerTick": 4
+        "dotDamagePerTick": 32
       },
       {
         "id": "fe-blaze",
@@ -156,7 +156,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Волна воды с силой прилива",
-        "baseDamageX": 1.2
+        "baseDamageX": 9.6
       },
       {
         "id": "we-spray",
@@ -168,10 +168,10 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Замедляет и наносит урон со временем",
-        "baseDamageX": 0.7,
+        "baseDamageX": 5.6,
         "dotDurationMs": 5000,
         "dotTickIntervalMs": 2000,
-        "dotDamagePerTick": 3
+        "dotDamagePerTick": 24
       },
       {
         "id": "we-mend",
@@ -248,7 +248,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Быстрый режущий удар",
-        "baseDamageX": 1.1
+        "baseDamageX": 8.8
       },
       {
         "id": "ae-lightning",
@@ -260,7 +260,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Молния с высоким шансом крита",
-        "baseDamageX": 1.35
+        "baseDamageX": 10.8
       },
       {
         "id": "ae-haste",
@@ -340,7 +340,7 @@
         "category": "uninterruptible",
         "canBeInterrupted": false,
         "description": "Тяжёлый удар, снижает уклонение цели",
-        "baseDamageX": 1.5
+        "baseDamageX": 12
       },
       {
         "id": "ee-quake",
@@ -352,10 +352,10 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "DoT от осколков камня",
-        "baseDamageX": 0.65,
+        "baseDamageX": 5.2,
         "dotDurationMs": 8000,
         "dotTickIntervalMs": 2000,
-        "dotDamagePerTick": 5
+        "dotDamagePerTick": 40
       },
       {
         "id": "ee-shell",
@@ -436,7 +436,7 @@
         "canBeInterrupted": false,
         "requiredDefensiveTag": "block",
         "description": "Мощный бросок камня — блокируется щитом",
-        "baseDamageX": 2.2
+        "baseDamageX": 17.6
       },
       {
         "id": "eg-stomp",
@@ -448,10 +448,10 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Землетрясение и осколки",
-        "baseDamageX": 0.9,
+        "baseDamageX": 7.2,
         "dotDurationMs": 6000,
         "dotTickIntervalMs": 2000,
-        "dotDamagePerTick": 4
+        "dotDamagePerTick": 32
       },
       {
         "id": "eg-fortify",
@@ -537,7 +537,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Волна жара и жгучий урон",
-        "baseDamageX": 1.25
+        "baseDamageX": 10
       },
       {
         "id": "fg-magma",
@@ -549,10 +549,10 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Оставляет зону горения",
-        "baseDamageX": 0.8,
+        "baseDamageX": 6.4,
         "dotDurationMs": 7000,
         "dotTickIntervalMs": 2000,
-        "dotDamagePerTick": 5
+        "dotDamagePerTick": 40
       },
       {
         "id": "fg-overheat",
@@ -638,7 +638,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Мощная струя воды",
-        "baseDamageX": 1.18
+        "baseDamageX": 9.44
       },
       {
         "id": "wg-bubble",
@@ -650,10 +650,10 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Замедляет и наносит урон со временем",
-        "baseDamageX": 0.72,
+        "baseDamageX": 5.76,
         "dotDurationMs": 6000,
         "dotTickIntervalMs": 2000,
-        "dotDamagePerTick": 3
+        "dotDamagePerTick": 24
       },
       {
         "id": "wg-tide",
@@ -736,7 +736,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Удар сквозь защиту",
-        "baseDamageX": 1.3
+        "baseDamageX": 10.4
       },
       {
         "id": "ee2-curse",
@@ -748,10 +748,10 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Снижает броню и наносит урон",
-        "baseDamageX": 0.8,
+        "baseDamageX": 6.4,
         "dotDurationMs": 8000,
         "dotTickIntervalMs": 2000,
-        "dotDamagePerTick": 5
+        "dotDamagePerTick": 40
       },
       {
         "id": "ee2-merge",
@@ -837,7 +837,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Мощный удар с небес",
-        "baseDamageX": 1.4
+        "baseDamageX": 11.2
       },
       {
         "id": "fe2-inferno",
@@ -849,10 +849,10 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Сильное горение",
-        "baseDamageX": 0.85,
+        "baseDamageX": 6.8,
         "dotDurationMs": 9000,
         "dotTickIntervalMs": 2000,
-        "dotDamagePerTick": 6
+        "dotDamagePerTick": 48
       },
       {
         "id": "fe2-brand",
@@ -938,7 +938,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Серия ударов молнией",
-        "baseDamageX": 1.25
+        "baseDamageX": 10
       },
       {
         "id": "ae2-vortex",
@@ -950,10 +950,10 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Вращающийся урон",
-        "baseDamageX": 0.8,
+        "baseDamageX": 6.4,
         "dotDurationMs": 6000,
         "dotTickIntervalMs": 2000,
-        "dotDamagePerTick": 4
+        "dotDamagePerTick": 32
       },
       {
         "id": "ae2-wind",
@@ -1039,7 +1039,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Мощная волна воды",
-        "baseDamageX": 1.28
+        "baseDamageX": 10.24
       },
       {
         "id": "we2-chill",
@@ -1051,10 +1051,10 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Холодный DoT",
-        "baseDamageX": 0.8,
+        "baseDamageX": 6.4,
         "dotDurationMs": 8000,
         "dotTickIntervalMs": 2000,
-        "dotDamagePerTick": 5
+        "dotDamagePerTick": 40
       },
       {
         "id": "we2-mirror",
