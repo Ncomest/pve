@@ -2,16 +2,16 @@ import type { Ability } from "./types";
 import { BLADE_AND_POISON_ABILITIES } from "./blade-and-poison";
 
 export const ABILITIES: Ability[] = [
-  {
-    id: "heal",
-    name: "Лечение",
-    description: "Вы выпиваете эликсир и восстанавливаете 40 ед здоровья",
-    type: "heal",
-    value: 50,
-    cooldownMs: 12000,
-    icon: "/images/hero/ability/heal_potion.png",
-    effects: [{ kind: "heal", value: 50 }],
-  },
+  // {
+  //   id: "heal",
+  //   name: "Лечение",
+  //   description: "Вы выпиваете эликсир и восстанавливаете 40 ед здоровья",
+  //   type: "heal",
+  //   value: 50,
+  //   cooldownMs: 12000,
+  //   icon: "/images/hero/ability/heal_potion.png",
+  //   effects: [{ kind: "heal", value: 50 }],
+  // },
   {
     id: "rebuke",
     name: "Укор",

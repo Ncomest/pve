@@ -183,11 +183,11 @@ function getEquipmentOfferTooltip(offer: MerchantOffer): string {
   lines.push(`Слот: ${SLOT_NAMES[item.slot]}`);
   if (item.stats.hp != null) lines.push(`HP: +${item.stats.hp}`);
   if (item.stats.power != null) lines.push(`Атака: +${item.stats.power}`);
-  if (item.stats.chanceCrit != null) lines.push(`Крит: +${item.stats.chanceCrit} крита`);
-  if (item.stats.evasion != null) lines.push(`Уклонение: +${item.stats.evasion} уклонения`);
+  if (item.stats.chanceCrit != null) lines.push(`Крит: +${item.stats.chanceCrit}`);
+  if (item.stats.evasion != null) lines.push(`Уклонение: +${item.stats.evasion}`);
   if (item.stats.speed != null) lines.push(`Скорость: +${item.stats.speed}`);
   if (item.stats.armor != null) lines.push(`Броня: +${item.stats.armor}`);
-  if (item.stats.accuracy != null) lines.push(`Меткость: +${item.stats.accuracy} меткости`);
+  if (item.stats.accuracy != null) lines.push(`Меткость: +${item.stats.accuracy}`);
   if (item.stats.critDefense != null) lines.push(`Защита от крита: +${item.stats.critDefense}`);
   if (item.stats.spirit != null) lines.push(`Дух: +${item.stats.spirit}`);
   if (item.stats.lifesteal != null) lines.push(`Самоисцеление: +${item.stats.lifesteal}`);
@@ -201,8 +201,8 @@ function getEquipmentOfferStatsLines(offer: MerchantOffer): string[] {
   const lines: string[] = [];
   if (item.stats.hp != null) lines.push(`HP: +${item.stats.hp}`);
   if (item.stats.power != null) lines.push(`Атака: +${item.stats.power}`);
-  if (item.stats.chanceCrit != null) lines.push(`Крит: +${item.stats.chanceCrit} крита`);
-  if (item.stats.evasion != null) lines.push(`Уклонение: +${item.stats.evasion} уклонения`);
+  if (item.stats.chanceCrit != null) lines.push(`Крит: +${item.stats.chanceCrit}`);
+  if (item.stats.evasion != null) lines.push(`Уклонение: +${item.stats.evasion}`);
   if (item.stats.speed != null) lines.push(`Скорость: +${item.stats.speed}`);
   if (item.stats.armor != null) lines.push(`Броня: +${item.stats.armor}`);
   if (item.stats.accuracy != null) lines.push(`Меткость: +${item.stats.accuracy}`);
@@ -427,7 +427,14 @@ onUnmounted(() => {
       <span class="merchant-page__gold-label">золотых</span>
     </div>
 
-    <div v-if="message" class="merchant-page__toast">{{ message }}</div>
+    <div
+      class="merchant-page__toast"
+      :class="{ 'merchant-page__toast--visible': !!message }"
+      role="status"
+      aria-live="polite"
+    >
+      {{ message || "\u00A0" }}
+    </div>
 
     <div class="merchant-page__content">
       <section class="merchant-page__section merchant-page__section--inventory">
@@ -470,10 +477,10 @@ onUnmounted(() => {
                 Атака: +{{ selectedDisplayItem.stats.power }}
               </div>
               <div v-if="selectedDisplayItem.stats.chanceCrit != null" class="merchant-page__item-stat">
-                Крит: +{{ selectedDisplayItem.stats.chanceCrit }} крита
+                Крит: +{{ selectedDisplayItem.stats.chanceCrit }}
               </div>
               <div v-if="selectedDisplayItem.stats.evasion != null" class="merchant-page__item-stat">
-                Уклонение: +{{ selectedDisplayItem.stats.evasion }} уклонения
+                Уклонение: +{{ selectedDisplayItem.stats.evasion }}
               </div>
               <div v-if="selectedDisplayItem.stats.speed != null" class="merchant-page__item-stat">
                 Скорость: +{{ selectedDisplayItem.stats.speed }}

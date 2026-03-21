@@ -29,9 +29,6 @@ export interface ElixirDefinition {
   spiritBonus?: number;
 }
 
-/** Бонус духа от эликсира духа (единый источник для расчёта регенерации). */
-export const SPIRIT_ELIXIR_BONUS_POINTS = 200;
-
 export const ELIXIR_DURATION_MS = 5 * 60_000;
 
 /** Заглушки: все иконки пока один и тот же “зелья восстановления здоровья”. */
@@ -40,7 +37,7 @@ export const ELIXIRS: ElixirDefinition[] = [
     id: "elixir-heal_flat",
     name: "Зелье здоровья",
     kind: "heal_flat",
-    price: 250,
+    price: 350,
     icon: "/images/elixir/elixir_4.png",
     durationMs: ELIXIR_DURATION_MS,
     powerDelta: undefined,
@@ -52,7 +49,7 @@ export const ELIXIRS: ElixirDefinition[] = [
     price: 200,
     icon: "/images/elixir/elixir_5.png",
     durationMs: ELIXIR_DURATION_MS,
-    spiritBonus: SPIRIT_ELIXIR_BONUS_POINTS,
+    spiritBonus: 400,
   },
   {
     id: "elixir-power_plus_5",
@@ -79,7 +76,7 @@ export const ELIXIRS: ElixirDefinition[] = [
     price: 200,
     icon: "/images/elixir/elixir_3.png",
     durationMs: ELIXIR_DURATION_MS,
-    critPercentBonus: 0.05,
+    critPercentBonus: 0.03,
   },
   {
     id: "elixir-speed_plus_5",
@@ -88,7 +85,7 @@ export const ELIXIRS: ElixirDefinition[] = [
     price: 200,
     icon: "/images/elixir/elixir_6.png",
     durationMs: ELIXIR_DURATION_MS,
-    speedPercentBonus: 0.05,
+    speedPercentBonus: 0.03,
   },
   {
     id: "elixir-health_percent_plus_15",
@@ -105,7 +102,7 @@ export const ELIXIRS: ElixirDefinition[] = [
     price: 200,
     icon: "/images/elixir/elixir_7.png",
     durationMs: ELIXIR_DURATION_MS,
-    evasionPercentBonus: 0.05,
+    evasionPercentBonus: 0.03,
   },
 ];
 
@@ -114,6 +111,10 @@ export const ELIXIR_BY_ID: Record<string, ElixirDefinition> =
     string,
     ElixirDefinition
   >;
+
+/** Бонус духа от «Эликсира духа» — совпадает с `ELIXIR_BY_ID['elixir-regen'].spiritBonus`. */
+export const SPIRIT_ELIXIR_BONUS_POINTS =
+  ELIXIR_BY_ID["elixir-regen"]?.spiritBonus ?? 200;
 
 export function getElixirDefinition(id: string): ElixirDefinition | null {
   return ELIXIR_BY_ID[id] ?? null;

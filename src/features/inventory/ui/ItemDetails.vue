@@ -44,11 +44,11 @@ const emit = defineEmits<{
       </div>
       <div v-if="item.stats.chanceCrit" class="item-details__stat">
         Крит:
-        <span class="item-details__stat-value">+{{ item.stats.chanceCrit }} крита</span>
+        <span class="item-details__stat-value">+{{ item.stats.chanceCrit }}</span>
       </div>
       <div v-if="item.stats.evasion" class="item-details__stat">
         Уклонение:
-        <span class="item-details__stat-value">+{{ item.stats.evasion }} уклонения</span>
+        <span class="item-details__stat-value">+{{ item.stats.evasion }}</span>
       </div>
       <div v-if="item.stats.speed" class="item-details__stat">
         Скорость: <span class="item-details__stat-value">+{{ item.stats.speed }}</span>
@@ -58,7 +58,7 @@ const emit = defineEmits<{
       </div>
       <div v-if="item.stats.accuracy" class="item-details__stat">
         Меткость:
-        <span class="item-details__stat-value">+{{ item.stats.accuracy }} меткости</span>
+        <span class="item-details__stat-value">+{{ item.stats.accuracy }}</span>
       </div>
       <div v-if="item.stats.critDefense" class="item-details__stat">
         Защита от крита:

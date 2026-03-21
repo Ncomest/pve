@@ -111,6 +111,42 @@ export function aggregateEquipmentBonuses(partials: ItemStats[]): EquipmentBonus
   return stats;
 }
 
+/** Суммы «очков» с предметов до перевода в доли (для UI: «200 очков → 1%»). */
+export interface EquipmentRawPoints {
+  crit: number;
+  evasion: number;
+  speed: number;
+  armor: number;
+  accuracy: number;
+  critDefense: number;
+  lifesteal: number;
+  spirit: number;
+}
+
+export function aggregateEquipmentRawPoints(partials: ItemStats[]): EquipmentRawPoints {
+  const out: EquipmentRawPoints = {
+    crit: 0,
+    evasion: 0,
+    speed: 0,
+    armor: 0,
+    accuracy: 0,
+    critDefense: 0,
+    lifesteal: 0,
+    spirit: 0,
+  };
+  for (const effective of partials) {
+    out.crit += effective.chanceCrit ?? 0;
+    out.evasion += effective.evasion ?? 0;
+    out.speed += effective.speed ?? 0;
+    out.armor += effective.armor ?? 0;
+    out.accuracy += effective.accuracy ?? 0;
+    out.critDefense += effective.critDefense ?? 0;
+    out.lifesteal += effective.lifesteal ?? 0;
+    out.spirit += effective.spirit ?? 0;
+  }
+  return out;
+}
+
 /**
  * Итоговые статы героя в бою: база из `PLAYER_CHARACTER` + прирост уровня + экипировка.
  */

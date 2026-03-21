@@ -3,7 +3,10 @@ import type { EquipmentSlot, ItemInstance, ItemStats } from "@/entities/item/mod
 import { getEffectiveStats } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
 import { getDisplayItem } from "@/entities/item/model";
-import { aggregateEquipmentBonuses } from "@/entities/character/lib/playerStatAggregation";
+import {
+  aggregateEquipmentBonuses,
+  aggregateEquipmentRawPoints,
+} from "@/entities/character/lib/playerStatAggregation";
 import { getItemSellPrice } from "@/shared/lib/merchant/getItemSellPrice";
 import type { MerchantOffer } from "@/entities/merchant/model/merchant-stock";
 import { generateInstanceId } from "@/entities/item/lib/createInstance";
@@ -21,6 +24,24 @@ const MAX_CONSUMABLES_SIZE = 10;
 // Максимальный размер стака для расходников/эликсиров.
 const MAX_CONSUMABLE_STACK_SIZE = 99;
 const STARTING_GOLD = 100;
+
+function collectEquippedPartials(state: CharacterState): ItemStats[] {
+  const partials: ItemStats[] = [];
+  for (const instance of Object.values(state.equipped)) {
+    if (!instance) continue;
+    const template = getTemplate(instance.templateId);
+    if (!template) continue;
+    partials.push(
+      getEffectiveStats(
+        template.baseStats,
+        instance.itemLevel,
+        instance.rolls,
+        instance.generatedBaseStats,
+      ),
+    );
+  }
+  return partials;
+}
 
 /** Проверяет, что объект — старый формат вещи (Item с stats без templateId). */
 function isOldFormatItem(
@@ -63,21 +84,12 @@ export const useCharacterStore = defineStore("character", {
 
   getters: {
     equipmentStats(state) {
-      const partials: ItemStats[] = [];
-      for (const instance of Object.values(state.equipped)) {
-        if (!instance) continue;
-        const template = getTemplate(instance.templateId);
-        if (!template) continue;
-        partials.push(
-          getEffectiveStats(
-            template.baseStats,
-            instance.itemLevel,
-            instance.rolls,
-            instance.generatedBaseStats,
-          ),
-        );
-      }
-      return aggregateEquipmentBonuses(partials);
+      return aggregateEquipmentBonuses(collectEquippedPartials(state));
+    },
+
+    /** Сырые очки статов с экипировки (до перевода в доли), для отображения в UI. */
+    equipmentRawPoints(state) {
+      return aggregateEquipmentRawPoints(collectEquippedPartials(state));
     },
 
     inventoryItems(state) {

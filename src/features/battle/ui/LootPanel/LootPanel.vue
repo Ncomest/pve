@@ -118,13 +118,13 @@ const slotIconSrc = (slot: string | undefined) => {
           <div v-if="display.stats.chanceCrit" class="loot-panel__tooltip-stat">
             Крит:
             <span class="loot-panel__tooltip-stat-value">
-              +{{ display.stats.chanceCrit }} крита
+              +{{ display.stats.chanceCrit }}
             </span>
           </div>
           <div v-if="display.stats.evasion" class="loot-panel__tooltip-stat">
             Уклонение:
             <span class="loot-panel__tooltip-stat-value">
-              +{{ display.stats.evasion }} уклонения
+              +{{ display.stats.evasion }}
             </span>
           </div>
           <div v-if="display.stats.speed" class="loot-panel__tooltip-stat">

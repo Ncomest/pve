@@ -5,17 +5,27 @@ import { useCharacterStore } from "@/app/store/character";
 import { computed } from "vue";
 import { PLAYER_CHARACTER } from "@/entities/character/model";
 import { useHeroAvatar } from "@/features/inventory/model/useHeroAvatar";
-import { speedPointsToFraction, armorPointsToFraction } from "@/entities/item/lib/statPoints";
+import {
+  speedPointsToFraction,
+  armorPointsToFraction,
+  accuracyPointsToFraction,
+  critDefensePointsToFraction,
+  lifestealPointsToFraction,
+} from "@/entities/item/lib/statPoints";
 import {
   playerSpeedBaseline,
   speedGearPointsFromTotalSpeedStat,
   applyElixirSpeedPercentToSpeedTotal,
   applyElixirArmorPercentToArmorPoints,
   LEVEL_HP_PER_LEVEL,
+  LEVEL_POWER_PER_LEVEL,
 } from "@/entities/character/lib/playerStatAggregation";
 import { hpPerTickFromSpirit } from "@/features/character/model/usePlayerHp";
 import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
 import "./HeroStats.scss";
+
+/** Интервал тика регенера HP вне боя (сек), см. `usePlayerHp`. */
+const REGEN_TICK_SEC = 10;
 
 const { level, xp, xpToNext, percentToNext } = usePlayerProgress();
 const characterStore = useCharacterStore();
@@ -23,17 +33,42 @@ const elixirsStore = useElixirsStore();
 
 const base = PLAYER_CHARACTER.stats;
 const eq = computed(() => characterStore.equipmentStats);
+const raw = computed(() => characterStore.equipmentRawPoints);
 
-interface StatRow {
-  label: string;
-  base: number;
-  bonus: number;
-  fmt: (v: number) => string;
+/** Итоговая доля 0..1 → строка вида «1%» / «0,25%». */
+function fmtPctFromFraction(fraction: number): string {
+  const p = Math.min(1, Math.max(0, fraction)) * 100;
+  const rounded = Math.round(p * 100) / 100;
+  if (Number.isInteger(rounded)) return `${rounded}%`;
+  return `${rounded.toFixed(2)}%`;
 }
+
+type StatRow =
+  | {
+      kind: "percent";
+      label: string;
+      gearPoints: number;
+      pct: string;
+    }
+  | {
+      kind: "pair";
+      label: string;
+      fromGear: number;
+      total: number;
+    }
+  | {
+      kind: "spirit";
+      label: string;
+      gearPoints: number;
+      hpPerSec: string;
+    };
 
 const statRows = computed<StatRow[]>(() => {
   const hpBonusFromLevel = Math.max(0, level.value - 1) * LEVEL_HP_PER_LEVEL;
   const hpBonusTotal = hpBonusFromLevel + eq.value.hp + elixirsStore.activeHealthPercentBonusApplied;
+  const maxHpTotal = base.maxHp + hpBonusTotal;
+
+  const levelPowerBonus = Math.max(0, level.value - 1) * LEVEL_POWER_PER_LEVEL;
 
   const elixirDef = elixirsStore.activeElixirDef;
   const elixirPowerDelta = elixirDef?.kind === "power" ? elixirDef.powerDelta ?? 0 : 0;
@@ -51,100 +86,113 @@ const statRows = computed<StatRow[]>(() => {
   const equipSpeed = eq.value.speed ?? 0;
   const equipEvasion = eq.value.evasion ?? 0;
   const equipArmor = eq.value.armor ?? 0;
-  const equipAccuracy = eq.value.accuracy ?? 0;
-  const equipCritDef = eq.value.critDefense ?? 0;
-  const equipSpirit = eq.value.spirit ?? 0;
-  const equipLifesteal = eq.value.lifesteal ?? 0;
-
-  const powerBonusFromElixir = elixirPowerDelta;
 
   const critBeforeElixir = (base.chanceCrit ?? 0) + equipCrit;
   const critAfterElixir = Math.min(1, critBeforeElixir + elixirCritPercentBonus);
-  const critDeltaFromElixir = critAfterElixir - critBeforeElixir;
 
   const evasionBeforeElixir = (base.evasion ?? 0) + equipEvasion;
   const evasionAfterElixir = Math.min(1, evasionBeforeElixir + elixirEvasionPercentBonus);
-  const evasionDeltaFromElixir = evasionAfterElixir - evasionBeforeElixir;
 
   const baselineSpeed = playerSpeedBaseline();
-  const baseSpeedPoints = speedGearPointsFromTotalSpeedStat(base.speed ?? baselineSpeed);
   const speedTotalBeforeElixir = (base.speed ?? baselineSpeed) + equipSpeed;
   const speedTotalAfterElixir = applyElixirSpeedPercentToSpeedTotal(
     speedTotalBeforeElixir,
     elixirSpeedPercentBonus,
   );
-  const speedBeforePoints = speedGearPointsFromTotalSpeedStat(speedTotalBeforeElixir);
-  const speedAfterPoints = speedGearPointsFromTotalSpeedStat(speedTotalAfterElixir);
-  const speedDeltaFromElixir = speedAfterPoints - speedBeforePoints;
+  const speedFractionTotal = speedPointsToFraction(
+    speedGearPointsFromTotalSpeedStat(speedTotalAfterElixir),
+  );
 
   const armorBeforePoints = (base.armor ?? 0) + equipArmor;
   const armorAfterPoints = applyElixirArmorPercentToArmorPoints(
     armorBeforePoints,
     elixirArmorPercentBonus,
   );
-  const armorDeltaFromElixir = armorAfterPoints - armorBeforePoints;
+  const armorFractionTotal = armorPointsToFraction(armorAfterPoints);
+
+  const accuracyTotal = Math.min(
+    1,
+    (base.accuracy ?? 0) + accuracyPointsToFraction(raw.value.accuracy),
+  );
+  const critDefTotal = Math.min(
+    1,
+    (base.critDefense ?? 0) + critDefensePointsToFraction(raw.value.critDefense),
+  );
+  const lifestealTotal = Math.min(
+    1,
+    (base.lifesteal ?? 0) + lifestealPointsToFraction(raw.value.lifesteal),
+  );
+
+  const gearSpirit = raw.value.spirit;
+  const totalSpiritPoints =
+    (base.spirit ?? 0) + gearSpirit + elixirsStore.activeSpiritElixirBonus;
+  const hpPerTick = hpPerTickFromSpirit(totalSpiritPoints);
+  const hpPerSec = hpPerTick / REGEN_TICK_SEC;
+  const hpPerSecStr = `${hpPerSec.toLocaleString(undefined, {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+  })} HP/с`;
 
   return [
     {
+      kind: "pair",
       label: "Атака",
-      base: base.power,
-      bonus: equipPower + powerBonusFromElixir,
-      fmt: (v) => String(v),
+      fromGear: equipPower,
+      total: base.power + levelPowerBonus + equipPower + elixirPowerDelta,
     },
     {
+      kind: "pair",
       label: "Здоровье",
-      base: base.maxHp,
-      bonus: hpBonusTotal,
-      fmt: (v) => String(v),
+      fromGear: eq.value.hp,
+      total: maxHpTotal,
     },
     {
+      kind: "percent",
       label: "Скорость",
-      base: baseSpeedPoints,
-      bonus: equipSpeed + speedDeltaFromElixir,
-      fmt: (v) => (speedPointsToFraction(v) * 100).toFixed(2) + "%",
+      gearPoints: Math.round(raw.value.speed),
+      pct: fmtPctFromFraction(speedFractionTotal),
     },
     {
+      kind: "percent",
       label: "Крит",
-      base: base.chanceCrit,
-      bonus: equipCrit + critDeltaFromElixir,
-      fmt: (v) => (v * 100).toFixed(2) + "%",
+      gearPoints: Math.round(raw.value.crit),
+      pct: fmtPctFromFraction(critAfterElixir),
     },
     {
+      kind: "percent",
       label: "Броня",
-      base: base.armor,
-      // В `bonus` включаем и экипировку, и прирост от активного эликсира.
-      bonus: equipArmor + armorDeltaFromElixir,
-      fmt: (v) => (armorPointsToFraction(v) * 100).toFixed(2) + "%",
+      gearPoints: Math.round(raw.value.armor),
+      pct: fmtPctFromFraction(armorFractionTotal),
     },
     {
+      kind: "percent",
       label: "Уклонение",
-      base: base.evasion,
-      bonus: equipEvasion + evasionDeltaFromElixir,
-      fmt: (v) => (v * 100).toFixed(2) + "%",
+      gearPoints: Math.round(raw.value.evasion),
+      pct: fmtPctFromFraction(evasionAfterElixir),
     },
     {
+      kind: "percent",
       label: "Меткость",
-      base: base.accuracy ?? 0,
-      bonus: equipAccuracy,
-      fmt: (v) => (v * 100).toFixed(2) + "%",
+      gearPoints: Math.round(raw.value.accuracy),
+      pct: fmtPctFromFraction(accuracyTotal),
     },
     {
+      kind: "percent",
       label: "Защита от крита",
-      base: base.critDefense ?? 0,
-      bonus: equipCritDef,
-      fmt: (v) => (v * 100).toFixed(2) + "%",
+      gearPoints: Math.round(raw.value.critDefense),
+      pct: fmtPctFromFraction(critDefTotal),
     },
     {
+      kind: "spirit",
       label: "Дух",
-      base: base.spirit ?? 0,
-      bonus: equipSpirit,
-      fmt: (v) => String(Math.round(v)),
+      gearPoints: Math.round(gearSpirit),
+      hpPerSec: hpPerSecStr,
     },
     {
+      kind: "percent",
       label: "Самоисцеление",
-      base: base.lifesteal ?? 0,
-      bonus: equipLifesteal,
-      fmt: (v) => (v * 100).toFixed(2) + "%",
+      gearPoints: Math.round(raw.value.lifesteal),
+      pct: fmtPctFromFraction(lifestealTotal),
     },
   ];
 });
@@ -266,11 +314,18 @@ const currentAvatarSrc = computed(() => selectedSrc());
       >
         <span class="hero-stats__row-label">{{ row.label }}:</span>
         <span class="hero-stats__row-values">
-          <span class="hero-stats__val hero-stats__val--base">{{ row.fmt(row.base) }}</span>
-          <span v-if="row.bonus !== 0" class="hero-stats__val hero-stats__val--bonus">
-            +{{ row.fmt(row.bonus) }}
-          </span>
-          <span class="hero-stats__val hero-stats__val--total">{{ row.fmt(row.base + row.bonus) }}</span>
+          <template v-if="row.kind === 'pair'">
+            <span class="hero-stats__val hero-stats__val--muted">{{ row.fromGear }}</span>
+            <span class="hero-stats__val hero-stats__val--total">{{ Math.round(row.total) }}</span>
+          </template>
+          <template v-else-if="row.kind === 'percent'">
+            <span class="hero-stats__val hero-stats__val--muted">{{ row.gearPoints }}</span>
+            <span class="hero-stats__val hero-stats__val--total">{{ row.pct }}</span>
+          </template>
+          <template v-else>
+            <span class="hero-stats__val hero-stats__val--muted">{{ row.gearPoints }}</span>
+            <span class="hero-stats__val hero-stats__val--total">{{ row.hpPerSec }}</span>
+          </template>
         </span>
       </div>
     </div>
