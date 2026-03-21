@@ -1,12 +1,18 @@
-import { SPIRIT_ELIXIR_BONUS_POINTS, type ElixirDefinition } from "@/features/elixirs/model/elixirs";
+import {
+  DEFAULT_HEAL_FLAT_HP,
+  SPIRIT_ELIXIR_BONUS_POINTS,
+  type ElixirDefinition,
+} from "@/features/elixirs/model/elixirs";
 
 export function getElixirDescription(def: ElixirDefinition): string {
   const durationMinutes = Math.max(1, Math.round(def.durationMs / 60_000));
   const base = `Бафф: ${durationMinutes} минут.\nНе стакается: выпивание сбивает предыдущий.`;
 
   switch (def.kind) {
-    case "heal_flat":
-      return `Восстанавливает 200 HP мгновенно.\nАктивные эликсиры/баффы не сбиваются.`;
+    case "heal_flat": {
+      const hp = def.healFlatHp ?? DEFAULT_HEAL_FLAT_HP;
+      return `Восстанавливает ${hp} HP мгновенно.\nАктивные эликсиры/баффы не сбиваются.`;
+    }
     case "spirit_elixir": {
       const bonus = def.spiritBonus ?? SPIRIT_ELIXIR_BONUS_POINTS;
       return `Временно +${bonus} к духу (сильнее восстановление HP вне боя по формуле духа).\n${base}`;

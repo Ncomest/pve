@@ -13,7 +13,11 @@ import { rarityColor } from "@/entities/item/lib/rarityColor";
 import { SLOT_NAMES, type ItemSlot } from "@/entities/item/model";
 import InventoryGrid from "@/features/inventory/ui/InventoryGrid.vue";
 import ConsumablesGrid from "@/features/inventory/ui/ConsumablesGrid.vue";
-import { ELIXIRS, getElixirDefinition } from "@/features/elixirs/model/elixirs";
+import {
+  DEFAULT_HEAL_FLAT_HP,
+  ELIXIRS,
+  getElixirDefinition,
+} from "@/features/elixirs/model/elixirs";
 import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
 import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
 import "./MerchantPage.scss";
@@ -95,7 +99,7 @@ const selectedElixirDescription = computed(() => {
   const base = `Бафф: 5 минут.\nНе стакается: выпивание сбивает предыдущий.`;
   switch (def.kind) {
     case "heal_flat":
-      return `Восстанавливает 200 HP мгновенно.\nАктивные эликсиры/баффы не сбиваются.`;
+      return `Восстанавливает ${def.healFlatHp ?? DEFAULT_HEAL_FLAT_HP} HP мгновенно.\nАктивные эликсиры/баффы не сбиваются.`;
     case "spirit_elixir":
       return `Временно +${def.spiritBonus ?? 200} к духу (сильнее реген HP вне боя).\n${base}`;
     case "power":
@@ -219,7 +223,7 @@ function getElixirOfferTooltip(elixir: (typeof ELIXIRS)[number]): string {
   lines.push(base.trimEnd());
   switch (def.kind) {
     case "heal_flat":
-      lines.push("Восстанавливает 200 HP мгновенно.");
+      lines.push(`Восстанавливает ${def.healFlatHp ?? DEFAULT_HEAL_FLAT_HP} HP мгновенно.`);
       break;
     case "spirit_elixir":
       lines.push(`Временно +${def.spiritBonus ?? 200} к духу (реген HP вне боя).`);

@@ -3,6 +3,14 @@ import { computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { useBattle } from "@/features/battle/model/useBattle";
 import { useSkillsStore } from "@/app/store/skills";
+import { useCharacterStore } from "@/app/store/character";
+import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
+import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
+import { PLAYER_CHARACTER } from "@/entities/character/model";
+import {
+  buildBossStatRows,
+  buildHeroStatRows,
+} from "@/entities/character/lib/combatStatDisplayRows";
 import { ALL_ABILITIES } from "@/features/abilities/model/abilities";
 import { buildHotkeyString } from "@/shared/lib/hotkey/buildHotkeyString";
 import { CharacterCard } from "@/entities/character/ui";
@@ -22,6 +30,9 @@ const props = defineProps<{
 
 const router = useRouter();
 const skillsStore = useSkillsStore();
+const characterStore = useCharacterStore();
+const playerProgress = usePlayerProgress();
+const elixirsStore = useElixirsStore();
 
 const {
   player,
@@ -65,7 +76,38 @@ const {
   bossCastState,
   bossCastTimeLeftMs,
   bossCastTotalMs,
+  selectedBoss,
 } = useBattle(() => props.bossId);
+
+const playerStatRows = computed(() =>
+  buildHeroStatRows(
+    {
+      base: PLAYER_CHARACTER.stats,
+      level: playerProgress.level.value,
+      equipment: characterStore.equipmentStats,
+      raw: characterStore.equipmentRawPoints,
+      elixirDef: elixirsStore.activeElixirDef,
+      healthPercentBonusHp: elixirsStore.activeHealthPercentBonusApplied,
+      spiritElixirBonus: elixirsStore.activeSpiritElixirBonus,
+    },
+    {
+      attackTotal: playerPower.value,
+      maxHpTotal: player.stats.maxHp,
+      critFraction: playerEffectiveCrit.value,
+      evasionFraction: playerEffectiveEvasion.value,
+      speedStatTotal: playerEffectiveSpeed.value,
+      armorPoints: playerArmor.value,
+      accuracyFraction: player.stats.accuracy ?? 0,
+      critDefenseFraction: player.stats.critDefense ?? 0,
+      lifestealFraction: player.stats.lifesteal ?? 0,
+      spiritPointsTotal: player.stats.spirit ?? 0,
+    },
+  ),
+);
+
+const bossStatRows = computed(() =>
+  buildBossStatRows(selectedBoss.value.stats, boss.stats, bossEffectiveArmor.value),
+);
 
 const powerBoostText = computed(() => {
   if (powerBoostLeftMs.value <= 0) return "";
@@ -216,29 +258,26 @@ onUnmounted(() => {
       <div class="battle-page__stats-panel battle-page__stats-panel--character">
         <h3 class="battle-page__stats-title">Герой</h3>
         <dl class="battle-page__stats-list">
-          <div class="battle-page__stats-row">
-            <dt>Сила</dt>
-            <dd>{{ playerPower }}</dd>
-          </div>
-          <div class="battle-page__stats-row">
-            <dt>Крит</dt>
-            <dd>{{ (playerEffectiveCrit * 100).toFixed(0) }}%</dd>
-          </div>
-          <div class="battle-page__stats-row">
-            <dt>Уклонение</dt>
-            <dd>{{ (playerEffectiveEvasion * 100).toFixed(0) }}%</dd>
-          </div>
-          <div class="battle-page__stats-row">
-            <dt>Скорость</dt>
-            <dd>{{ playerEffectiveSpeed.toFixed(1) }}</dd>
-          </div>
-          <div class="battle-page__stats-row">
-            <dt>Броня</dt>
-            <dd>{{ playerArmor }}</dd>
-          </div>
-          <div class="battle-page__stats-row">
-            <dt>Здоровье</dt>
-            <dd>{{ player.stats.hp }} / {{ player.stats.maxHp }}</dd>
+          <div
+            v-for="row in playerStatRows"
+            :key="'hero-' + row.label"
+            class="battle-page__stats-row"
+          >
+            <dt>{{ row.label }}</dt>
+            <dd class="battle-page__stats-dd">
+              <template v-if="row.kind === 'pair'">
+                <span class="battle-page__stats-muted">{{ row.fromGear }}</span>
+                <span class="battle-page__stats-strong">{{ Math.round(row.total) }}</span>
+              </template>
+              <template v-else-if="row.kind === 'percent'">
+                <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
+                <span class="battle-page__stats-strong">{{ row.pct }}</span>
+              </template>
+              <template v-else>
+                <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
+                <span class="battle-page__stats-strong">{{ row.hpPerSec }}</span>
+              </template>
+            </dd>
           </div>
         </dl>
       </div>
@@ -257,33 +296,26 @@ onUnmounted(() => {
       <div class="battle-page__stats-panel battle-page__stats-panel--boss">
         <h3 class="battle-page__stats-title">{{ boss.name }}</h3>
         <dl class="battle-page__stats-list">
-          <div class="battle-page__stats-row">
-            <dt>Сила</dt>
-            <dd>{{ boss.stats.power }}</dd>
-          </div>
-          <div class="battle-page__stats-row">
-            <dt>Крит</dt>
-            <dd>{{ (boss.stats.chanceCrit * 100).toFixed(0) }}%</dd>
-          </div>
-          <div class="battle-page__stats-row">
-            <dt>Уклонение</dt>
-            <dd>{{ (boss.stats.evasion * 100).toFixed(0) }}%</dd>
-          </div>
-          <div class="battle-page__stats-row">
-            <dt>Меткость</dt>
-            <dd>{{ ((boss.stats.accuracy ?? 0) * 100).toFixed(0) }}%</dd>
-          </div>
-          <div class="battle-page__stats-row">
-            <dt>Защита от крита</dt>
-            <dd>{{ ((boss.stats.critDefense ?? 0) * 100).toFixed(0) }}%</dd>
-          </div>
-          <div class="battle-page__stats-row">
-            <dt>Броня</dt>
-            <dd>{{ bossEffectiveArmor }}</dd>
-          </div>
-          <div class="battle-page__stats-row">
-            <dt>Здоровье</dt>
-            <dd>{{ boss.stats.hp }} / {{ boss.stats.maxHp }}</dd>
+          <div
+            v-for="row in bossStatRows"
+            :key="'boss-' + row.label"
+            class="battle-page__stats-row"
+          >
+            <dt>{{ row.label }}</dt>
+            <dd class="battle-page__stats-dd">
+              <template v-if="row.kind === 'pair'">
+                <span class="battle-page__stats-muted">{{ row.fromGear }}</span>
+                <span class="battle-page__stats-strong">{{ Math.round(row.total) }}</span>
+              </template>
+              <template v-else-if="row.kind === 'percent'">
+                <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
+                <span class="battle-page__stats-strong">{{ row.pct }}</span>
+              </template>
+              <template v-else>
+                <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
+                <span class="battle-page__stats-strong">{{ row.hpPerSec }}</span>
+              </template>
+            </dd>
           </div>
         </dl>
       </div>
@@ -294,62 +326,52 @@ onUnmounted(() => {
         <div class="battle-page__stats-panel battle-page__stats-panel--character">
           <h3 class="battle-page__stats-title">Герой</h3>
           <dl class="battle-page__stats-list">
-            <div class="battle-page__stats-row">
-              <dt>Сила</dt>
-              <dd>{{ playerPower }}</dd>
-            </div>
-            <div class="battle-page__stats-row">
-              <dt>Крит</dt>
-              <dd>{{ (playerEffectiveCrit * 100).toFixed(0) }}%</dd>
-            </div>
-            <div class="battle-page__stats-row">
-              <dt>Уклонение</dt>
-              <dd>{{ (playerEffectiveEvasion * 100).toFixed(0) }}%</dd>
-            </div>
-            <div class="battle-page__stats-row">
-              <dt>Скорость</dt>
-              <dd>{{ playerEffectiveSpeed.toFixed(1) }}</dd>
-            </div>
-            <div class="battle-page__stats-row">
-              <dt>Броня</dt>
-              <dd>{{ playerArmor }}</dd>
-            </div>
-            <div class="battle-page__stats-row">
-              <dt>Здоровье</dt>
-              <dd>{{ player.stats.hp }} / {{ player.stats.maxHp }}</dd>
+            <div
+              v-for="row in playerStatRows"
+              :key="'m-hero-' + row.label"
+              class="battle-page__stats-row"
+            >
+              <dt>{{ row.label }}</dt>
+              <dd class="battle-page__stats-dd">
+                <template v-if="row.kind === 'pair'">
+                  <span class="battle-page__stats-muted">{{ row.fromGear }}</span>
+                  <span class="battle-page__stats-strong">{{ Math.round(row.total) }}</span>
+                </template>
+                <template v-else-if="row.kind === 'percent'">
+                  <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
+                  <span class="battle-page__stats-strong">{{ row.pct }}</span>
+                </template>
+                <template v-else>
+                  <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
+                  <span class="battle-page__stats-strong">{{ row.hpPerSec }}</span>
+                </template>
+              </dd>
             </div>
           </dl>
         </div>
         <div class="battle-page__stats-panel battle-page__stats-panel--boss">
           <h3 class="battle-page__stats-title">{{ boss.name }}</h3>
           <dl class="battle-page__stats-list">
-            <div class="battle-page__stats-row">
-              <dt>Сила</dt>
-              <dd>{{ boss.stats.power }}</dd>
-            </div>
-            <div class="battle-page__stats-row">
-              <dt>Крит</dt>
-              <dd>{{ (boss.stats.chanceCrit * 100).toFixed(0) }}%</dd>
-            </div>
-            <div class="battle-page__stats-row">
-              <dt>Уклонение</dt>
-              <dd>{{ (boss.stats.evasion * 100).toFixed(0) }}%</dd>
-            </div>
-            <div class="battle-page__stats-row">
-              <dt>Меткость</dt>
-              <dd>{{ ((boss.stats.accuracy ?? 0) * 100).toFixed(0) }}%</dd>
-            </div>
-            <div class="battle-page__stats-row">
-              <dt>Защита от крита</dt>
-              <dd>{{ ((boss.stats.critDefense ?? 0) * 100).toFixed(0) }}%</dd>
-            </div>
-            <div class="battle-page__stats-row">
-              <dt>Броня</dt>
-              <dd>{{ bossEffectiveArmor }}</dd>
-            </div>
-            <div class="battle-page__stats-row">
-              <dt>Здоровье</dt>
-              <dd>{{ boss.stats.hp }} / {{ boss.stats.maxHp }}</dd>
+            <div
+              v-for="row in bossStatRows"
+              :key="'m-boss-' + row.label"
+              class="battle-page__stats-row"
+            >
+              <dt>{{ row.label }}</dt>
+              <dd class="battle-page__stats-dd">
+                <template v-if="row.kind === 'pair'">
+                  <span class="battle-page__stats-muted">{{ row.fromGear }}</span>
+                  <span class="battle-page__stats-strong">{{ Math.round(row.total) }}</span>
+                </template>
+                <template v-else-if="row.kind === 'percent'">
+                  <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
+                  <span class="battle-page__stats-strong">{{ row.pct }}</span>
+                </template>
+                <template v-else>
+                  <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
+                  <span class="battle-page__stats-strong">{{ row.hpPerSec }}</span>
+                </template>
+              </dd>
             </div>
           </dl>
         </div>

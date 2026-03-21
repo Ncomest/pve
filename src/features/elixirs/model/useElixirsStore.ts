@@ -6,7 +6,11 @@ import { LEVEL_HP_PER_LEVEL } from "@/entities/character/lib/playerStatAggregati
 import { calcCurrentHp, readHpFromStorage, saveHpSnapshot } from "@/features/character/model/usePlayerHp";
 import { createItemInstance } from "@/entities/item/lib/createInstance";
 import type { ElixirDefinition, ElixirKind } from "./elixirs";
-import { getElixirDefinition, SPIRIT_ELIXIR_BONUS_POINTS } from "./elixirs";
+import {
+  DEFAULT_HEAL_FLAT_HP,
+  getElixirDefinition,
+  SPIRIT_ELIXIR_BONUS_POINTS,
+} from "./elixirs";
 
 type RegenWindow = { startAt: number; endAt: number };
 
@@ -194,7 +198,8 @@ export const useElixirsStore = defineStore("elixirs", {
 
       // "Зелье" (heal_flat) должно только лечить и не сбивать/заменять активные бафф-эликсиры.
       if (def.kind === "heal_flat") {
-        const nextHp = Math.min(currentMaxHpBefore, currentHpBefore + 200);
+        const healAmount = def.healFlatHp ?? DEFAULT_HEAL_FLAT_HP;
+        const nextHp = Math.min(currentMaxHpBefore, currentHpBefore + healAmount);
 
         // Выпиваем 1 шт из стака.
         characterStore.consumeItemFromConsumables(idx, 1);
