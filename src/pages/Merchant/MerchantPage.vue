@@ -48,6 +48,9 @@ const merchantOffers = ref<MerchantOffer[]>([]);
 const heroLevelAtGeneration = ref<number>(playerProgress.level.value);
 const nextRefreshAt = ref<number>(0);
 let autoRefreshTimer: ReturnType<typeof setTimeout> | null = null;
+/** Текущее время для реактивного отображения оставшегося до автообновления интервала */
+const nowForCountdown = ref<number>(Date.now());
+let countdownIntervalId: ReturnType<typeof setInterval> | null = null;
 
 const offersWithDisplay = computed(() =>
   merchantOffers.value.map((offer) => ({
@@ -397,20 +400,39 @@ function refreshManually() {
   showMessage("Товары обновлены.");
 }
 
+function formatCountdownMs(ms: number): string {
+  const totalSec = Math.max(0, Math.floor(ms / 1000));
+  if (totalSec >= 3600) {
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  }
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
 const nextRefreshLabel = computed(() => {
   if (!nextRefreshAt.value) return "";
-  const d = new Date(nextRefreshAt.value);
-  return `Следующее обновление: ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  const left = nextRefreshAt.value - nowForCountdown.value;
+  return `До обновления: ${formatCountdownMs(left)}`;
 });
 
 onMounted(() => {
   loadOrRegenerateOffers();
   if (nextRefreshAt.value) scheduleAutoRefresh();
+  nowForCountdown.value = Date.now();
+  countdownIntervalId = setInterval(() => {
+    nowForCountdown.value = Date.now();
+  }, 1000);
 });
 
 onUnmounted(() => {
   if (autoRefreshTimer) clearTimeout(autoRefreshTimer);
   autoRefreshTimer = null;
+  if (countdownIntervalId) clearInterval(countdownIntervalId);
+  countdownIntervalId = null;
 });
 </script>
 
