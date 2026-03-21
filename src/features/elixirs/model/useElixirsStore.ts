@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { useCharacterStore } from "@/app/store/character";
 import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
 import { PLAYER_CHARACTER } from "@/entities/character/model";
+import { LEVEL_HP_PER_LEVEL } from "@/entities/character/lib/playerStatAggregation";
 import { calcCurrentHp, readHpFromStorage, saveHpSnapshot } from "@/features/character/model/usePlayerHp";
 import { createItemInstance } from "@/entities/item/lib/createInstance";
 import type { ElixirDefinition, ElixirKind } from "./elixirs";
@@ -24,7 +25,7 @@ const getWorldBaseMaxHp = () => {
   const characterStore = useCharacterStore();
   const playerProgress = usePlayerProgress();
 
-  const bonusHp = (playerProgress.level.value - 1) * 20;
+  const bonusHp = Math.max(0, playerProgress.level.value - 1) * LEVEL_HP_PER_LEVEL;
   return PLAYER_CHARACTER.stats.maxHp + bonusHp + characterStore.equipmentStats.hp;
 };
 

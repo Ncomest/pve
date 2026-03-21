@@ -1,11 +1,9 @@
 import type { ItemTemplate, EquipmentSlot, ItemSlot } from "@/entities/item/model";
 
 /**
- * База шаблонов вещей и их статов.
- *
- * Баланс: базовые значения статов меняются в константе BASE ниже.
- * Вес крита/уклонения (очки → %) — в lib/statPoints.ts.
- * Подробнее: см. docs/balance-items.md.
+ * Шаблоны предметов: id, имя, слот, редкость «по умолчанию» для типа.
+ * Числовые статы экипировки с дропа/магазина задаются процедурно (`lib/itemGeneration.ts` + `createInstance.ts` → `generatedBaseStats`), не здесь.
+ * См. docs/balance-items.md, docs/item-level-and-loot.md.
  */
 
 type Rarity = ItemTemplate["rarity"];
@@ -21,30 +19,6 @@ const SLOTS: EquipmentSlot[] = [
   "pants",
   "boots",
   "necklace",
-];
-
-/** Базовые статы для шаблонов (у каждой вещи 3 стата из STAT_COMBOS). hp/power/speed/armor — числа как есть; chanceCrit и evasion — в очках (перевод в % в lib/statPoints.ts). */
-const BASE = {
-  hp: 5,
-  power: 2,
-  chanceCrit: 50,
-  evasion: 25,
-  speed: 50,
-  armor: 50,
-} as const;
-
-/** Комбинации из 3 статов на вещь (менять при добавлении статов в BASE). */
-const STAT_COMBOS: (keyof typeof BASE)[][] = [
-  ["hp", "power", "chanceCrit"],
-  ["hp", "power", "evasion"],
-  ["hp", "power", "speed"],
-  ["hp", "power", "armor"],
-  ["hp", "chanceCrit", "evasion"],
-  ["hp", "chanceCrit", "speed"],
-  ["hp", "chanceCrit", "armor"],
-  ["hp", "evasion", "speed"],
-  ["hp", "evasion", "armor"],
-  ["hp", "speed", "armor"],
 ];
 
 const SLOT_NAMES_RU: Record<EquipmentSlot, string[]> = {
@@ -170,15 +144,6 @@ const SLOT_NAMES_RU: Record<EquipmentSlot, string[]> = {
   ],
 };
 
-function buildBaseStats(combo: (keyof typeof BASE)[]): ItemTemplate["baseStats"] {
-  const baseStats: ItemTemplate["baseStats"] = {};
-  for (const key of combo) {
-    const v = BASE[key];
-    baseStats[key] = v;
-  }
-  return baseStats;
-}
-
 function buildTemplates(): Record<string, ItemTemplate> {
   const out: Record<string, ItemTemplate> = {};
   let rarityIndex = 0;
@@ -195,7 +160,7 @@ function buildTemplates(): Record<string, ItemTemplate> {
         name: names[i],
         slot,
         rarity,
-        baseStats: buildBaseStats(STAT_COMBOS[i]),
+        baseStats: {},
       };
     }
   }

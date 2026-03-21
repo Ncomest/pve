@@ -29,12 +29,15 @@ import { getDisplayItem } from "@/entities/item/model";
 import { createItemInstance } from "@/entities/item/lib/createInstance";
 import type { ItemInstance } from "@/entities/item/model";
 import { useDamageNumbers } from "@/shared/ui/DamageNumbers/useDamageNumbers";
+import { armorPointsToFraction } from "@/entities/item/lib/statPoints";
 import {
-  armorPointsToFraction,
-  speedPointsToFraction,
-  ARMOR_POINTS_TO_FRACTION,
-  SPEED_POINTS_TO_FRACTION,
-} from "@/entities/item/lib/statPoints";
+  buildPlayerCombatStats,
+  cooldownFactorFromSpeed,
+  applyElixirArmorPercentToArmorPoints,
+  applyElixirSpeedPercentToSpeedTotal,
+  playerSpeedBaseline,
+  LEVEL_HP_PER_LEVEL,
+} from "@/entities/character/lib/playerStatAggregation";
 
 /** Тип записи лога боя для цветовой подсветки */
 export type BattleLogEntryType = "player-damage" | "boss-damage" | "player-dodge" | "boss-dodge" | "other";
@@ -51,7 +54,7 @@ const cloneStats = (stats: Stats): Stats => ({
   power: stats.power,
   chanceCrit: stats.chanceCrit,
   evasion: stats.evasion,
-  speed: stats.speed ?? 2,
+  speed: stats.speed ?? playerSpeedBaseline(),
   armor: stats.armor ?? 0,
   accuracy: stats.accuracy ?? 0,
   critDefense: stats.critDefense ?? 0,
@@ -110,29 +113,11 @@ export function useBattle(bossId: () => string | undefined) {
 
   const basePlayerStats = cloneStats(PLAYER_CHARACTER.stats);
 
-  const buildPlayerStatsForLevel = (level: number): Stats => {
-    const bonusHp = (level - 1) * 20;
-    const bonusPower = (level - 1) * 2;
-    const equipStats = characterStore.equipmentStats;
-
-    const baseSpirit = basePlayerStats.spirit ?? 0;
-    return {
-      hp: basePlayerStats.maxHp + bonusHp + equipStats.hp,
-      maxHp: basePlayerStats.maxHp + bonusHp + equipStats.hp,
-      power: basePlayerStats.power + bonusPower + equipStats.power,
-      chanceCrit: Math.min(1, (basePlayerStats.chanceCrit + equipStats.chanceCrit)),
-      evasion: Math.min(1, basePlayerStats.evasion + equipStats.evasion),
-      speed: (basePlayerStats.speed ?? 2) + (equipStats.speed ?? 0),
-      armor: (basePlayerStats.armor ?? 0) + (equipStats.armor ?? 0),
-      accuracy: Math.min(1, (basePlayerStats.accuracy ?? 0) + (equipStats.accuracy ?? 0)),
-      critDefense: Math.min(1, (basePlayerStats.critDefense ?? 0) + (equipStats.critDefense ?? 0)),
-      spirit: baseSpirit + (equipStats.spirit ?? 0),
-      lifesteal: Math.min(1, (basePlayerStats.lifesteal ?? 0) + (equipStats.lifesteal ?? 0)),
-    };
-  };
+  const buildPlayerStatsForLevel = (level: number): Stats =>
+    buildPlayerCombatStats(basePlayerStats, characterStore.equipmentStats, level);
 
   const calcMaxHp = (level: number) => {
-    const bonusHp = (level - 1) * 20;
+    const bonusHp = Math.max(0, level - 1) * LEVEL_HP_PER_LEVEL;
     return basePlayerStats.maxHp + bonusHp + characterStore.equipmentStats.hp;
   };
 
@@ -245,16 +230,10 @@ export function useBattle(bossId: () => string | undefined) {
         player.stats.power += activeElixirDef.powerDelta ?? 0;
         break;
       case "armor_percent":
-        // Эликсир "+X% к броне" интерпретируем так же, как "+X% к криту":
-        // добавляем X процентных пунктов к эффективной доле снижения урона.
-        // Затем переводим эту долю обратно в очки брони.
-        {
-          const armorBonus = activeElixirDef.armorPercentBonus ?? 0;
-          const beforeArmor = player.stats.armor ?? 0;
-          const beforeReduction = armorPointsToFraction(beforeArmor);
-          const afterReduction = Math.min(0.9, beforeReduction + armorBonus);
-          player.stats.armor = Math.round(afterReduction / ARMOR_POINTS_TO_FRACTION);
-        }
+        player.stats.armor = applyElixirArmorPercentToArmorPoints(
+          player.stats.armor ?? 0,
+          activeElixirDef.armorPercentBonus ?? 0,
+        );
         break;
       case "crit_percent":
         player.stats.chanceCrit = Math.min(
@@ -263,16 +242,10 @@ export function useBattle(bossId: () => string | undefined) {
         );
         break;
       case "speed_percent":
-        // Аналогично броне: добавляем X процентных пунктов к доле сокращения кулдаунов.
-        {
-          const speedBonus = activeElixirDef.speedPercentBonus ?? 0;
-          const beforeSpeedTotal = player.stats.speed ?? 2;
-          const beforeSpeedPoints = Math.max(0, beforeSpeedTotal - 2);
-          const beforeReduction = speedPointsToFraction(beforeSpeedPoints);
-          const afterReduction = Math.min(1, beforeReduction + speedBonus);
-          const afterSpeedPoints = afterReduction / SPEED_POINTS_TO_FRACTION;
-          player.stats.speed = afterSpeedPoints + 2;
-        }
+        player.stats.speed = applyElixirSpeedPercentToSpeedTotal(
+          player.stats.speed ?? playerSpeedBaseline(),
+          activeElixirDef.speedPercentBonus ?? 0,
+        );
         break;
       case "health_percent":
         // maxHp уже увеличен на этапе playerHp.init.
@@ -507,18 +480,14 @@ export function useBattle(bossId: () => string | undefined) {
   const GCD_KEY = "__gcd__";
 
   /**
-   * Коэффициент скорости для КД.
-   * Скорость от экипировки хранится как очки и конвертируется в долю:
-   * 50 очков = ~0.25% (см. speedPointsToFraction).
-   * Дополнительные временные баффы (speedBonus) добавляются как проценты.
+   * Коэффициент скорости для КД (см. `cooldownFactorFromSpeed` в playerStatAggregation).
    */
-  const speedFactor = computed(() => {
-    const totalSpeed = player.stats.speed ?? 2;
-    const speedPoints = Math.max(0, totalSpeed - 2);
-    const speedFromPoints = speedPointsToFraction(speedPoints);
-    const totalCooldownReduction = Math.min(0.7, speedFromPoints + speedBonus.value);
-    return 1 - totalCooldownReduction;
-  });
+  const speedFactor = computed(() =>
+    cooldownFactorFromSpeed(
+      player.stats.speed ?? playerSpeedBaseline(),
+      speedBonus.value,
+    ),
+  );
 
   /** GCD с учётом скорости персонажа */
   const GCD_MS = computed(() => Math.round(GCD_BASE_MS * speedFactor.value));
@@ -586,7 +555,7 @@ export function useBattle(bossId: () => string | undefined) {
   );
   /** Эффективная скорость героя (база × (1 + бонус), напр. «Молниеносная вспышка») для отображения */
   const playerEffectiveSpeed = computed(() => {
-    const base = player.stats.speed ?? 2;
+    const base = player.stats.speed ?? playerSpeedBaseline();
     return base * (1 + speedBonus.value);
   });
   /** Броня героя (пока без баффов) */

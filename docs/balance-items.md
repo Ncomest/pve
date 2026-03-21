@@ -8,7 +8,7 @@
 
 **Файлы:** `src/entities/item/lib/itemGeneration.ts` (линии статов по редкости, веса 90/4/3/2/1), `PROC_BASE` в том же файле.
 
-**Файл:** `src/entities/item/items-db.ts` — шаблоны слотов (имена), эликсиры, ресурсы.
+**Файл:** `src/entities/item/items-db.ts` — id/имена/слоты шаблонов экипировки, эликсиры, ресурсы (числовые статы предметов с дропа не задаются здесь — см. `itemGeneration.ts`).
 
 ---
 
@@ -20,7 +20,7 @@
 - Уклонение: как раньше (`EVASION_POINTS_TO_FRACTION`).
 - Броня: **50 очков ≈ 1%** снижения входящего урона (потолок 90%).
 
-Использование: суммирование в `src/app/store/character.ts` (`equipmentStats`), затем перевод в доли для боя и UI.
+**Агрегация по экипировке и слияние с базой героя:** `src/entities/character/lib/playerStatAggregation.ts` (единая точка; стор вызывает оттуда `aggregateEquipmentBonuses`). Подробнее: `docs/player-character-stats.md`.
 
 ---
 
@@ -44,4 +44,5 @@
 |-------------------------|------|
 | Линии статов по редкости | `itemGeneration.ts` |
 | Очки → проценты         | `statPoints.ts`     |
+| Сумма статов с экипировки + база героя | `playerStatAggregation.ts` |
 | Рост от уровня вещи     | `itemLevel.ts`      |

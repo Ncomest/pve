@@ -8,6 +8,7 @@ export interface Character {
   stats: Stats;
 }
 
+/** Стартовые статы; слияние с экипировкой и уровнем — `entities/character/lib/playerStatAggregation.ts`. */
 export const PLAYER_CHARACTER: Character = {
   name: "Герой",
   level: 1,
@@ -17,10 +18,10 @@ export const PLAYER_CHARACTER: Character = {
     hp: 250,
     maxHp: 250,
     power: 20,
-    chanceCrit: 0.05,
-    evasion: 0.05,
-    speed: 2,
-    armor: 5,
+    chanceCrit: 0,
+    evasion: 0,
+    speed: 0,
+    armor: 0,
     accuracy: 0,
     critDefense: 0,
     spirit: 0,

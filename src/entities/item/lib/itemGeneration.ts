@@ -4,8 +4,8 @@ const rng = () => Math.random();
 
 /** Базовые «единицы» для масштабирования линий статов (см. docs/balance-items). */
 export const PROC_BASE: ItemStats = {
-  hp: 5,
-  power: 2,
+  hp: 30,
+  power: 20,
   armor: 50,
   chanceCrit: 50,
   evasion: 25,

@@ -5,12 +5,14 @@ import { useCharacterStore } from "@/app/store/character";
 import { computed } from "vue";
 import { PLAYER_CHARACTER } from "@/entities/character/model";
 import { useHeroAvatar } from "@/features/inventory/model/useHeroAvatar";
+import { speedPointsToFraction, armorPointsToFraction } from "@/entities/item/lib/statPoints";
 import {
-  speedPointsToFraction,
-  armorPointsToFraction,
-  SPEED_POINTS_TO_FRACTION,
-  ARMOR_POINTS_TO_FRACTION,
-} from "@/entities/item/lib/statPoints";
+  playerSpeedBaseline,
+  speedGearPointsFromTotalSpeedStat,
+  applyElixirSpeedPercentToSpeedTotal,
+  applyElixirArmorPercentToArmorPoints,
+  LEVEL_HP_PER_LEVEL,
+} from "@/entities/character/lib/playerStatAggregation";
 import { hpPerTickFromSpirit } from "@/features/character/model/usePlayerHp";
 import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
 import "./HeroStats.scss";
@@ -30,7 +32,7 @@ interface StatRow {
 }
 
 const statRows = computed<StatRow[]>(() => {
-  const hpBonusFromLevel = (level.value - 1) * 20;
+  const hpBonusFromLevel = Math.max(0, level.value - 1) * LEVEL_HP_PER_LEVEL;
   const hpBonusTotal = hpBonusFromLevel + eq.value.hp + elixirsStore.activeHealthPercentBonusApplied;
 
   const elixirDef = elixirsStore.activeElixirDef;
@@ -64,21 +66,22 @@ const statRows = computed<StatRow[]>(() => {
   const evasionAfterElixir = Math.min(1, evasionBeforeElixir + elixirEvasionPercentBonus);
   const evasionDeltaFromElixir = evasionAfterElixir - evasionBeforeElixir;
 
-  // В бою скорость переводится в долю (speedPointsToFraction) по формуле:
-  // speedPoints = speed - 2, поэтому работаем в "очках скорости" (speedPoints).
-  const baseSpeedPoints = Math.max(0, (base.speed ?? 2) - 2);
-  const speedBeforePoints = baseSpeedPoints + equipSpeed;
-  const speedBeforeFraction = speedPointsToFraction(speedBeforePoints);
-  const speedAfterFraction = Math.min(1, speedBeforeFraction + elixirSpeedPercentBonus);
-  const speedAfterPoints = speedAfterFraction / SPEED_POINTS_TO_FRACTION;
+  const baselineSpeed = playerSpeedBaseline();
+  const baseSpeedPoints = speedGearPointsFromTotalSpeedStat(base.speed ?? baselineSpeed);
+  const speedTotalBeforeElixir = (base.speed ?? baselineSpeed) + equipSpeed;
+  const speedTotalAfterElixir = applyElixirSpeedPercentToSpeedTotal(
+    speedTotalBeforeElixir,
+    elixirSpeedPercentBonus,
+  );
+  const speedBeforePoints = speedGearPointsFromTotalSpeedStat(speedTotalBeforeElixir);
+  const speedAfterPoints = speedGearPointsFromTotalSpeedStat(speedTotalAfterElixir);
   const speedDeltaFromElixir = speedAfterPoints - speedBeforePoints;
 
-  // В бою `armor_percent` применяется как прибавка к "доле снижения урона" (armorPointsToFraction),
-  // затем снова переводится в очки брони с округлением.
   const armorBeforePoints = (base.armor ?? 0) + equipArmor;
-  const armorBeforeFraction = armorPointsToFraction(armorBeforePoints);
-  const armorAfterFraction = Math.min(0.9, armorBeforeFraction + elixirArmorPercentBonus);
-  const armorAfterPoints = Math.round(armorAfterFraction / ARMOR_POINTS_TO_FRACTION);
+  const armorAfterPoints = applyElixirArmorPercentToArmorPoints(
+    armorBeforePoints,
+    elixirArmorPercentBonus,
+  );
   const armorDeltaFromElixir = armorAfterPoints - armorBeforePoints;
 
   return [
@@ -147,7 +150,7 @@ const statRows = computed<StatRow[]>(() => {
 });
 
 const getMaxHp = () => {
-  const bonusHp = (level.value - 1) * 20;
+  const bonusHp = Math.max(0, level.value - 1) * LEVEL_HP_PER_LEVEL;
   return (
     PLAYER_CHARACTER.stats.maxHp +
     bonusHp +

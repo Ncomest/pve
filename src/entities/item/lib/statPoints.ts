@@ -10,7 +10,8 @@
  * - 50 очков скорости = 0.25%  =>  0.0025 / 50
  * - 50 очков брони = 1%       =>  0.01 / 50
  *
- * См. также docs/balance-items.md.
+ * См. также docs/balance-items.md и docs/player-character-stats.md.
+ * Суммирование очков с экипировки и слияние с базой героя: `entities/character/lib/playerStatAggregation.ts`.
  */
 export const CRIT_POINTS_TO_FRACTION = 0.0025 / 50; // 50 очков ≈ 0.25%
 export const EVASION_POINTS_TO_FRACTION = 0.0001; // 25 очков ≈ 0.25%

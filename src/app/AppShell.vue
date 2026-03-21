@@ -5,6 +5,7 @@ import { usePlayerProgress } from "@/features/character/model/usePlayerProgress"
 import { hpPerTickFromSpirit, usePlayerHp } from "@/features/character/model/usePlayerHp";
 import { useCharacterStore } from "@/app/store/character";
 import { PLAYER_CHARACTER } from "@/entities/character/model";
+import { LEVEL_HP_PER_LEVEL } from "@/entities/character/lib/playerStatAggregation";
 import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
 import { getElixirDefinition } from "@/features/elixirs/model/elixirs";
 
@@ -18,7 +19,7 @@ const getBaseSpirit = () =>
   (PLAYER_CHARACTER.stats.spirit ?? 0) + (characterStore.equipmentStats.spirit ?? 0);
 
 const getMaxHp = () => {
-  const bonusHp = (level.value - 1) * 20;
+  const bonusHp = Math.max(0, level.value - 1) * LEVEL_HP_PER_LEVEL;
   return (
     PLAYER_CHARACTER.stats.maxHp +
     bonusHp +
