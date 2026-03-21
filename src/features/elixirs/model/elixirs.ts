@@ -1,6 +1,6 @@
 export type ElixirKind =
   | "heal_flat" // +200 HP
-  | "regen_elixir" // усиление регена вне боя
+  | "spirit_elixir" // временно +очки духа (реген вне боя)
   | "power" // +5 к атаке
   | "armor_percent" // +5% к броне
   | "crit_percent" // +5% к криту
@@ -19,14 +19,18 @@ export interface ElixirDefinition {
   icon: string;
   /** Длительность бафа. */
   durationMs: number;
-  /** Дельта для статов (для kind != regen_elixir и != heal_flat может быть undefined). */
+  /** Дельта для статов (для kind != spirit_elixir и != heal_flat может быть undefined). */
   powerDelta?: number;
   armorPercentBonus?: number;
   critPercentBonus?: number;
   speedPercentBonus?: number;
   evasionPercentBonus?: number;
-  regenExtraPerTick?: number; // +N HP за каждый тик 10с (база = 1/10с)
+  /** Временный бонус к духу (реген HP вне боя: 1 + floor((дух)/50) за тик 10с). */
+  spiritBonus?: number;
 }
+
+/** Бонус духа от эликсира духа (единый источник для расчёта регенерации). */
+export const SPIRIT_ELIXIR_BONUS_POINTS = 200;
 
 export const ELIXIR_DURATION_MS = 5 * 60_000;
 
@@ -43,12 +47,12 @@ export const ELIXIRS: ElixirDefinition[] = [
   },
   {
     id: "elixir-regen",
-    name: "Эликсир восстановления",
-    kind: "regen_elixir",
+    name: "Эликсир духа",
+    kind: "spirit_elixir",
     price: 200,
     icon: "/images/elixir/elixir_5.png",
     durationMs: ELIXIR_DURATION_MS,
-    regenExtraPerTick: 3, // 1 -> 4 HP / 10s
+    spiritBonus: SPIRIT_ELIXIR_BONUS_POINTS,
   },
   {
     id: "elixir-power_plus_5",

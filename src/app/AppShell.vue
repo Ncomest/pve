@@ -2,7 +2,7 @@
 import { RouterLink, RouterView, useRoute } from "vue-router";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
-import { usePlayerHp } from "@/features/character/model/usePlayerHp";
+import { hpPerTickFromSpirit, usePlayerHp } from "@/features/character/model/usePlayerHp";
 import { useCharacterStore } from "@/app/store/character";
 import { PLAYER_CHARACTER } from "@/entities/character/model";
 import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
@@ -13,6 +13,9 @@ const characterStore = useCharacterStore();
 characterStore.init();
 
 const elixirsStore = useElixirsStore();
+
+const getBaseSpirit = () =>
+  (PLAYER_CHARACTER.stats.spirit ?? 0) + (characterStore.equipmentStats.spirit ?? 0);
 
 const getMaxHp = () => {
   const bonusHp = (level.value - 1) * 20;
@@ -28,6 +31,8 @@ const { useRealtimeHp } = usePlayerHp();
 const { currentHp, currentMaxHp, hpPct } = useRealtimeHp(
   getMaxHp,
   () => elixirsStore.activeRegenWindow,
+  getBaseSpirit,
+  () => elixirsStore.activeSpiritElixirBonus,
 );
 const isFullHp = computed(() => currentHp.value >= currentMaxHp.value);
 
@@ -37,8 +42,10 @@ const nowMs = ref(Date.now());
 let nowTickerId: ReturnType<typeof setInterval> | null = null;
 
 onMounted(() => {
+  elixirsStore.clearExpiredElixirIfNeeded();
   nowTickerId = window.setInterval(() => {
     nowMs.value = Date.now();
+    elixirsStore.clearExpiredElixirIfNeeded();
   }, 1000);
 });
 
@@ -49,14 +56,12 @@ onBeforeUnmount(() => {
 const regenHintText = computed(() => {
   // Делаем вычисление зависимым от тика, чтобы оно обновлялось.
   nowMs.value;
-  const isRegenActive = elixirsStore.activeRegenWindow != null;
+  const hasSpiritElixir = elixirsStore.activeRegenWindow != null;
+  // Если HP полностью, подсказку регенерации скрываем; при активном эликсире духа оставляем.
+  if (!hasSpiritElixir && isFullHp.value) return "";
 
-  // Если HP полностью, убираем подсказку базового регена.
-  // Но при активном “эликсире восстановления” показываем, чтобы было видно усиление.
-  if (!isRegenActive && isFullHp.value) return "";
-
-  const regenPer10s = isRegenActive ? 4 : 1;
-  return `+${regenPer10s} ед / 10с`;
+  const perTick = hpPerTickFromSpirit(getBaseSpirit() + elixirsStore.activeSpiritElixirBonus);
+  return `+${perTick} ед / 10с`;
 });
 
 const formatRemainingTime = (msLeft: number) => {

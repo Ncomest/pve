@@ -19,6 +19,7 @@ import { usePlayerProgress } from "@/features/character/model/usePlayerProgress"
 import { usePlayerHp } from "@/features/character/model/usePlayerHp";
 import { useCharacterStore } from "@/app/store/character";
 import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
+import { SPIRIT_ELIXIR_BONUS_POINTS } from "@/features/elixirs/model/elixirs";
 import {
   ALL_TEMPLATE_IDS,
   RESOURCE_TEMPLATE_IDS,
@@ -145,13 +146,14 @@ export function useBattle(bossId: () => string | undefined) {
   // Эликсиры могут менять maxHp/статы в бою.
   const healthPercentBonus = elixirsStore.activeHealthPercentBonusApplied;
   const regenWindow = elixirsStore.activeRegenWindow;
+  const spiritElixirBonus = elixirsStore.activeSpiritElixirBonus;
 
   const initialStats = {
     ...basePlayerStatsForRevert,
     maxHp: basePlayerStatsForRevert.maxHp + healthPercentBonus,
     hp: basePlayerStatsForRevert.hp + healthPercentBonus,
   };
-  playerHp.init(initialStats.maxHp, regenWindow, initialStats.spirit ?? 0);
+  playerHp.init(initialStats.maxHp, regenWindow, initialStats.spirit ?? 0, spiritElixirBonus);
 
   const player = reactive({
     name: PLAYER_CHARACTER.name,
@@ -234,8 +236,10 @@ export function useBattle(bossId: () => string | undefined) {
 
     switch (activeElixirDef.kind) {
       case "heal_flat":
-      case "regen_elixir":
-        // Модификаторов боевых статов нет.
+        break;
+      case "spirit_elixir":
+        player.stats.spirit =
+          (player.stats.spirit ?? 0) + (activeElixirDef.spiritBonus ?? SPIRIT_ELIXIR_BONUS_POINTS);
         break;
       case "power":
         player.stats.power += activeElixirDef.powerDelta ?? 0;

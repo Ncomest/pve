@@ -164,14 +164,14 @@ const { currentHp, currentMaxHp, hpPct } = useRealtimeHp(
   getMaxHp,
   () => elixirsStore.activeRegenWindow,
   getSpiritPoints,
+  () => elixirsStore.activeSpiritElixirBonus,
 );
 
 const isFullHp = computed(() => currentHp.value >= currentMaxHp.value);
 const regenHintText = computed(() => {
   if (isFullHp.value) return "";
-  const perTick = hpPerTickFromSpirit(getSpiritPoints());
-  const base = elixirsStore.activeRegenWindow ? perTick + 3 : perTick;
-  return `+${base}/10с`;
+  const perTick = hpPerTickFromSpirit(getSpiritPoints() + elixirsStore.activeSpiritElixirBonus);
+  return `+${perTick}/10с`;
 });
 
 const { avatars, selectedAvatarId, selectedSrc, selectAvatar } = useHeroAvatar();

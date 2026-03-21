@@ -29,7 +29,9 @@ const MAX_CONSUMABLE_STACK_SIZE = 99;
 const STARTING_GOLD = 100;
 
 /** Проверяет, что объект — старый формат вещи (Item с stats без templateId). */
-function isOldFormatItem(value: unknown): value is { id: string; stats?: unknown } {
+function isOldFormatItem(
+  value: unknown,
+): value is { id: string; stats?: unknown } {
   if (!value || typeof value !== "object") return false;
   const o = value as Record<string, unknown>;
   return "stats" in o && !("templateId" in o) && typeof o.id === "string";
@@ -76,7 +78,7 @@ export const useCharacterStore = defineStore("character", {
         armor: 0,
         accuracy: 0,
         critDefense: 0,
-        spirit: 0,
+        spirit: 200,
         lifesteal: 0,
       };
       let critPoints = 0;
@@ -123,7 +125,7 @@ export const useCharacterStore = defineStore("character", {
 
     isEquipped: (state) => (instanceId: string) => {
       return Object.values(state.equipped).some(
-        (inst) => inst?.instanceId === instanceId
+        (inst) => inst?.instanceId === instanceId,
       );
     },
 
@@ -142,8 +144,14 @@ export const useCharacterStore = defineStore("character", {
 
       // Убедимся, что новое поле `consumables` присутствует при старых сохранениях
       // (pinia-plugin-persistedstate может подставлять только то, что было раньше).
-      if (!this.consumables || this.consumables.length !== MAX_CONSUMABLES_SIZE) {
-        this.consumables = Array.from({ length: MAX_CONSUMABLES_SIZE }, () => null);
+      if (
+        !this.consumables ||
+        this.consumables.length !== MAX_CONSUMABLES_SIZE
+      ) {
+        this.consumables = Array.from(
+          { length: MAX_CONSUMABLES_SIZE },
+          () => null,
+        );
       }
 
       // Миграция инвентаря:
@@ -196,7 +204,10 @@ export const useCharacterStore = defineStore("character", {
           if (!existing) break;
 
           const existingCount = existing.count ?? 1;
-          const canAdd = Math.min(MAX_CONSUMABLE_STACK_SIZE - existingCount, remainingToAdd);
+          const canAdd = Math.min(
+            MAX_CONSUMABLE_STACK_SIZE - existingCount,
+            remainingToAdd,
+          );
           existing.count = existingCount + canAdd;
           remainingToAdd -= canAdd;
           continue;

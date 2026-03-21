@@ -96,8 +96,8 @@ const selectedElixirDescription = computed(() => {
   switch (def.kind) {
     case "heal_flat":
       return `Восстанавливает 200 HP мгновенно.\nАктивные эликсиры/баффы не сбиваются.`;
-    case "regen_elixir":
-      return `Восстановление вне боя: 1 → 4 HP каждые 10с (плюс 3 HP/10с).\n${base}`;
+    case "spirit_elixir":
+      return `Временно +${def.spiritBonus ?? 200} к духу (сильнее реген HP вне боя).\n${base}`;
     case "power":
       return `Увеличивает атаку: +${def.powerDelta ?? 5}.\n${base}`;
     case "armor_percent":
@@ -221,8 +221,8 @@ function getElixirOfferTooltip(elixir: (typeof ELIXIRS)[number]): string {
     case "heal_flat":
       lines.push("Восстанавливает 200 HP мгновенно.");
       break;
-    case "regen_elixir":
-      lines.push("Реген вне боя: 1 → 4 HP/10с (плюс 3 HP/10с).");
+    case "spirit_elixir":
+      lines.push(`Временно +${def.spiritBonus ?? 200} к духу (реген HP вне боя).`);
       break;
     case "power":
       lines.push(`Атака +${def.powerDelta ?? 5}.`);

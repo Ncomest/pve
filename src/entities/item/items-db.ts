@@ -219,7 +219,7 @@ const ELIXIR_TEMPLATES: Record<string, ItemTemplate> = {
   },
   "elixir-regen": {
     id: "elixir-regen",
-    name: "Эликсир восстановления",
+    name: "Эликсир духа",
     slot: ELIXIR_TEMPLATE_SLOT,
     rarity: "common",
     baseStats: {},

@@ -5,7 +5,7 @@ import { PLAYER_CHARACTER } from "@/entities/character/model";
 import { calcCurrentHp, readHpFromStorage, saveHpSnapshot } from "@/features/character/model/usePlayerHp";
 import { createItemInstance } from "@/entities/item/lib/createInstance";
 import type { ElixirDefinition, ElixirKind } from "./elixirs";
-import { getElixirDefinition } from "./elixirs";
+import { getElixirDefinition, SPIRIT_ELIXIR_BONUS_POINTS } from "./elixirs";
 
 type RegenWindow = { startAt: number; endAt: number };
 
@@ -28,8 +28,13 @@ const getWorldBaseMaxHp = () => {
   return PLAYER_CHARACTER.stats.maxHp + bonusHp + characterStore.equipmentStats.hp;
 };
 
+const getWorldBaseSpirit = () => {
+  const characterStore = useCharacterStore();
+  return (PLAYER_CHARACTER.stats.spirit ?? 0) + (characterStore.equipmentStats.spirit ?? 0);
+};
+
 function getActiveRegenWindow(kind: ElixirKind, startAt: number | null, endAt: number | null): RegenWindow | null {
-  if (kind !== "regen_elixir") return null;
+  if (kind !== "spirit_elixir") return null;
   if (startAt == null || endAt == null) return null;
   const now = Date.now();
   if (now >= endAt) return null;
@@ -70,6 +75,13 @@ export const useElixirsStore = defineStore("elixirs", {
       return getActiveRegenWindow(def.kind, state.activeElixirStartAt, state.activeElixirEndAt);
     },
 
+    /** Бонус духа от активного эликсира духа (0, если бафа нет). */
+    activeSpiritElixirBonus(): number {
+      const def = this.activeElixirDef;
+      if (!def || def.kind !== "spirit_elixir") return 0;
+      return def.spiritBonus ?? SPIRIT_ELIXIR_BONUS_POINTS;
+    },
+
     activeHealthPercentBonusApplied(state): number {
       if (!state.activeElixirId || state.activeElixirEndAt == null) return 0;
       if (Date.now() >= state.activeElixirEndAt) return 0;
@@ -94,6 +106,16 @@ export const useElixirsStore = defineStore("elixirs", {
   },
 
   actions: {
+    /**
+     * Геттеры с `Date.now()` в Pinia не пересчитываются со временем (время не реактивно).
+     * Сбрасываем истёкший эликсир в state, чтобы UI и расчёт HP совпадали с реальностью.
+     */
+    clearExpiredElixirIfNeeded(): void {
+      if (this.activeElixirEndAt == null) return;
+      if (Date.now() < this.activeElixirEndAt) return;
+      this.clear();
+    },
+
     buyElixir(elixirId: string): { ok: boolean; reason?: string } {
       const def = getElixirDefinition(elixirId);
       if (!def) return { ok: false, reason: "Неизвестный эликсир." };
@@ -113,6 +135,8 @@ export const useElixirsStore = defineStore("elixirs", {
     },
 
     drinkElixir(elixirId: string): { ok: boolean; reason?: string } {
+      this.clearExpiredElixirIfNeeded();
+
       const characterStore = useCharacterStore();
       const def = getElixirDefinition(elixirId);
       if (!def) return { ok: false, reason: "Неизвестный эликсир." };
@@ -135,15 +159,21 @@ export const useElixirsStore = defineStore("elixirs", {
       const defBefore = activeIdBefore && oldActive ? getElixirDefinition(activeIdBefore) : null;
 
       const isHealthPercentBefore = defBefore?.kind === "health_percent";
-      const isRegenBefore = defBefore?.kind === "regen_elixir";
+      const isSpiritElixirBefore = defBefore?.kind === "spirit_elixir";
 
       const currentMaxHpBefore = isHealthPercentBefore
         ? baseMaxHp + this.activeHealthPercentBonusHp
         : baseMaxHp;
 
-      const regenWindowBefore: RegenWindow | null = isRegenBefore
+      const regenWindowBefore: RegenWindow | null = isSpiritElixirBefore
         ? { startAt: this.activeElixirStartAt ?? now, endAt: this.activeElixirEndAt ?? now }
         : null;
+
+      const baseSpiritBefore = getWorldBaseSpirit();
+      const spiritElixirBonusBefore =
+        isSpiritElixirBefore && defBefore
+          ? defBefore.spiritBonus ?? SPIRIT_ELIXIR_BONUS_POINTS
+          : 0;
 
       const snapshot = readHpFromStorage();
       const snapBase = snapshot ?? {
@@ -152,7 +182,14 @@ export const useElixirsStore = defineStore("elixirs", {
         savedAt: now,
       };
 
-      const currentHpBefore = calcCurrentHp(snapBase, now, currentMaxHpBefore, regenWindowBefore);
+      const currentHpBefore = calcCurrentHp(
+        snapBase,
+        now,
+        currentMaxHpBefore,
+        regenWindowBefore,
+        baseSpiritBefore,
+        spiritElixirBonusBefore,
+      );
 
       // "Зелье" (heal_flat) должно только лечить и не сбивать/заменять активные бафф-эликсиры.
       if (def.kind === "heal_flat") {

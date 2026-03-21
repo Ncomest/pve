@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import App from "./app/App.vue";
 import { routes } from "./app/router";
 import { pinia } from "./app/store";
+import { useElixirsStore } from "./features/elixirs/model/useElixirsStore";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
@@ -22,4 +23,7 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0, left: 0 }),
 });
 
-createApp(App).use(pinia).use(router).component("FontAwesomeIcon", FontAwesomeIcon).mount("#app");
+const app = createApp(App);
+app.use(pinia);
+useElixirsStore().clearExpiredElixirIfNeeded();
+app.use(router).component("FontAwesomeIcon", FontAwesomeIcon).mount("#app");
