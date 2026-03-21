@@ -1549,11 +1549,10 @@ export function useBattle(bossId: () => string | undefined) {
       return { hit: false };
     }
 
-    const effectiveEvasion =
-      ability.requiredDefensiveTag === "full-dodge"
-        ? 0
-        : Math.min(1, player.stats.evasion + playerEvasionBonus.value);
-    const defenderStats: Stats = { ...player.stats, evasion: effectiveEvasion };
+    // Уклонение от статов и «Ускользание» не действуют против кастуемых способностей босса
+    // (только автоатака босса проверяется через evasion). У приёмов с full-dodge уклонение —
+    // только через способность «Уворот» (ветка выше).
+    const defenderStats: Stats = { ...player.stats, evasion: 0 };
     const attacker: Stats = {
       ...boss.stats,
       power: getBossEffectivePower() * (ability.baseDamageX ?? 1),
@@ -2407,19 +2406,18 @@ export function useBattle(bossId: () => string | undefined) {
         applyBossAbilityHit(ability);
         break;
       }
-      case "eat-apple": {
-        const healAmount = ability.value ?? 0;
-        if (healAmount <= 0) return;
-        const before = boss.stats.hp;
-        boss.stats.hp += healAmount;
-        clampHp(boss.stats);
-        const healed = boss.stats.hp - before;
-        if (healed > 0) {
-          pushLog(`${ability.name}: босс восстанавливает ${healed} HP.`);
-        }
-        break;
-      }
       default: {
+        if (ability.type === "heal" && (ability.value ?? 0) > 0) {
+          const healAmount = ability.value ?? 0;
+          const before = boss.stats.hp;
+          boss.stats.hp += healAmount;
+          clampHp(boss.stats);
+          const healed = boss.stats.hp - before;
+          if (healed > 0) {
+            pushLog(`${ability.name}: босс восстанавливает ${healed} HP.`);
+          }
+          break;
+        }
         if (ability.type === "damage" && ability.baseDamageX != null) {
           applyBossAbilityHit(ability);
         }
