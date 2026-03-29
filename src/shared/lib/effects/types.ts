@@ -1,7 +1,7 @@
 /**
  * Активный эффект в бою (бафф или дебафф) с оставшимся временем действия.
  */
-export type DebuffType = "ground" | "poison" | "curse" | "burn" | "other" | "bleed";
+export type DebuffType = "ground" | "poison" | "curse" | "burn" | "bleed";
 
 export interface ActiveEffect {
   id: string;

@@ -45,7 +45,7 @@ export type BossDefensiveTag = "full-dodge" | "block" | "heavy-mitigation" | "ic
 export interface BossAbility {
   id: string;
   name: string;
-  type: "damage" | "heal" | "buff";
+  type: "damage" | "heal" | "buff" | 'damage-dot' | 'heal-hot' | 'absord';
   icon?: string;
   cooldownMs: number;
   castTimeMs: number;
@@ -59,7 +59,7 @@ export interface BossAbility {
   dotTickIntervalMs?: number;
   dotDamagePerTick?: number;
   debuffRequiresCleanse?: boolean;
-  debuffType?: "poison" | "curse" | "burn" | "ground" | "other";
+  debuffType?: "poison" | "curse" | "burn" | "ground" | "bleed";
 
   // Бафы на боссе
   selfBuffType?: "damage" | "evasion" | "armor" | "thorns" | "lifesteal";

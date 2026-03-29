@@ -28,7 +28,7 @@ const props = defineProps<{
   castCategory?: BossAbilityCategory;
   castCanBeInterrupted?: boolean;
   castRequiredTag?: BossDefensiveTag;
-  castDebuffType?: "poison" | "curse" | "burn" | "ground" | "other";
+  castDebuffType?: "poison" | "curse" | "burn" | "ground" | "bleed";
 }>();
 
 const attackCooldownProgress = computed(() => {

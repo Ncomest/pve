@@ -6,7 +6,7 @@ const SELL_PRICE_BY_RARITY: Record<string, number> = {
   uncommon: 25,
   rare: 45,
   epic: 120,
-  unique: 300,
+  unique: 180,
   legendary: 300,
 };
 
