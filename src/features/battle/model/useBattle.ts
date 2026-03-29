@@ -44,7 +44,7 @@ import {
   playerSpeedBaseline,
   LEVEL_HP_PER_LEVEL,
 } from "@/entities/character/lib/playerStatAggregation";
-import { useDotEffectNotStack } from "./ability-effects/dotEffectNotStack";
+import { useDotEffectNotStack } from "./ability-effects/useDotEffectNotStack";
 
 /** Тип записи лога боя для цветовой подсветки */
 export type BattleLogEntryType =
