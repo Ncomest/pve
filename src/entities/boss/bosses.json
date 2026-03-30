@@ -197,7 +197,7 @@
       {
         "id": "pack-bite",
         "name": "Укус хлореллы",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/bite.png",
         "cooldownMs": 20000,
         "castTimeMs": 2800,
@@ -260,12 +260,12 @@
         "selfBuffType": "damage",
         "selfBuffValue": 3,
         "selfBuffDurationMs": 11000,
-        "dispellable": true
+        "dispellable": false
       },
       {
         "id": "infected-bite",
         "name": "Зараженный укус",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/bite.png",
         "cooldownMs": 20000,
         "castTimeMs": 3000,
@@ -398,7 +398,7 @@
       {
         "id": "poison-blade",
         "name": "Перегрызть",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/tooth.png",
         "cooldownMs": 21000,
         "castTimeMs": 3000,
@@ -545,7 +545,7 @@
       {
         "id": "pack-bite",
         "name": "Укус стаи",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/bite.png",
         "cooldownMs": 15000,
         "castTimeMs": 2500,
@@ -690,7 +690,7 @@
       {
         "id": "poison-blade",
         "name": "Клыки гадюки",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/bite.png",
         "cooldownMs": 21000,
         "castTimeMs": 3000,
@@ -779,7 +779,7 @@
       {
         "id": "poison-blade",
         "name": "Ядовитый клинок",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/potion_4.png",
         "cooldownMs": 20000,
         "castTimeMs": 3000,
@@ -922,7 +922,7 @@
       {
         "id": "poison-blade",
         "name": "Чумной плевок",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/nose.png",
         "cooldownMs": 20000,
         "castTimeMs": 2800,
@@ -1011,7 +1011,7 @@
       {
         "id": "fire-bolt",
         "name": "Огненный болт",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/arrow_1.png",
         "cooldownMs": 16000,
         "castTimeMs": 3000,
@@ -1104,7 +1104,7 @@
       {
         "id": "fire-bolt",
         "name": "Горящая стрела",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/firebolt.png",
         "cooldownMs": 18000,
         "castTimeMs": 3000,
@@ -1299,7 +1299,7 @@
       {
         "id": "hex-curse",
         "name": "Проклятье мага",
-        "type": "damage",
+        "type": "debuff",
         "icon": "/images/bosses/icons/special/curse_1.png",
         "cooldownMs": 22000,
         "castTimeMs": 3000,
@@ -1353,7 +1353,7 @@
       {
         "id": "fire-bolt",
         "name": "Искра",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/firebolt.png",
         "cooldownMs": 14000,
         "castTimeMs": 2800,
@@ -1434,7 +1434,7 @@
       {
         "id": "shaman-curse",
         "name": "Проклятье степей",
-        "type": "damage",
+        "type": "debuff",
         "icon": "/images/bosses/icons/special/curse_2.png",
         "cooldownMs": 23000,
         "castTimeMs": 3200,
@@ -1461,7 +1461,7 @@
       {
         "id": "fireball",
         "name": "Огненный шар",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/fire_breath.png",
         "cooldownMs": 17000,
         "castTimeMs": 3000,
@@ -1530,7 +1530,7 @@
       {
         "id": "bear-hug",
         "name": "Медвежья хватка",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/bear_bite.png",
         "cooldownMs": 18000,
         "castTimeMs": 3000,
@@ -1624,7 +1624,7 @@
       {
         "id": "bear-hug",
         "name": "Хватка тролля",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/bear_bite.png",
         "cooldownMs": 22000,
         "castTimeMs": 3200,
@@ -1706,7 +1706,7 @@
       {
         "id": "fire-breath",
         "name": "Жар",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/fire_breath.png",
         "cooldownMs": 20000,
         "castTimeMs": 3200,
@@ -1836,7 +1836,7 @@
       {
         "id": "poison-flask",
         "name": "Ядовитая колба",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/potion_5.png",
         "cooldownMs": 24000,
         "castTimeMs": 3000,
@@ -1955,7 +1955,7 @@
       {
         "id": "poison-flask",
         "name": "Флакон с ядом",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/potion_5.png",
         "cooldownMs": 24000,
         "castTimeMs": 3000,
@@ -2340,7 +2340,7 @@
       {
         "id": "fire-breath",
         "name": "Огненное дыхание",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/fire_breath.png",
         "cooldownMs": 18000,
         "castTimeMs": 3500,
@@ -2369,16 +2369,15 @@
       {
         "id": "ancient-curse",
         "name": "Древнее проклятие",
-        "type": "damage",
+        "type": "debuff",
         "icon": "/images/bosses/icons/special/curse_2.png",
         "cooldownMs": 28000,
         "castTimeMs": 3500,
         "category": "persistent_debuff",
-        "canBeInterrupted": true,
-        "debuffRequiresCleanse": true,
-        "debuffType": "curse",
-        "description": "Накладывает древнее проклятие, ослабляющее героя. Снимается Cleanse",
-        "baseDamageX": 0.8
+        "requiredDefensiveTag": "teleport",
+        "description": "Проклинает область под героем. Снижает все статы на 10%. Можно снять только телепортом",
+        "dotDurationMs": 30000,
+        "value": 0.1
       },
       {
         "id": "scale-armor",
@@ -2514,7 +2513,7 @@
       {
         "id": "fire-breath",
         "name": "Тройное дыхание",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/fire_breath.png",
         "cooldownMs": 18000,
         "castTimeMs": 3500,
@@ -2530,7 +2529,7 @@
       {
         "id": "poison-flask",
         "name": "Три укуса",
-        "type": "damage",
+        "type": "debuff-dot",
         "icon": "/images/bosses/icons/special/bite.png",
         "cooldownMs": 19000,
         "castTimeMs": 3000,

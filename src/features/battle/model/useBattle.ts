@@ -44,7 +44,8 @@ import {
   playerSpeedBaseline,
   LEVEL_HP_PER_LEVEL,
 } from "@/entities/character/lib/playerStatAggregation";
-import { useDotEffectNotStack } from "./ability-effects/useDotEffectNotStack";
+import { useOnPlayerDotEffectNotStack } from "./ability-effects/useOnPlayerDotEffectNotStack";
+import { useBossBuffEffectNotStack } from "./ability-effects/useBossBuffEffectNotStack";
 
 /** Тип записи лога боя для цветовой подсветки */
 export type BattleLogEntryType =
@@ -324,9 +325,6 @@ export function useBattle(bossId: () => string | undefined) {
 
   /** Баф брони босса от «Тайный барьер» гоблина-мага */
   let arcaneShieldTimeoutId: ReturnType<typeof setTimeout> | null = null;
-
-  // TODO: Убрать выше все ненужные таймауты
-  const bossBuffTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
   /*======================================== */
 
@@ -661,29 +659,27 @@ export function useBattle(bossId: () => string | undefined) {
 
   // TODO: Убрать все ненужные очистки бафов с босса
   // Очистка бафов с босса
-  const clearBuffFromBoss = (abilityId: string) => {
-    const timeoutId = bossBuffTimeouts.get(abilityId);
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-      bossBuffTimeouts.delete(abilityId);
-    }
-    // Удаляем бафф из массива
-    bossBuffs.value = bossBuffs.value.filter((e) => e.id !== abilityId);
-  };
+  // const clearBuffFromBoss = (abilityId: string) => {
+  //   const timeoutId = bossBuffTimeouts.get(abilityId);
+  //   if (timeoutId) {
+  //     clearTimeout(timeoutId);
+  //     bossBuffTimeouts.delete(abilityId);
+  //   }
+  //   // Удаляем бафф из массива
+  //   bossBuffs.value = bossBuffs.value.filter((e) => e.id !== abilityId);
+  // };
 
-  const clearAllBossBuffs = () => {
-    // 1. Очищаем все таймауты из Map и сам Map
-    // TODO: откуда идет timeoutId?
-    bossBuffTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
-    bossBuffTimeouts.clear();
+  // const clearAllBossBuffs = () => {
+  //   // 1. Очищаем все таймауты из Map и сам Map
+  //   // TODO: откуда идет timeoutId?
+  //   bossBuffTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+  //   bossBuffTimeouts.clear();
 
-    // 2. Очищаем массив баффов/дебаффов на боссе
-    bossBuffs.value = [];
-  };
+  //   // 2. Очищаем массив баффов/дебаффов на боссе
+  //   bossBuffs.value = [];
+  // };
 
   // ========================== //
-
-
   const clearArcaneShieldBuff = () => {
     if (arcaneShieldTimeoutId !== null) {
       clearTimeout(arcaneShieldTimeoutId);
@@ -1723,45 +1719,16 @@ export function useBattle(bossId: () => string | undefined) {
     switch (ability.type) {
       case "buff": {
         if (
-          ability.selfBuffType === "damage" &&
+          ability.selfBuffType !== undefined &&
           ability.selfBuffDurationMs &&
           ability.selfBuffValue != null
         ) {
-          const durationMs = ability.selfBuffDurationMs;
-          const endTime = Date.now() + durationMs;
-
-          // Отменяем предыдущий таймаут и удаляем старую запись баффа
-          clearBuffFromBoss(ability.id);
-
-          // Добавляем новый бафф в массив
-          bossBuffs.value = [
-            ...bossBuffs.value,
-            {
-              id: ability.id,
-              name: ability.name,
-              icon: ability.icon ?? "IconPowerBoost",
-              durationSeconds: durationMs / 1000,
-              endTime,
-              dispellable: ability.dispellable ?? true,
-            },
-          ];
-
-          // Устанавливаем новый таймаут
-          const timeoutId = window.setTimeout(() => {
-            clearBuffFromBoss(ability.id);
-          }, durationMs);
-
-          // Сохраняем идентификатор таймаута
-          bossBuffTimeouts.set(ability.id, timeoutId);
-
-          pushLog(
-            `${ability.name}: ${ability.description} на ${durationMs / 1000}с.`,
-          );
+          useBossBuffEffectNotStack(ability, bossBuffs, pushLog, isBattleOver);
         }
 
         break;
       }
-      case "damage-dot": {
+      case "debuff-dot": {
         const result = applyBossAbilityHit(ability);
         if (!result.hit) return;
 
@@ -1770,7 +1737,7 @@ export function useBattle(bossId: () => string | undefined) {
           ability.dotTickIntervalMs &&
           ability.dotDamagePerTick
         ) {
-          const { dotEffectNotStack } = useDotEffectNotStack(
+          const { dotEffectNotStack } = useOnPlayerDotEffectNotStack(
             ability,
             playerDebuffs,
             isBattleOver,
@@ -1787,12 +1754,39 @@ export function useBattle(bossId: () => string | undefined) {
         break;
       }
       case "heal": {
+        if ((ability.value ?? 0) > 0) {
+          const healAmount = ability.value ?? 0;
+          const before = boss.stats.hp;
+          boss.stats.hp += healAmount;
+          clampHp(boss.stats);
+          const healed = boss.stats.hp - before;
+
+          if (healed > 0) {
+            pushLog(`${ability.name}: босс восстанавливает ${healed} HP.`);
+          }
+        }
+
         break;
       }
       case "heal-hot": {
         break;
       }
       case "absord": {
+        break;
+      }
+      // TODO: Добавить эффекты для дебаффов
+      case "debuff": {
+        if (ability.debuffType === "curse") {
+          const { dotEffectNotStack } = useOnPlayerDotEffectNotStack(
+            ability,
+            playerDebuffs,
+            isBattleOver,
+            applyDamageFromBoss,
+            spawnPlayerDmg,
+            pushLog,
+          );
+          dotEffectNotStack();
+        }
         break;
       }
       default: {
@@ -1802,57 +1796,56 @@ export function useBattle(bossId: () => string | undefined) {
     }
 
     // TODO: убрать после рефактора кода
-    switch (ability.id) {
-      
-      case "arcane-shield": {
-        if (
-          ability.selfBuffType === "armor" &&
-          ability.selfBuffDurationMs &&
-          ability.selfBuffValue != null
-        ) {
-          clearArcaneShieldBuff();
-          const durationMs = ability.selfBuffDurationMs;
-          const endTime = Date.now() + durationMs;
-          bossBuffs.value = [
-            ...bossBuffs.value.filter((e) => e.id !== "arcane-shield"),
-            {
-              id: "arcane-shield",
-              name: ability.name,
-              icon: ability.icon ?? "IconArmorBreak",
-              durationSeconds: durationMs / 1000,
-              endTime,
-              dispellable: ability.dispellable ?? true,
-            },
-          ];
-          arcaneShieldTimeoutId = window.setTimeout(() => {
-            clearArcaneShieldBuff();
-          }, durationMs);
-          pushLog(
-            `${ability.name}: броня босса увеличена на ${Math.round(
-              (ability.selfBuffValue ?? 0) * 100,
-            )}% на ${durationMs / 1000}с.`,
-          );
-        }
-        break;
-      }
-      default: {
-        if (ability.type === "heal" && (ability.value ?? 0) > 0) {
-          const healAmount = ability.value ?? 0;
-          const before = boss.stats.hp;
-          boss.stats.hp += healAmount;
-          clampHp(boss.stats);
-          const healed = boss.stats.hp - before;
-          if (healed > 0) {
-            pushLog(`${ability.name}: босс восстанавливает ${healed} HP.`);
-          }
-          break;
-        }
-        if (ability.type === "damage" && ability.baseDamageX != null) {
-          applyBossAbilityHit(ability);
-        }
-        break;
-      }
-    }
+    // switch (ability.id) {
+    //   case "arcane-shield": {
+    //     if (
+    //       ability.selfBuffType === "armor" &&
+    //       ability.selfBuffDurationMs &&
+    //       ability.selfBuffValue != null
+    //     ) {
+    //       clearArcaneShieldBuff();
+    //       const durationMs = ability.selfBuffDurationMs;
+    //       const endTime = Date.now() + durationMs;
+    //       bossBuffs.value = [
+    //         ...bossBuffs.value.filter((e) => e.id !== "arcane-shield"),
+    //         {
+    //           id: "arcane-shield",
+    //           name: ability.name,
+    //           icon: ability.icon ?? "IconArmorBreak",
+    //           durationSeconds: durationMs / 1000,
+    //           endTime,
+    //           dispellable: ability.dispellable ?? true,
+    //         },
+    //       ];
+    //       arcaneShieldTimeoutId = window.setTimeout(() => {
+    //         clearArcaneShieldBuff();
+    //       }, durationMs);
+    //       pushLog(
+    //         `${ability.name}: броня босса увеличена на ${Math.round(
+    //           (ability.selfBuffValue ?? 0) * 100,
+    //         )}% на ${durationMs / 1000}с.`,
+    //       );
+    //     }
+    //     break;
+    //   }
+    //   default: {
+    //     if (ability.type === "heal" && (ability.value ?? 0) > 0) {
+    //       const healAmount = ability.value ?? 0;
+    //       const before = boss.stats.hp;
+    //       boss.stats.hp += healAmount;
+    //       clampHp(boss.stats);
+    //       const healed = boss.stats.hp - before;
+    //       if (healed > 0) {
+    //         pushLog(`${ability.name}: босс восстанавливает ${healed} HP.`);
+    //       }
+    //       break;
+    //     }
+    //     if (ability.type === "damage" && ability.baseDamageX != null) {
+    //       applyBossAbilityHit(ability);
+    //     }
+    //     break;
+    //   }
+    // }
   };
 
   /** Таймер боя: время с начала битвы в миллисекундах */
@@ -2028,7 +2021,6 @@ export function useBattle(bossId: () => string | undefined) {
     clearBossBleed();
     clearBossArmorDebuff();
     clearPoisonDot("poisonous-bite");
-    clearAllBossBuffs();
     clearArcaneShieldBuff();
 
     bossAbilityLastUsedTurn = {};
@@ -2070,7 +2062,6 @@ export function useBattle(bossId: () => string | undefined) {
       clearBossArmorDebuff();
       clearPoisonDot("poisonous-bite");
       clearArcaneShieldBuff();
-      clearAllBossBuffs();
       stopBattleTimer();
       if (elixirRevertTimeoutId !== null) {
         clearTimeout(elixirRevertTimeoutId);
@@ -2161,10 +2152,6 @@ export function useBattle(bossId: () => string | undefined) {
     if (nextBossAbilityTimeoutId !== null) {
       window.clearTimeout(nextBossAbilityTimeoutId);
     }
-
-    // TODO: Почистить выше все ненужные таймауты
-    // Очищаем все активные таймауты баффов босса
-    clearAllBossBuffs();
   });
 
   const abilityButtons = computed(() => ABILITIES);

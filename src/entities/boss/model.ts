@@ -40,12 +40,12 @@ export type BossAbilityCategory =
   | "persistent_debuff"
   | "self_buff";
 
-export type BossDefensiveTag = "full-dodge" | "block" | "heavy-mitigation" | "ice-wall";
+export type BossDefensiveTag = "full-dodge" | "block" | "heavy-mitigation" | "ice-wall" | "teleport";
 
 export interface BossAbility {
   id: string;
   name: string;
-  type: "damage" | "heal" | "buff" | 'damage-dot' | 'heal-hot' | 'absord';
+  type: "damage" | "heal" | "buff" | 'debuff-dot' | 'heal-hot' | 'absord' | 'debuff';
   icon?: string;
   cooldownMs: number;
   castTimeMs: number;

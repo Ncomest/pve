@@ -4,7 +4,7 @@ import { DamageNumberType } from "@/shared/ui/DamageNumbers/useDamageNumbers";
 import { onUnmounted, type Ref } from "vue";
 import { BattleLogEntryType } from "../useBattle";
 
-export const useDotEffectNotStack = (
+export const useOnPlayerDotEffectNotStack = (
   ability: BossAbility,
   playerDebuffs: Ref<ActiveEffect[]>,
   isBattleOver: Ref<boolean>,
@@ -54,7 +54,7 @@ export const useDotEffectNotStack = (
         icon: ability.icon ?? "IconBleed",
         durationSeconds: durationMs / 1000,
         endTime,
-        debuffType: "curse",
+        debuffType: "bleed",
       },
     ];
 

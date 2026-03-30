@@ -1,104 +1,120 @@
 <script setup lang="ts">
-import { computed } from "vue";
- import type { ActiveEffect } from "@/shared/lib/effects/types";
- import type { BossAbilityCategory, BossDefensiveTag } from "@/entities/boss/model";
-import { EffectSlots } from "@/shared/ui/EffectSlots";
-import { HealthBar } from "@/shared/ui/HealthBar";
-import CooldownOverlay from "@/shared/ui/CooldownOverlay/CooldownOverlay.vue";
-import "./BossCard.scss";
+  import { computed } from "vue";
+  import type { ActiveEffect } from "@/shared/lib/effects/types";
+  import type {
+    BossAbilityCategory,
+    BossDefensiveTag,
+  } from "@/entities/boss/model";
+  import { EffectSlots } from "@/shared/ui/EffectSlots";
+  import { HealthBar } from "@/shared/ui/HealthBar";
+  import CooldownOverlay from "@/shared/ui/CooldownOverlay/CooldownOverlay.vue";
+  import "./BossCard.scss";
 
-const props = defineProps<{
-  name: string;
-  level: number;
-  hp: number;
-  maxHp: number;
-  hpPercent: number;
-  power: number;
-  chanceCrit: number;
-  evasion: number;
-  image?: string;
-  buffs?: ActiveEffect[];
-  debuffs?: ActiveEffect[];
-  attackCooldownLeft: number;
-  attackCooldownMax: number;
-  currentAbilityName?: string;
-  currentAbilityIcon?: string;
-  castTimeLeftMs?: number;
-  castTotalMs?: number;
-  castCategory?: BossAbilityCategory;
-  castCanBeInterrupted?: boolean;
-  castRequiredTag?: BossDefensiveTag;
-  castDebuffType?: "poison" | "curse" | "burn" | "ground" | "bleed";
-}>();
+  const props = defineProps<{
+    name: string;
+    level: number;
+    hp: number;
+    maxHp: number;
+    hpPercent: number;
+    power: number;
+    chanceCrit: number;
+    evasion: number;
+    image?: string;
+    buffs?: ActiveEffect[];
+    debuffs?: ActiveEffect[];
+    attackCooldownLeft: number;
+    attackCooldownMax: number;
+    currentAbilityName?: string;
+    currentAbilityIcon?: string;
+    castTimeLeftMs?: number;
+    castTotalMs?: number;
+    castCategory?: BossAbilityCategory;
+    castCanBeInterrupted?: boolean;
+    castRequiredTag?: BossDefensiveTag;
+    castDebuffType?: "poison" | "curse" | "burn" | "ground" | "bleed";
+  }>();
 
-const attackCooldownProgress = computed(() => {
-  if (props.attackCooldownMax <= 0) return 1;
-  return 1 - Math.max(0, Math.min(1, props.attackCooldownLeft / props.attackCooldownMax));
-});
+  const attackCooldownProgress = computed(() => {
+    if (props.attackCooldownMax <= 0) return 1;
+    return (
+      1 -
+      Math.max(
+        0,
+        Math.min(1, props.attackCooldownLeft / props.attackCooldownMax),
+      )
+    );
+  });
 
-const attackCooldownText = computed(() => {
-  if (props.attackCooldownLeft <= 0) return "";
-  return `${(props.attackCooldownLeft / 1000).toFixed(1)}с`;
-});
+  const attackCooldownText = computed(() => {
+    if (props.attackCooldownLeft <= 0) return "";
+    return `${(props.attackCooldownLeft / 1000).toFixed(1)}с`;
+  });
 
-const hasCast = computed(() => {
-  return (
-    props.castTotalMs !== undefined &&
-    props.castTotalMs > 0 &&
-    props.castTimeLeftMs !== undefined &&
-    props.castTimeLeftMs > 0
-  );
-});
+  const hasCast = computed(() => {
+    return (
+      props.castTotalMs !== undefined &&
+      props.castTotalMs > 0 &&
+      props.castTimeLeftMs !== undefined &&
+      props.castTimeLeftMs > 0
+    );
+  });
 
-const castProgress = computed(() => {
-  if (!hasCast.value || !props.castTotalMs) return 0;
-  const left = Math.max(0, Math.min(props.castTimeLeftMs ?? 0, props.castTotalMs));
-  const ratio = 1 - left / props.castTotalMs;
-  return Math.max(0, Math.min(1, ratio));
-});
+  const castProgress = computed(() => {
+    if (!hasCast.value || !props.castTotalMs) return 0;
+    const left = Math.max(
+      0,
+      Math.min(props.castTimeLeftMs ?? 0, props.castTotalMs),
+    );
+    const ratio = 1 - left / props.castTotalMs;
+    return Math.max(0, Math.min(1, ratio));
+  });
 
-const castProgressPercent = computed(() => castProgress.value * 100);
+  const castProgressPercent = computed(() => castProgress.value * 100);
 
-const castTimeText = computed(() => {
-  if (!hasCast.value || props.castTimeLeftMs === undefined) return "";
-  return `${(props.castTimeLeftMs / 1000).toFixed(1)}с`;
-});
+  const castTimeText = computed(() => {
+    if (!hasCast.value || props.castTimeLeftMs === undefined) return "";
+    return `${(props.castTimeLeftMs / 1000).toFixed(1)}с`;
+  });
 
-const mechanicTagText = computed(() => {
-  if (!hasCast.value) return "";
+  const mechanicTagText = computed(() => {
+    if (!hasCast.value) return "";
 
-  // Атаки, которых нужно избегать через «Телепорт» (войда / лужи под ногами)
-  if (props.castDebuffType === "ground") {
-    return "Войда";
-  }
+    // Атаки, которых нужно избегать через «Телепорт» (войда / лужи под ногами)
+    if (props.castDebuffType === "ground") {
+      return "Войда";
+    }
 
-  switch (props.castRequiredTag) {
-    case "ice-wall":
-      return "Фронтальная";
-    case "block":
-      return "Блокируемая";
-    case "full-dodge":
-      return "Увернуться";
-    default:
-      return "";
-  }
-});
+    switch (props.castRequiredTag) {
+      case "ice-wall":
+        return "Фронтальная";
+      case "block":
+        return "Блокируемая";
+      case "full-dodge":
+        return "Увернуться";
+      case 'teleport':
+        return 'Телепортироваться'    
+      default:
+        // const exh: never = props.castRequiredTag;
 
-const castCategoryClass = computed(() => {
-  switch (props.castCategory) {
-    case "interruptible":
-      return "boss-card__cast-bar--interruptible";
-    case "uninterruptible":
-      return "boss-card__cast-bar--uninterruptible";
-    case "dot":
-    case "persistent_debuff":
-      return "boss-card__cast-bar--dot";
-    case "self_buff":
-      return "boss-card__cast-bar--self-buff";
-    default:
-      return "";
-  }
-});
+        return "";
+    }
+  });
+
+  const castCategoryClass = computed(() => {
+    switch (props.castCategory) {
+      case "interruptible":
+        return "boss-card__cast-bar--interruptible";
+      case "uninterruptible":
+        return "boss-card__cast-bar--uninterruptible";
+      case "dot":
+      case "persistent_debuff":
+        return "boss-card__cast-bar--dot";
+      case "self_buff":
+        return "boss-card__cast-bar--self-buff";
+      default:
+        return "";
+    }
+  });
 </script>
 
 <template>
@@ -115,10 +131,27 @@ const castCategoryClass = computed(() => {
           decoding="async"
           fetchpriority="high"
         />
-        <svg v-else class="boss-card__avatar-placeholder" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg
+          v-else
+          class="boss-card__avatar-placeholder"
+          viewBox="0 0 48 48"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <rect width="48" height="48" rx="8" fill="rgba(255,255,255,0.04)" />
-          <circle cx="24" cy="18" r="7" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" />
-          <path d="M10 40c0-7.732 6.268-14 14-14s14 6.268 14 14" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-linecap="round" />
+          <circle
+            cx="24"
+            cy="18"
+            r="7"
+            stroke="rgba(255,255,255,0.2)"
+            stroke-width="1.5"
+          />
+          <path
+            d="M10 40c0-7.732 6.268-14 14-14s14 6.268 14 14"
+            stroke="rgba(255,255,255,0.2)"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          />
         </svg>
       </div>
       <div class="boss-card__attack-icon">
@@ -149,64 +182,66 @@ const castCategoryClass = computed(() => {
       />
       <div class="boss-card__cast-slot">
         <div v-if="hasCast" class="boss-card__cast">
-        <div class="boss-card__cast-header">
-          <div class="boss-card__cast-icon">
-            <img
-              v-if="currentAbilityIcon"
-              :src="currentAbilityIcon"
-              :alt="currentAbilityName || 'Способность босса'"
-              width="32"
-              height="32"
-              decoding="async"
-            />
-            <svg
-              v-else
-              class="boss-card__cast-icon-fallback"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="12" cy="12" r="10" fill="rgba(15,23,42,0.9)" />
-              <path
-                d="M12 6v6l4 2"
-                stroke="rgba(248,250,252,0.9)"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+          <div class="boss-card__cast-header">
+            <div class="boss-card__cast-icon">
+              <img
+                v-if="currentAbilityIcon"
+                :src="currentAbilityIcon"
+                :alt="currentAbilityName || 'Способность босса'"
+                width="32"
+                height="32"
+                decoding="async"
               />
-            </svg>
-          </div>
-          <div class="boss-card__cast-info">
-            <div class="boss-card__cast-name">
-              <span class="boss-card__cast-name-text">
-                {{ currentAbilityName || "Кастует способность" }}
-              </span>
-              <span
-                v-if="castCategory === 'interruptible' && castCanBeInterrupted"
-                class="boss-card__cast-tag"
+              <svg
+                v-else
+                class="boss-card__cast-icon-fallback"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                Прерываемая
-              </span>
-              <span
-                v-if="mechanicTagText"
-                class="boss-card__cast-tag boss-card__cast-tag--mechanic"
-              >
-                {{ mechanicTagText }}
-              </span>
-            </div>
-            <div class="boss-card__cast-bar-wrapper">
-              <div class="boss-card__cast-bar-background">
-                <div
-                  class="boss-card__cast-bar"
-                  :class="castCategoryClass"
-                  :style="{ width: `${castProgressPercent}%` }"
+                <circle cx="12" cy="12" r="10" fill="rgba(15,23,42,0.9)" />
+                <path
+                  d="M12 6v6l4 2"
+                  stroke="rgba(248,250,252,0.9)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                 />
+              </svg>
+            </div>
+            <div class="boss-card__cast-info">
+              <div class="boss-card__cast-name">
+                <span class="boss-card__cast-name-text">
+                  {{ currentAbilityName || "Кастует способность" }}
+                </span>
+                <span
+                  v-if="
+                    castCategory === 'interruptible' && castCanBeInterrupted
+                  "
+                  class="boss-card__cast-tag"
+                >
+                  Прерываемая
+                </span>
+                <span
+                  v-if="mechanicTagText"
+                  class="boss-card__cast-tag boss-card__cast-tag--mechanic"
+                >
+                  {{ mechanicTagText }}
+                </span>
               </div>
-              <div class="boss-card__cast-time">
-                {{ castTimeText }}
+              <div class="boss-card__cast-bar-wrapper">
+                <div class="boss-card__cast-bar-background">
+                  <div
+                    class="boss-card__cast-bar"
+                    :class="castCategoryClass"
+                    :style="{ width: `${castProgressPercent}%` }"
+                  />
+                </div>
+                <div class="boss-card__cast-time">
+                  {{ castTimeText }}
+                </div>
               </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
       <div class="boss-card__effects-wrap">
