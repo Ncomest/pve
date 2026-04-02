@@ -24,7 +24,7 @@ export const PLAYER_CHARACTER: Character = {
     armor: 0,
     accuracy: 0,
     critDefense: 0,
-    spirit: 0,
+    spirit: 1500,
     lifesteal: 0,
   },
 };
