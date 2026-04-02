@@ -38,14 +38,23 @@ export type BossAbilityCategory =
   | "uninterruptible"
   | "dot"
   | "persistent_debuff"
-  | "self_buff";
+  | "self_buff"
+  | "cleansable-debuff"
+  | "dispellable-buff";
 
-export type BossDefensiveTag = "full-dodge" | "block" | "heavy-mitigation" | "ice-wall" | "teleport";
+export type BossDefensiveTag = "block";
 
 export interface BossAbility {
   id: string;
   name: string;
-  type: "damage" | "heal" | "buff" | 'debuff-dot' | 'heal-hot' | 'absord' | 'debuff';
+  type:
+    | "damage"
+    | "heal"
+    | "buff"
+    | "debuff-dot"
+    | "heal-hot"
+    | "absord"
+    | "debuff";
   icon?: string;
   cooldownMs: number;
   castTimeMs: number;
@@ -65,7 +74,7 @@ export interface BossAbility {
   selfBuffType?: "damage" | "evasion" | "armor" | "thorns" | "lifesteal";
   selfBuffValue?: number;
   selfBuffDurationMs?: number;
-  dispellable?: boolean;
+  buffRequiresDispellable?: boolean;
 
   // Параметры урона/лечения
   baseDamageX?: number;
@@ -99,4 +108,3 @@ export interface Boss {
   /** Настройки таймингов и очереди способностей босса */
   abilityConfig?: BossAbilityConfig;
 }
-

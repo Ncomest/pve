@@ -79,41 +79,10 @@
   const mechanicTagText = computed(() => {
     if (!hasCast.value) return "";
 
-    // Атаки, которых нужно избегать через «Телепорт» (войда / лужи под ногами)
-    if (props.castDebuffType === "ground") {
-      return "Войда";
-    }
-
-    switch (props.castRequiredTag) {
-      case "ice-wall":
-        return "Фронтальная";
-      case "block":
-        return "Блокируемая";
-      case "full-dodge":
-        return "Увернуться";
-      case 'teleport':
-        return 'Телепортироваться'    
-      default:
-        // const exh: never = props.castRequiredTag;
-
-        return "";
-    }
-  });
-
-  const castCategoryClass = computed(() => {
-    switch (props.castCategory) {
-      case "interruptible":
-        return "boss-card__cast-bar--interruptible";
-      case "uninterruptible":
-        return "boss-card__cast-bar--uninterruptible";
-      case "dot":
-      case "persistent_debuff":
-        return "boss-card__cast-bar--dot";
-      case "self_buff":
-        return "boss-card__cast-bar--self-buff";
-      default:
-        return "";
-    }
+    if (props.castRequiredTag === "block") return "Блокировать";
+    if (props.castCategory === "interruptible") return "Прервать";
+    if (props.castCategory === "cleansable-debuff") return "Очистить";
+    if (props.debuffs) return 'Рассеить';
   });
 </script>
 
@@ -213,7 +182,7 @@
                 <span class="boss-card__cast-name-text">
                   {{ currentAbilityName || "Кастует способность" }}
                 </span>
-                <span
+                <!-- <span
                   v-if="
                     castCategory === 'interruptible' && castCanBeInterrupted
                   "
@@ -221,6 +190,18 @@
                 >
                   Прерываемая
                 </span>
+                <span
+                  v-if="castCategory === 'cleansable-debuff'"
+                  class="boss-card__cast-tag"
+                >
+                  Очищаемое
+                </span>
+                <span
+                  v-if="castCategory === 'dispellable-buff'"
+                  class="boss-card__cast-tag"
+                >
+                  Рассеиваемое
+                </span> -->
                 <span
                   v-if="mechanicTagText"
                   class="boss-card__cast-tag boss-card__cast-tag--mechanic"
@@ -232,7 +213,6 @@
                 <div class="boss-card__cast-bar-background">
                   <div
                     class="boss-card__cast-bar"
-                    :class="castCategoryClass"
                     :style="{ width: `${castProgressPercent}%` }"
                   />
                 </div>

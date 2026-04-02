@@ -84,14 +84,14 @@ export type AbilityEffect =
   | { kind: "interrupt" }
   | { kind: "movement_speed"; percent: number; durationMs: number }
   | {
-      kind: "cleanse";
+      kind: "cleansable-debuff";
       /** Кого чистим: пока всегда self, но оставляем поле на будущее */
       target: "self";
       /** Какие типы дебаффов снимаем; если не задано — снимаем все дебаффы */
       debuffTypes?: DebuffType[];
     }
   | {
-      kind: "dispel";
+      kind: "dispellable-buff";
       /** Кого диспеллим: сейчас только босса */
       target: "boss";
     };

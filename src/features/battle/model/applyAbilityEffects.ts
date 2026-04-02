@@ -202,72 +202,6 @@ function applyOneEffect(
       break;
     }
 
-    case "self_buff_evasion": {
-      ctx.setPlayerEvasionBonus(effect.percent);
-      const evEndTime = Date.now() + effect.durationMs;
-      addPlayerBuff(ctx, {
-        id: meta.id,
-        name: meta.name,
-        icon: meta.icon ?? "IconFlee",
-        durationSeconds: effect.durationMs / 1000,
-        endTime: evEndTime,
-      });
-      const evTimerId = window.setTimeout(() => {
-        ctx.setPlayerEvasionBonus(0);
-        removePlayerBuff(ctx, meta.id);
-      }, effect.durationMs);
-      ctx.addTimeoutId(evTimerId);
-      ctx.pushLog(`${meta.name}: уклонение +${Math.round(effect.percent * 100)}% на ${effect.durationMs / 1000}с.`);
-      break;
-    }
-
-    case "self_buff_power": {
-      ctx.startPowerBoost(effect.value, effect.durationMs);
-      const powEndTime = Date.now() + effect.durationMs;
-      addPlayerBuff(ctx, {
-        id: meta.id,
-        name: meta.name,
-        icon: meta.icon ?? "IconPowerBoost",
-        durationSeconds: effect.durationMs / 1000,
-        endTime: powEndTime,
-      });
-      const powTimerId = window.setTimeout(() => removePlayerBuff(ctx, meta.id), effect.durationMs);
-      ctx.addTimeoutId(powTimerId);
-      ctx.pushLog(`Ты усилил атаку на +${effect.value} на ${(effect.durationMs / 1000).toFixed(0)}с.`);
-      break;
-    }
-
-    case "enemy_debuff_armor": {
-      ctx.clearBossArmorDebuff();
-      const endTime = Date.now() + effect.durationMs;
-      ctx.setBossArmorDebuff({ value: effect.value, endTime });
-      addBossDebuff(ctx, {
-        id: "armor-break",
-        name: "Срез брони",
-        icon: "IconArmorBreak",
-        durationSeconds: effect.durationMs / 1000,
-        endTime,
-      });
-      const armTimerId = window.setTimeout(() => ctx.clearBossArmorDebuff(), effect.durationMs);
-      ctx.addTimeoutId(armTimerId);
-      break;
-    }
-
-    case "enemy_debuff_armor_percent": {
-      // Процентный срез брони храним в отдельном дебаффе; логика использования в getEffectiveBossArmor в useBattle
-      const endTime = Date.now() + effect.durationMs;
-      addBossDebuff(ctx, {
-        id: "armor-break-percent",
-        name: `Срез брони ${Math.round(effect.percent * 100)}%`,
-        icon: "IconArmorBreak",
-        durationSeconds: effect.durationMs / 1000,
-        endTime,
-      });
-      const armPctTimerId = window.setTimeout(() => removeBossDebuff(ctx, "armor-break-percent"), effect.durationMs);
-      ctx.addTimeoutId(armPctTimerId);
-      break;
-    }
-
     case "eviscerate_stacks": {
       const newStacks = Math.min(ctx.EVISERATE_STACKS_MAX, ctx.eviscerateStacks.value + effect.gain);
       ctx.setEviscerateStacks(newStacks);
@@ -287,24 +221,6 @@ function applyOneEffect(
       break;
     }
 
-    case "dodge_next": {
-      ctx.setDodgeNextAttack(true);
-      const endTime = Date.now() + effect.expireMs;
-      addPlayerBuff(ctx, {
-        id: meta.id,
-        name: meta.name,
-        icon: meta.icon ?? "IconFlee",
-        durationSeconds: effect.expireMs / 1000,
-        endTime,
-      });
-      const dodgeTimerId = window.setTimeout(() => {
-        ctx.setDodgeNextAttack(false);
-        removePlayerBuff(ctx, meta.id);
-      }, effect.expireMs);
-      ctx.addTimeoutId(dodgeTimerId);
-      ctx.pushLog(`${meta.name}: следующая атака босса промажет (${effect.expireMs / 1000}с).`);
-      break;
-    }
 
     case "block_specials": {
       const blockDuration = effect.durationMs;
@@ -319,40 +235,6 @@ function applyOneEffect(
       const blockTimerId = window.setTimeout(() => removePlayerBuff(ctx, meta.id), blockDuration);
       ctx.addTimeoutId(blockTimerId);
       ctx.pushLog(`${meta.name}: особые атаки босса заблокированы на ${blockDuration / 1000}с.`);
-      break;
-    }
-
-    case "damage_reduction": {
-      ctx.setDamageReductionPercent(effect.percent);
-      const drEndTime = Date.now() + effect.durationMs;
-      addPlayerBuff(ctx, {
-        id: meta.id,
-        name: meta.name,
-        icon: meta.icon ?? "IconPowerBoost",
-        durationSeconds: effect.durationMs / 1000,
-        endTime: drEndTime,
-      });
-      const drTimerId = window.setTimeout(() => {
-        ctx.setDamageReductionPercent(0);
-        removePlayerBuff(ctx, meta.id);
-      }, effect.durationMs);
-      ctx.addTimeoutId(drTimerId);
-      ctx.pushLog(`${meta.name}: входящий урон −${Math.round(effect.percent * 100)}% на ${effect.durationMs / 1000}с.`);
-      break;
-    }
-
-    case "movement_speed": {
-      const endTime = Date.now() + effect.durationMs;
-      addPlayerBuff(ctx, {
-        id: meta.id,
-        name: meta.name,
-        icon: meta.icon ?? "IconPowerBoost",
-        durationSeconds: effect.durationMs / 1000,
-        endTime,
-      });
-      const speedTimerId = window.setTimeout(() => removePlayerBuff(ctx, meta.id), effect.durationMs);
-      ctx.addTimeoutId(speedTimerId);
-      ctx.pushLog(`${meta.name}: скорость +${Math.round(effect.percent * 100)}% на ${effect.durationMs / 1000}с.`);
       break;
     }
 

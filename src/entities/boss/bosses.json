@@ -218,7 +218,7 @@
         "castTimeMs": 2500,
         "category": "uninterruptible",
         "canBeInterrupted": false,
-        "requiredDefensiveTag": "full-dodge",
+        "requiredDefensiveTag": "block",
         "description": "Прыжок с разворотом — только уворот",
         "baseDamageX": 2.6
       }
@@ -288,8 +288,8 @@
         "castTimeMs": 3000,
         "category": "uninterruptible",
         "canBeInterrupted": false,
-        "requiredDefensiveTag": "ice-wall",
-        "description": "Мощный рывок наносит большой урон. Блокируется только Стеной льда",
+        "requiredDefensiveTag": "block",
+        "description": "Мощный рывок наносит большой урон. Блокируется щитом",
         "baseDamageX": 3.2
       },
       {
@@ -301,8 +301,8 @@
         "castTimeMs": 3000,
         "category": "uninterruptible",
         "canBeInterrupted": false,
-        "requiredDefensiveTag": "full-dodge",
-        "description": "Размашистый удар хрюнделем. Избежать можно только уворотом",
+        "requiredDefensiveTag": "block",
+        "description": "Размашистый удар хрюнделем. Блокируется щитом",
         "baseDamageX": 3
       },
       {
@@ -363,8 +363,7 @@
         "cooldownMs": 23000,
         "castTimeMs": 2800,
         "category": "self_buff",
-        "canBeInterrupted": true,
-        "description": "Возбуждает себя — больше урона",
+        "description": "Возбуждает себя — больше урона на 40% на 10 секунд. Рассеиваемое",
         "selfBuffType": "damage",
         "selfBuffValue": 0.4,
         "selfBuffDurationMs": 10000,
@@ -377,9 +376,8 @@
         "icon": "/images/bosses/icons/special/claw_1.png",
         "cooldownMs": 17000,
         "castTimeMs": 2800,
-        "category": "interruptible",
-        "canBeInterrupted": true,
-        "description": "Рывок с разрывом",
+        "requiredDefensiveTag": "block",
+        "description": "Рывок с разрывом. Блокируется щитом",
         "baseDamageX": 1.6
       },
       {
@@ -389,10 +387,8 @@
         "icon": "/images/bosses/icons/special/dash.png",
         "cooldownMs": 19000,
         "castTimeMs": 3000,
-        "category": "uninterruptible",
-        "canBeInterrupted": false,
-        "requiredDefensiveTag": "full-dodge",
-        "description": "Прыжок на героя",
+        "requiredDefensiveTag": "block",
+        "description": "Прыжок на героя. Блокируется щитом",
         "baseDamageX": 3.2
       },
       {
@@ -402,9 +398,8 @@
         "icon": "/images/bosses/icons/special/tooth.png",
         "cooldownMs": 21000,
         "castTimeMs": 3000,
-        "category": "persistent_debuff",
-        "canBeInterrupted": false,
-        "description": "Глубокий укус с ядом",
+        "category": "cleansable-debuff",
+        "description": "Глубокий укус с ядом. Очищаемое",
         "baseDamageX": 0.6,
         "debuffRequiresCleanse": true,
         "debuffType": "poison",
@@ -566,8 +561,8 @@
         "castTimeMs": 3000,
         "category": "uninterruptible",
         "canBeInterrupted": false,
-        "requiredDefensiveTag": "full-dodge",
-        "description": "Мощный рывок. Избежать можно только уворотом",
+        "requiredDefensiveTag": "block",
+        "description": "Мощный рывок. Избежать можно только блоком",
         "baseDamageX": 3.2
       },
       {
@@ -646,7 +641,7 @@
         "castTimeMs": 2800,
         "category": "uninterruptible",
         "canBeInterrupted": false,
-        "requiredDefensiveTag": "full-dodge",
+        "requiredDefensiveTag": "block",
         "description": "Серия когтей",
         "baseDamageX": 3
       }
@@ -863,7 +858,7 @@
         "castTimeMs": 2600,
         "category": "uninterruptible",
         "canBeInterrupted": false,
-        "requiredDefensiveTag": "full-dodge",
+        "requiredDefensiveTag": "block",
         "description": "Низкий рывок",
         "baseDamageX": 3.5
       },
@@ -1192,7 +1187,7 @@
         "castTimeMs": 3000,
         "category": "uninterruptible",
         "canBeInterrupted": false,
-        "requiredDefensiveTag": "full-dodge",
+        "requiredDefensiveTag": "block",
         "description": "Низкий таран",
         "baseDamageX": 3.3
       },
@@ -1292,8 +1287,8 @@
         "castTimeMs": 3000,
         "category": "uninterruptible",
         "canBeInterrupted": false,
-        "requiredDefensiveTag": "full-dodge",
-        "description": "Взрыв тайной энергии. Избежать можно только уворотом",
+        "requiredDefensiveTag": "block",
+        "description": "Взрыв тайной энергии. Избежать можно только блоком",
         "baseDamageX": 2.5
       },
       {
@@ -1375,7 +1370,7 @@
         "castTimeMs": 2800,
         "category": "uninterruptible",
         "canBeInterrupted": false,
-        "requiredDefensiveTag": "full-dodge",
+        "requiredDefensiveTag": "block",
         "description": "Удар из невидимости",
         "baseDamageX": 2.7
       },
@@ -1686,7 +1681,7 @@
         "castTimeMs": 2800,
         "category": "uninterruptible",
         "canBeInterrupted": false,
-        "requiredDefensiveTag": "full-dodge",
+        "requiredDefensiveTag": "block",
         "description": "Удар с воздуха",
         "baseDamageX": 3.2
       },
@@ -1978,7 +1973,7 @@
         "castTimeMs": 2800,
         "category": "uninterruptible",
         "canBeInterrupted": false,
-        "requiredDefensiveTag": "full-dodge",
+        "requiredDefensiveTag": "block",
         "description": "Удар из тени",
         "baseDamageX": 2.8
       },
@@ -2244,7 +2239,7 @@
         "castTimeMs": 3200,
         "category": "uninterruptible",
         "canBeInterrupted": false,
-        "requiredDefensiveTag": "full-dodge",
+        "requiredDefensiveTag": "block",
         "description": "Волна искажения",
         "baseDamageX": 2.65
       }
@@ -2403,8 +2398,8 @@
         "castTimeMs": 3000,
         "category": "uninterruptible",
         "canBeInterrupted": false,
-        "requiredDefensiveTag": "full-dodge",
-        "description": "Серия ударов когтями. Избежать можно только уворотом",
+        "requiredDefensiveTag": "block",
+        "description": "Серия ударов когтями. Избежать можно только блоком",
         "baseDamageX": 2.2
       }
     ],
@@ -2481,7 +2476,7 @@
         "castTimeMs": 3000,
         "category": "uninterruptible",
         "canBeInterrupted": false,
-        "requiredDefensiveTag": "full-dodge",
+        "requiredDefensiveTag": "block",
         "description": "Стремительное скольжение",
         "baseDamageX": 3
       }

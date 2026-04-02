@@ -1440,8 +1440,8 @@ export function useBattle(bossId: () => string | undefined) {
 
   let bossAttackTimer: number | null = null;
 
-  /** Единая скорость атаки босса: 3600мс (3.6с) */
-  const BOSS_ATTACK_INTERVAL_MS = 3600;
+  /** Единая скорость атаки босса: 2000мс (2с) */
+  const BOSS_ATTACK_INTERVAL_MS = 2000;
 
   /** Кулдаун атаки босса для визуализации */
   const bossAttackCooldownLeft = ref(0);
@@ -1619,12 +1619,12 @@ export function useBattle(bossId: () => string | undefined) {
     if (tag === "block") {
       return playerBuffs.value.some((e) => e.id === "block");
     }
-    if (tag === "ice-wall") {
-      return playerBuffs.value.some((e) => e.id === "ice-wall");
-    }
-    if (tag === "heavy-mitigation") {
-      return damageReductionPercent.value > 0;
-    }
+    // if (tag === "ice-wall") {
+    //   return playerBuffs.value.some((e) => e.id === "ice-wall");
+    // }
+    // if (tag === "heavy-mitigation") {
+    //   return damageReductionPercent.value > 0;
+    // }
     return false;
   };
 
@@ -1633,22 +1633,22 @@ export function useBattle(bossId: () => string | undefined) {
 
     // «Уворот»: гарантированный промах только от особых атак,
     // которые помечены requiredDefensiveTag: "full-dodge"
-    if (
-      dodgeNextAttack.value &&
-      ability.requiredDefensiveTag === "full-dodge"
-    ) {
-      dodgeNextAttack.value = false;
-      if (dodgeNextExpireTimerId !== null) {
-        clearTimeout(dodgeNextExpireTimerId);
-        dodgeNextExpireTimerId = null;
-      }
-      playerBuffs.value = playerBuffs.value.filter((e) => e.id !== "dodge");
-      pushLog(
-        `Босс применяет ${ability.name}, но ты увернулся (Уворот)!`,
-        "player-dodge",
-      );
-      return { hit: false };
-    }
+    // if (
+    //   dodgeNextAttack.value &&
+    //   ability.requiredDefensiveTag === "full-dodge"
+    // ) {
+    //   dodgeNextAttack.value = false;
+    //   if (dodgeNextExpireTimerId !== null) {
+    //     clearTimeout(dodgeNextExpireTimerId);
+    //     dodgeNextExpireTimerId = null;
+    //   }
+    //   playerBuffs.value = playerBuffs.value.filter((e) => e.id !== "dodge");
+    //   pushLog(
+    //     `Босс применяет ${ability.name}, но ты увернулся (Уворот)!`,
+    //     "player-dodge",
+    //   );
+    //   return { hit: false };
+    // }
 
     // Уклонение от статов и «Ускользание» не действуют против кастуемых способностей босса
     // (только автоатака босса проверяется через evasion). У приёмов с full-dodge уклонение —
@@ -1673,18 +1673,11 @@ export function useBattle(bossId: () => string | undefined) {
     let defenseNote = "";
 
     const tag = ability.requiredDefensiveTag;
-    if (tag && tag !== "full-dodge") {
+    if (tag) {
       if (hasDefensiveTag(tag)) {
-        if (tag === "block" || tag === "ice-wall") {
+        if (tag === "block") {
           const mitigated = Math.max(1, Math.round(finalDamage * 0.1));
-          defenseNote =
-            tag === "block"
-              ? " (урон сильно снижен Блоком)"
-              : " (урон сильно снижен Стеной льда)";
-          finalDamage = mitigated;
-        } else if (tag === "heavy-mitigation") {
-          const mitigated = Math.max(1, Math.round(finalDamage * 0.3));
-          defenseNote = " (урон снижен сильной защитой)";
+          defenseNote = " (урон сильно снижен Блоком)";
           finalDamage = mitigated;
         }
       }
