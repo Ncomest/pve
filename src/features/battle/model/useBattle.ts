@@ -1783,7 +1783,7 @@ export function useBattle(bossId: () => string | undefined) {
         break;
       }
       default: {
-        const exhaustiveCheck: never = ability.type;
+        // const exhaustiveCheck: never = ability.type;
         break;
       }
     }

@@ -53,7 +53,7 @@ export const useBossBuffEffectNotStack = (
       icon: ability.icon ?? "IconPowerBoost",
       durationSeconds: durationMs / 1000,
       endTime,
-      dispellable: ability.dispellable ?? true,
+      dispellable: ability.buffRequiresDispellable ?? true,
     },
   ];
 

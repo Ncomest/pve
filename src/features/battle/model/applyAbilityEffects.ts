@@ -322,7 +322,7 @@ function applyOneEffect(
       break;
     }
 
-    case "cleanse": {
+    case "cleansable-debuff": {
       const removed = cleansePlayerDebuffs(ctx, effect.debuffTypes);
       if (removed > 0) {
         const typeNote =
@@ -336,7 +336,7 @@ function applyOneEffect(
       break;
     }
 
-    case "dispel": {
+    case "dispellable-buff": {
       const removed = dispelBossBuffs(ctx);
       if (removed > 0) {
         ctx.pushLog(`${meta.name}: с босса снято бафов: ${removed}.`);
