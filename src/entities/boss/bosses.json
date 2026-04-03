@@ -5,7 +5,7 @@
     "image": "/images/bosses/slime_3.png",
     "level": 1,
     "rarity": "common",
-    "xpReward": 30,
+    "xpReward": 50,
     "stats": {
       "hp": 1000,
       "maxHp": 1000,
@@ -85,7 +85,7 @@
     "image": "/images/bosses/slime_1.png",
     "level": 1,
     "rarity": "common",
-    "xpReward": 28,
+    "xpReward": 50,
     "stats": {
       "hp": 1000,
       "maxHp": 1000,
@@ -170,7 +170,7 @@
     "image": "/images/bosses/slime_2.png",
     "level": 1,
     "rarity": "common",
-    "xpReward": 30,
+    "xpReward": 50,
     "stats": {
       "hp": 1050,
       "maxHp": 1050,
@@ -235,7 +235,7 @@
     "image": "/images/bosses/boar.jpg",
     "level": 2,
     "rarity": "common",
-    "xpReward": 55,
+    "xpReward": 75,
     "stats": {
       "hp": 2000,
       "maxHp": 2000,
@@ -343,7 +343,7 @@
     "image": "/images/bosses/giena_1.png",
     "level": 2,
     "rarity": "common",
-    "xpReward": 52,
+    "xpReward": 75,
     "stats": {
       "hp": 1950,
       "maxHp": 1950,
@@ -420,7 +420,7 @@
     "image": "/images/bosses/frog_1.png",
     "level": 2,
     "rarity": "common",
-    "xpReward": 56,
+    "xpReward": 75,
     "stats": {
       "hp": 2100,
       "maxHp": 2100,
@@ -497,7 +497,7 @@
     "image": "/images/bosses/wolf.jpg",
     "level": 3,
     "rarity": "common",
-    "xpReward": 80,
+    "xpReward": 100,
     "stats": {
       "hp": 3000,
       "maxHp": 3000,
@@ -593,7 +593,7 @@
     "image": "/images/bosses/cat_1.png",
     "level": 3,
     "rarity": "common",
-    "xpReward": 76,
+    "xpReward": 100,
     "stats": {
       "hp": 2900,
       "maxHp": 2900,
@@ -658,7 +658,7 @@
     "image": "/images/bosses/snake_1.png",
     "level": 3,
     "rarity": "common",
-    "xpReward": 82,
+    "xpReward": 100,
     "stats": {
       "hp": 3100,
       "maxHp": 3100,
@@ -725,7 +725,7 @@
     "image": "/images/bosses/goblin.jpg",
     "level": 4,
     "rarity": "common",
-    "xpReward": 75,
+    "xpReward": 125,
     "stats": {
       "hp": 4000,
       "maxHp": 4000,
@@ -813,7 +813,7 @@
     "image": "/images/bosses/cobold_1.png",
     "level": 4,
     "rarity": "common",
-    "xpReward": 72,
+    "xpReward": 125,
     "stats": {
       "hp": 3900,
       "maxHp": 3900,
@@ -890,7 +890,7 @@
     "image": "/images/bosses/rat_1.png",
     "level": 4,
     "rarity": "common",
-    "xpReward": 78,
+    "xpReward": 125,
     "stats": {
       "hp": 4100,
       "maxHp": 4100,
@@ -957,7 +957,7 @@
     "image": "/images/bosses/goblin_crossbower.jpg",
     "level": 5,
     "rarity": "rare",
-    "xpReward": 120,
+    "xpReward": 165,
     "stats": {
       "hp": 5000,
       "maxHp": 5000,
@@ -1072,7 +1072,7 @@
     "image": "/images/bosses/skelet_1.png",
     "level": 5,
     "rarity": "rare",
-    "xpReward": 115,
+    "xpReward": 165,
     "stats": {
       "hp": 4800,
       "maxHp": 4800,
@@ -1138,7 +1138,7 @@
     "image": "/images/bosses/ork_1.png",
     "level": 5,
     "rarity": "rare",
-    "xpReward": 122,
+    "xpReward": 165,
     "stats": {
       "hp": 5200,
       "maxHp": 5200,
@@ -1216,7 +1216,7 @@
     "image": "/images/bosses/goblin_mage.jpg",
     "level": 6,
     "rarity": "rare",
-    "xpReward": 160,
+    "xpReward": 200,
     "stats": {
       "hp": 6000,
       "maxHp": 6000,
@@ -1333,7 +1333,7 @@
     "image": "/images/bosses/bes_1.png",
     "level": 6,
     "rarity": "rare",
-    "xpReward": 155,
+    "xpReward": 200,
     "stats": {
       "hp": 5800,
       "maxHp": 5800,
@@ -1402,7 +1402,7 @@
     "image": "/images/bosses/shaman_1.png",
     "level": 6,
     "rarity": "rare",
-    "xpReward": 162,
+    "xpReward": 200,
     "stats": {
       "hp": 6200,
       "maxHp": 6200,
@@ -1482,7 +1482,7 @@
     "image": "/images/bosses/bear.jpg",
     "level": 7,
     "rarity": "rare",
-    "xpReward": 180,
+    "xpReward": 225,
     "stats": {
       "hp": 7000,
       "maxHp": 7000,
@@ -1591,7 +1591,7 @@
     "image": "/images/bosses/troll_1.png",
     "level": 7,
     "rarity": "rare",
-    "xpReward": 175,
+    "xpReward": 225,
     "stats": {
       "hp": 6800,
       "maxHp": 6800,
@@ -1660,7 +1660,7 @@
     "image": "/images/bosses/basilisk_1.png",
     "level": 7,
     "rarity": "rare",
-    "xpReward": 182,
+    "xpReward": 225,
     "stats": {
       "hp": 7200,
       "maxHp": 7200,
@@ -1858,7 +1858,7 @@
     "image": "/images/bosses/ogre_1.png",
     "level": 8,
     "rarity": "epic",
-    "xpReward": 285,
+    "xpReward": 300,
     "stats": {
       "hp": 7800,
       "maxHp": 7800,
@@ -1923,7 +1923,7 @@
     "image": "/images/bosses/elf_1.png",
     "level": 8,
     "rarity": "epic",
-    "xpReward": 308,
+    "xpReward": 300,
     "stats": {
       "hp": 8200,
       "maxHp": 8200,
@@ -2005,7 +2005,7 @@
     "image": "/images/bosses/golem.jpg",
     "level": 9,
     "rarity": "rare",
-    "xpReward": 220,
+    "xpReward": 350,
     "stats": {
       "hp": 9000,
       "maxHp": 9000,
@@ -2129,7 +2129,7 @@
     "image": "/images/bosses/crystal_1.png",
     "level": 9,
     "rarity": "rare",
-    "xpReward": 210,
+    "xpReward": 350,
     "stats": {
       "hp": 8800,
       "maxHp": 8800,
@@ -2194,7 +2194,7 @@
     "image": "/images/bosses/void_1.png",
     "level": 9,
     "rarity": "rare",
-    "xpReward": 228,
+    "xpReward": 350,
     "stats": {
       "hp": 9200,
       "maxHp": 9200,
@@ -2256,7 +2256,7 @@
     "image": "/images/bosses/dragon.jpg",
     "level": 10,
     "rarity": "epic",
-    "xpReward": 500,
+    "xpReward": 400,
     "stats": {
       "hp": 20000,
       "maxHp": 20000,
@@ -2415,7 +2415,7 @@
     "image": "/images/bosses/wyrm_1.png",
     "level": 10,
     "rarity": "epic",
-    "xpReward": 480,
+    "xpReward": 400,
     "stats": {
       "hp": 18500,
       "maxHp": 18500,
@@ -2493,7 +2493,7 @@
     "image": "/images/bosses/hydra_1.png",
     "level": 10,
     "rarity": "epic",
-    "xpReward": 510,
+    "xpReward": 400,
     "stats": {
       "hp": 21000,
       "maxHp": 21000,

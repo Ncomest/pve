@@ -20,11 +20,12 @@
 
   &__avatar {
     flex-shrink: 0;
-    width: 80px;
+    height: 60px;
     aspect-ratio: 1;
     border-radius: 10px;
     overflow: hidden;
     background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.4);
   }
 
   &__avatar-img,
@@ -293,6 +294,5 @@
   @media (max-width: 426px) {
     padding: 4px;
     gap: 3px;
-    
   }
 }

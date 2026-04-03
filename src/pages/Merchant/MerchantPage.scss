@@ -166,6 +166,7 @@
   &__inventory-panel--sell-equipment {
     @media (max-width: 600px) {
       order: 1;
+      width: 100%;
     }
   }
 

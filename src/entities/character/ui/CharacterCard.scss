@@ -4,7 +4,7 @@
   background: rgba(15, 23, 42, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 16px 14px;
+  padding: 8px;
   display: flex;
   flex-direction: row;
   align-items: flex-start;
@@ -12,11 +12,12 @@
 
   &__avatar {
     flex-shrink: 0;
-    width: 80px;
+    height: 60px;
     aspect-ratio: 1;
     border-radius: 10px;
     overflow: hidden;
     background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.4);
   }
 
   &__avatar-img,
@@ -63,7 +64,9 @@
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.25);
-    transition: background 0.15s, border-color 0.15s;
+    transition:
+      background 0.15s,
+      border-color 0.15s;
 
     &--filled {
       background: rgba(250, 204, 21, 0.9);
@@ -119,7 +122,7 @@
     }
   }
 
-  @media (max-width: 426px){
+  @media (max-width: 425px) {
     padding: 8px;
     gap: 8px;
     align-items: stretch;
@@ -152,5 +155,4 @@
       min-height: 40px;
     }
   }
-
 }

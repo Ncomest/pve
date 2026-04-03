@@ -204,7 +204,7 @@ export function applyElixirArmorPercentToArmorPoints(
   armorPercentBonus: number,
 ): number {
   const beforeReduction = armorPointsToFraction(armorPoints);
-  const afterReduction = Math.min(0.9, beforeReduction + armorPercentBonus);
+  const afterReduction = Math.min(0.5, beforeReduction + armorPercentBonus);
   return Math.round(afterReduction / ARMOR_POINTS_TO_FRACTION);
 }
 
