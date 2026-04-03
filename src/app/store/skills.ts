@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-export const PANELS_COUNT = 3;
+export const PANELS_COUNT = 2;
 export const SLOTS_PER_PANEL = 7;
 
 export interface SkillSlot {
@@ -18,7 +18,7 @@ function createEmptyBar(): SkillBar {
 }
 
 interface SkillsState {
-  /** 3 панели, в каждой по 7 слотов */
+  /** 2 панели, в каждой по 7 слотов */
   panels: SkillBar[];
 }
 
@@ -43,7 +43,11 @@ export const useSkillsStore = defineStore("skills", {
   },
 
   actions: {
-    setAbility(panelIndex: number, slotIndex: number, abilityId: string | null) {
+    setAbility(
+      panelIndex: number,
+      slotIndex: number,
+      abilityId: string | null,
+    ) {
       if (panelIndex < 0 || panelIndex >= this.panels.length) return;
       if (slotIndex < 0 || slotIndex >= SLOTS_PER_PANEL) return;
       this.panels[panelIndex][slotIndex].abilityId = abilityId;
@@ -64,7 +68,7 @@ export const useSkillsStore = defineStore("skills", {
   },
 
   persist: {
-    key: "pve-skills-v2",
+    key: "pve-skills-v3",
     storage: localStorage,
   },
 });

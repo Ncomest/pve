@@ -82,7 +82,7 @@
     if (props.castRequiredTag === "block") return "Блокировать";
     if (props.castCategory === "interruptible") return "Прервать";
     if (props.castCategory === "cleansable-debuff") return "Очистить";
-    if (props.debuffs) return 'Рассеить';
+    if (props.debuffs) return "Рассеить";
   });
 </script>
 
@@ -182,26 +182,6 @@
                 <span class="boss-card__cast-name-text">
                   {{ currentAbilityName || "Кастует способность" }}
                 </span>
-                <!-- <span
-                  v-if="
-                    castCategory === 'interruptible' && castCanBeInterrupted
-                  "
-                  class="boss-card__cast-tag"
-                >
-                  Прерываемая
-                </span>
-                <span
-                  v-if="castCategory === 'cleansable-debuff'"
-                  class="boss-card__cast-tag"
-                >
-                  Очищаемое
-                </span>
-                <span
-                  v-if="castCategory === 'dispellable-buff'"
-                  class="boss-card__cast-tag"
-                >
-                  Рассеиваемое
-                </span> -->
                 <span
                   v-if="mechanicTagText"
                   class="boss-card__cast-tag boss-card__cast-tag--mechanic"

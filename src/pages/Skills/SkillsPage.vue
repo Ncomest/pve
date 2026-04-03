@@ -40,11 +40,7 @@
     skillsStore.clearSlot(panelIndex, slotIndex);
   }
 
-  function setHotkey(
-    panelIndex: number,
-    slotIndex: number,
-    hotkey: string,
-  ) {
+  function setHotkey(panelIndex: number, slotIndex: number, hotkey: string) {
     skillsStore.setHotkey(panelIndex, slotIndex, hotkey);
   }
 
@@ -173,8 +169,8 @@
 
     <p class="ability-list__hint">
       <template v-if="!isMobile">
-        Нажмите на способность, чтобы выбрать её, затем кликните на пустой
-        слот панели для назначения. Выбрано:
+        Нажмите на способность, чтобы выбрать её, затем кликните на пустой слот
+        панели для назначения. Выбрано:
       </template>
       <template v-else>
         Нажмите на способность, чтобы открыть описание, затем нажмите
@@ -262,9 +258,7 @@
                   v-if="ability.cooldownMs > 0"
                   class="ability-card__detail-row"
                 >
-                  <span class="ability-card__detail-label"
-                    >Перезарядка:</span
-                  >
+                  <span class="ability-card__detail-label">Перезарядка:</span>
                   <span class="ability-card__detail-value"
                     >{{ (ability.cooldownMs / 1000).toFixed(0) }} сек</span
                   >

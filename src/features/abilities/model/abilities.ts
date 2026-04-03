@@ -14,7 +14,7 @@ export const ABILITIES: Ability[] = [
   // },
   {
     id: "rebuke",
-    name: "Укор",
+    name: "Прерывание",
     description: "Вы можете прервать способность босса",
     type: "control",
     value: 0,
@@ -91,7 +91,7 @@ export const ABILITIES: Ability[] = [
     role: "defense",
     effects: [
       {
-        kind: "cleanse",
+        kind: "cleansable-debuff",
         target: "self",
         debuffTypes: ["poison", "curse", "burn", "bleed"],
       },
@@ -99,8 +99,8 @@ export const ABILITIES: Ability[] = [
   },
   {
     id: "dispell",
-    name: "Dispell",
-    description: "Снимает с врага усиление",
+    name: "Рассеивание",
+    description: "Снимает с врага баффы",
     type: "buff",
     value: 0,
     cooldownMs: 10_000,
@@ -108,7 +108,7 @@ export const ABILITIES: Ability[] = [
     role: "control",
     effects: [
       {
-        kind: "dispel",
+        kind: "dispellable-buff",
         target: "boss",
       },
     ],
@@ -119,5 +119,7 @@ export const ABILITIES: Ability[] = [
 export { BLADE_AND_POISON_ABILITIES };
 
 /** Все способности: базовые + класс «Клинок и Яд» (для страницы навыков и выбора слотов) */
-export const ALL_ABILITIES: Ability[] = [...ABILITIES, ...BLADE_AND_POISON_ABILITIES];
-
+export const ALL_ABILITIES: Ability[] = [
+  ...ABILITIES,
+  ...BLADE_AND_POISON_ABILITIES,
+];
