@@ -55,7 +55,7 @@ export const ELIXIRS: ElixirDefinition[] = [
     price: 10,
     icon: "/images/elixir/elixir_5.png",
     durationMs: ELIXIR_DURATION_MS,
-    spiritBonus: 200,
+    spiritBonus: 1000,
   },
   {
     id: "elixir-power_plus_5",
