@@ -51,7 +51,8 @@
     font-weight: 500;
   }
 
-  @media (max-width: 426px) {
+  @media (max-width: 425px) {
+    display: none;
     min-width: 0;
     max-width: 90vw;
     width: 90vw;

@@ -348,13 +348,17 @@
   }
 }
 
-@media (max-width: 426px) {
+@media (max-width: 425px) {
   .skill-panel {
     padding: 4px 2px;
 
     &__slots {
       gap: 0;
       justify-content: space-evenly;
+    }
+
+    &__slot-wrap--has-ability:hover {
+      // display: none;
     }
   }
 }
