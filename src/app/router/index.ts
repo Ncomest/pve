@@ -2,7 +2,7 @@ import type { RouteRecordRaw } from "vue-router";
 
 export const routes: RouteRecordRaw[] = [
   {
-    path: "/",
+    path: "/boss-select",
     name: "boss-select",
     component: () => import("@/pages/BossSelect/BossSelectPage.vue"),
   },
@@ -13,7 +13,7 @@ export const routes: RouteRecordRaw[] = [
     props: true,
   },
   {
-    path: "/character",
+    path: "/",
     name: "character",
     component: () => import("@/pages/Character/CharacterPage.vue"),
   },
@@ -43,4 +43,3 @@ export const routes: RouteRecordRaw[] = [
     component: () => import("@/pages/Craft/CraftPage.vue"),
   },
 ];
-
