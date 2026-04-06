@@ -4,16 +4,15 @@ const rng = () => Math.random();
 
 /** Базовые «единицы» для масштабирования линий статов (см. docs/balance-items). */
 export const PROC_BASE: ItemStats = {
-  hp: 30,
-  power: 20,
-  armor: 50,
-  chanceCrit: 50,
-  evasion: 25,
-  speed: 50,
-  spirit: 50,
-  accuracy: 50,
-  critDefense: 50,
-  lifesteal: 50,
+  hp: 10,
+  power: 2,
+  armor: 10,
+  chanceCrit: 10,
+  evasion: 10,
+  speed: 10,
+  accuracy: 10,
+  critDefense: 10,
+  lifesteal: 10,
 };
 
 /** Веса редкости: белая 90%, зелёная 4%, синяя 3%, эпическая 2%, уникальная 1%. */
@@ -26,18 +25,14 @@ const RARITY_WEIGHTS: { rarity: ItemRarity; weight: number }[] = [
 ];
 
 /** Доля силы ролла от «базового дропа» (min..max включительно в процентах). */
-const RARITY_STRENGTH_RANGE: Record<ItemRarity, { min: number; max: number }> = {
-  common: { min: 10, max: 20 },
-  uncommon: { min: 21, max: 40 },
-  rare: { min: 41, max: 60 },
-  epic: { min: 61, max: 80 },
-  unique: { min: 81, max: 100 },
-};
-
-function rollStrengthPercent(rarity: ItemRarity): number {
-  const { min, max } = RARITY_STRENGTH_RANGE[rarity];
-  return (min + rng() * (max - min)) / 100;
-}
+const RARITY_STRENGTH_RANGE: Record<ItemRarity, { min: number; max: number }> =
+  {
+    common: { min: 60, max: 80 },
+    uncommon: { min: 70, max: 85 },
+    rare: { min: 80, max: 90 },
+    epic: { min: 90, max: 95 },
+    unique: { min: 100, max: 100 },
+  };
 
 function pick<T>(a: T, b: T): T {
   return rng() < 0.5 ? a : b;
@@ -49,80 +44,87 @@ function pick<T>(a: T, b: T): T {
 export function generateBaseStatsForRarity(rarity: ItemRarity): ItemStats {
   const out: ItemStats = {};
 
-  /** Отдельный ролл силы для каждой линии, иначе одинаковый PROC_BASE даёт одинаковые числа (напр. броня и дух). */
-  const scale = (key: keyof typeof PROC_BASE) =>
-    Math.max(
-      1,
-      Math.round((PROC_BASE[key] ?? 0) * rollStrengthPercent(rarity)),
-    );
+  const rollStatValue = (key: keyof typeof PROC_BASE) => {
+    const { min: minPercent, max: maxPercent } = RARITY_STRENGTH_RANGE[rarity];
+    const percent =
+      (minPercent + Math.random() * (maxPercent - minPercent)) / 100;
+    const baseValue = PROC_BASE[key] ?? 0;
+    const result = Math.max(1, Math.round(baseValue * percent));
+    console.log(`📊 ${key}: база=${baseValue} * ${percent}% = ${result}`);
+    return result;
+  };
 
+  // Логика выбора статов для разных редкостей
   if (rarity === "common") {
-    if (pick(0, 1) === 0) {
-      out.power = scale("power");
-    } else {
-      out.armor = scale("armor");
-    }
-    if (pick(0, 1) === 0) {
-      out.spirit = scale("spirit");
-    } else {
-      out.accuracy = scale("accuracy");
-    }
-    out.hp = scale("hp");
+    if (pick(0, 1) === 0) out.power = rollStatValue("power");
+    else out.armor = rollStatValue("armor");
+
+    if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
+    else out.hp = rollStatValue("hp");
+
     return out;
   }
 
   if (rarity === "uncommon") {
-    if (pick(0, 1) === 0) out.power = scale("power");
-    else out.armor = scale("armor");
-    if (pick(0, 1) === 0) out.spirit = scale("spirit");
-    else out.accuracy = scale("accuracy");
-    if (pick(0, 1) === 0) out.chanceCrit = scale("chanceCrit");
-    else out.speed = scale("speed");
-    out.hp = scale("hp");
+    if (pick(0, 1) === 0) out.power = rollStatValue("power");
+    else out.armor = rollStatValue("armor");
+
+    if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
+    else out.hp = rollStatValue("hp");
+
+    if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
+    else out.speed = rollStatValue("speed");
+
     return out;
   }
 
   if (rarity === "rare") {
-    if (pick(0, 1) === 0) out.power = scale("power");
-    else out.armor = scale("armor");
-    if (pick(0, 1) === 0) out.spirit = scale("spirit");
-    else out.accuracy = scale("accuracy");
-    if (pick(0, 1) === 0) out.chanceCrit = scale("chanceCrit");
-    else out.speed = scale("speed");
-    if (pick(0, 1) === 0) out.critDefense = scale("critDefense");
-    else out.evasion = scale("evasion");
-    out.hp = scale("hp");
+    if (pick(0, 1) === 0) out.power = rollStatValue("power");
+    else out.armor = rollStatValue("armor");
+
+    if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
+    else out.hp = rollStatValue("hp");
+
+    if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
+    else out.speed = rollStatValue("speed");
+
+    if (pick(0, 1) === 0) out.critDefense = rollStatValue("critDefense");
+    else out.evasion = rollStatValue("evasion");
+
     return out;
   }
 
   if (rarity === "epic") {
-    if (pick(0, 1) === 0) out.power = scale("power");
-    else out.armor = scale("armor");
-    if (pick(0, 1) === 0) out.spirit = scale("spirit");
-    else out.accuracy = scale("accuracy");
-    if (pick(0, 1) === 0) out.chanceCrit = scale("chanceCrit");
-    else out.speed = scale("speed");
-    if (pick(0, 1) === 0) out.critDefense = scale("critDefense");
-    else out.evasion = scale("evasion");
-    out.lifesteal = scale("lifesteal");
-    out.hp = scale("hp");
+    if (pick(0, 1) === 0) out.power = rollStatValue("power");
+    else out.armor = rollStatValue("armor");
+
+    if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
+    else out.hp = rollStatValue("hp");
+
+    if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
+    else out.speed = rollStatValue("speed");
+
+    if (pick(0, 1) === 0) out.critDefense = rollStatValue("critDefense");
+    else out.evasion = rollStatValue("evasion");
+
+    out.lifesteal = rollStatValue("lifesteal");
+
     return out;
   }
 
-  // unique
-  if (pick(0, 1) === 0) out.power = scale("power");
-  else out.armor = scale("armor");
-  if (pick(0, 1) === 0) out.spirit = scale("spirit");
-  else out.accuracy = scale("accuracy");
-  out.chanceCrit = scale("chanceCrit");
-  out.speed = scale("speed");
-  if (pick(0, 1) === 0) out.critDefense = scale("critDefense");
-  else out.evasion = scale("evasion");
-  out.lifesteal = scale("lifesteal");
-  out.hp = scale("hp");
+  // unique - все статы
+  out.power = rollStatValue("power");
+  out.armor = rollStatValue("armor");
+  out.accuracy = rollStatValue("accuracy");
+  out.hp = rollStatValue("hp");
+  out.chanceCrit = rollStatValue("chanceCrit");
+  out.speed = rollStatValue("speed");
+  out.critDefense = rollStatValue("critDefense");
+  out.evasion = rollStatValue("evasion");
+  out.lifesteal = rollStatValue("lifesteal");
+
   return out;
 }
-
 /** Случайная редкость по весам 90/4/3/2/1. */
 export function rollItemRarity(): ItemRarity {
   const total = RARITY_WEIGHTS.reduce((s, x) => s + x.weight, 0);

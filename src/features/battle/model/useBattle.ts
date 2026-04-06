@@ -23,10 +23,10 @@ import type { BattleEffectContext } from "@/features/battle/model/applyAbilityEf
 import { useCooldowns } from "@/shared/lib/cooldowns/useCooldowns";
 import { expGainedFromMonster } from "@/shared/lib/experience/experience";
 import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
-import { usePlayerHp } from "@/features/character/model/usePlayerHp";
+// import { usePlayerHp } from "@/features/character/model/usePlayerHp";
 import { useCharacterStore } from "@/app/store/character";
 import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
-import { SPIRIT_ELIXIR_BONUS_POINTS } from "@/features/elixirs/model/elixirs";
+// import { SPIRIT_ELIXIR_BONUS_POINTS } from "@/features/elixirs/model/elixirs";
 import { ALL_TEMPLATE_IDS, getTemplate } from "@/entities/item/items-db";
 import { getResourceDropTemplateId } from "@/entities/boss/lib/resourceBossDrops";
 import { scaleResourceBossStats } from "@/entities/boss/lib/scaleResourceBossStats";
@@ -42,7 +42,7 @@ import {
   applyElixirArmorPercentToArmorPoints,
   applyElixirSpeedPercentToSpeedTotal,
   playerSpeedBaseline,
-  LEVEL_HP_PER_LEVEL,
+  // LEVEL_HP_PER_LEVEL,
 } from "@/entities/character/lib/playerStatAggregation";
 import { useOnPlayerDotEffectNotStack } from "./ability-effects/useOnPlayerDotEffectNotStack";
 import { useBossBuffEffectNotStack } from "./ability-effects/useBossBuffEffectNotStack";
@@ -122,7 +122,7 @@ export function useBattle(bossId: () => string | undefined) {
   const resourceBossIdSet = shallowRef<Set<string>>(new Set());
   const playerProgress = usePlayerProgress();
   const characterStore = useCharacterStore();
-  const playerHp = usePlayerHp();
+  // const playerHp = usePlayerHp();
   const elixirsStore = useElixirsStore();
 
   const { numbers: bossDamageNumbers, spawnNumber: spawnBossDmg } =
@@ -139,10 +139,10 @@ export function useBattle(bossId: () => string | undefined) {
       level,
     );
 
-  const calcMaxHp = (level: number) => {
-    const bonusHp = Math.max(0, level - 1) * LEVEL_HP_PER_LEVEL;
-    return basePlayerStats.maxHp + bonusHp + characterStore.equipmentStats.hp;
-  };
+  // const calcMaxHp = (level: number) => {
+  //   const bonusHp = Math.max(0, level - 1) * LEVEL_HP_PER_LEVEL;
+  //   return basePlayerStats.maxHp + bonusHp + characterStore.equipmentStats.hp;
+  // };
 
   const selectedBoss = computed(() => {
     const list = allBosses.value;
@@ -157,26 +157,27 @@ export function useBattle(bossId: () => string | undefined) {
 
   // Эликсиры могут менять maxHp/статы в бою.
   const healthPercentBonus = elixirsStore.activeHealthPercentBonusApplied;
-  const regenWindow = elixirsStore.activeRegenWindow;
-  const spiritElixirBonus = elixirsStore.activeSpiritElixirBonus;
+  // const regenWindow = elixirsStore.activeRegenWindow;
+  // const spiritElixirBonus = elixirsStore.activeSpiritElixirBonus;
 
   const initialStats = {
     ...basePlayerStatsForRevert,
     maxHp: basePlayerStatsForRevert.maxHp + healthPercentBonus,
     hp: basePlayerStatsForRevert.hp + healthPercentBonus,
   };
-  playerHp.init(
-    initialStats.maxHp,
-    regenWindow,
-    initialStats.spirit ?? 0,
-    spiritElixirBonus,
-  );
+
+  // playerHp.init(
+  //   initialStats.maxHp,
+  //   regenWindow,
+  //   initialStats.spirit ?? 0,
+  //   spiritElixirBonus,
+  // );
 
   const player = reactive({
     name: PLAYER_CHARACTER.name,
     stats: {
       ...initialStats,
-      hp: playerHp.hp.value,
+      // hp: 7542,
     },
   });
 
@@ -262,13 +263,13 @@ export function useBattle(bossId: () => string | undefined) {
     elixirRevertTimeoutId = window.setTimeout(revert, remainingMs);
 
     switch (activeElixirDef.kind) {
-      case "heal_flat":
-        break;
-      case "spirit_elixir":
-        player.stats.spirit =
-          (player.stats.spirit ?? 0) +
-          (activeElixirDef.spiritBonus ?? SPIRIT_ELIXIR_BONUS_POINTS);
-        break;
+      // case "heal_flat":
+      //   break;
+      // case "spirit_elixir":
+      //   player.stats.spirit =
+      //     (player.stats.spirit ?? 0) +
+      //     (activeElixirDef.spiritBonus ?? SPIRIT_ELIXIR_BONUS_POINTS);
+      //   break;
       case "power":
         player.stats.power += activeElixirDef.powerDelta ?? 0;
         break;
@@ -291,7 +292,7 @@ export function useBattle(bossId: () => string | undefined) {
         );
         break;
       case "health_percent":
-        // maxHp уже увеличен на этапе playerHp.init.
+        // maxHp расчитывается и применяется в elixirsStore.activeHealthPercentBonusHp
         break;
       case "evasion_percent":
         player.stats.evasion = Math.min(
@@ -1951,13 +1952,13 @@ export function useBattle(bossId: () => string | undefined) {
     resetCooldowns();
     resetGcd();
 
-    const newMaxHp = calcMaxHp(playerProgress.level.value);
-    playerHp.updateMaxHp(newMaxHp);
+    // const newMaxHp = calcMaxHp(playerProgress.level.value);
+    // playerHp.updateMaxHp(newMaxHp);
 
     const freshStats = buildPlayerStatsForLevel(playerProgress.level.value);
     player.stats = {
       ...freshStats,
-      hp: playerHp.hp.value,
+      // hp: playerHp.hp.value,
     };
     applySelectedBoss();
 
@@ -2044,10 +2045,10 @@ export function useBattle(bossId: () => string | undefined) {
   };
 
   // Синхронизируем HP игрока в хранилище при каждом изменении
-  watch(
-    () => player.stats.hp,
-    (hp) => playerHp.setHp(hp),
-  );
+  // watch(
+  //   () => player.stats.hp,
+  //   (hp) => playerHp.setHp(hp),
+  // );
 
   watch(isBattleOver, (over) => {
     if (over) {
@@ -2061,7 +2062,7 @@ export function useBattle(bossId: () => string | undefined) {
         elixirRevertTimeoutId = null;
       }
       // Сохраняем финальное HP сразу после окончания боя
-      playerHp.saveHp();
+      // playerHp.saveHp();
 
       if (boss.stats.hp <= 0 && player.stats.hp > 0) {
         const monsterLevel = boss.level;

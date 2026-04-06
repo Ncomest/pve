@@ -101,10 +101,10 @@ const selectedElixirDescription = computed(() => {
   if (!def) return "";
   const base = `Бафф: 5 минут.\nНе стакается: выпивание сбивает предыдущий.`;
   switch (def.kind) {
-    case "heal_flat":
-      return `Восстанавливает ${def.healFlatHp ?? DEFAULT_HEAL_FLAT_HP} HP мгновенно.\nАктивные эликсиры/баффы не сбиваются.`;
-    case "spirit_elixir":
-      return `Временно +${def.spiritBonus ?? 200} к духу (сильнее реген HP вне боя).\n${base}`;
+    // case "heal_flat":
+    //   return `Восстанавливает ${def.healFlatHp ?? DEFAULT_HEAL_FLAT_HP} HP мгновенно.\nАктивные эликсиры/баффы не сбиваются.`;
+    // case "spirit_elixir":
+    //   return `Временно +${def.spiritBonus ?? 200} к духу (сильнее реген HP вне боя).\n${base}`;
     case "power":
       return `Увеличивает атаку: +${def.powerDelta ?? 5}.\n${base}`;
     case "armor_percent":
@@ -214,7 +214,7 @@ function getEquipmentOfferStatsLines(offer: MerchantOffer): string[] {
   if (item.stats.armor != null) lines.push(`Броня: +${item.stats.armor}`);
   if (item.stats.accuracy != null) lines.push(`Меткость: +${item.stats.accuracy}`);
   if (item.stats.critDefense != null) lines.push(`Защита от крита: +${item.stats.critDefense}`);
-  if (item.stats.spirit != null) lines.push(`Дух: +${item.stats.spirit}`);
+  // if (item.stats.spirit != null) lines.push(`Дух: +${item.stats.spirit}`);
   if (item.stats.lifesteal != null) lines.push(`Самоисцеление: +${item.stats.lifesteal}`);
   return lines;
 }
@@ -225,12 +225,12 @@ function getElixirOfferTooltip(elixir: (typeof ELIXIRS)[number]): string {
   const lines: string[] = [];
   lines.push(base.trimEnd());
   switch (def.kind) {
-    case "heal_flat":
-      lines.push(`Восстанавливает ${def.healFlatHp ?? DEFAULT_HEAL_FLAT_HP} HP мгновенно.`);
-      break;
-    case "spirit_elixir":
-      lines.push(`Временно +${def.spiritBonus ?? 200} к духу (реген HP вне боя).`);
-      break;
+    // case "heal_flat":
+    //   lines.push(`Восстанавливает ${def.healFlatHp ?? DEFAULT_HEAL_FLAT_HP} HP мгновенно.`);
+    //   break;
+    // case "spirit_elixir":
+    //   lines.push(`Временно +${def.spiritBonus ?? 200} к духу (реген HP вне боя).`);
+    //   break;
     case "power":
       lines.push(`Атака +${def.powerDelta ?? 5}.`);
       break;
@@ -252,11 +252,11 @@ function getElixirOfferTooltip(elixir: (typeof ELIXIRS)[number]): string {
     default:
       break;
   }
-  if (def.kind === "heal_flat") {
-    lines.push("Баффы эликсиров не сбиваются.");
-  } else {
+  // if (def.kind === "heal_flat") {
+  //   lines.push("Баффы эликсиров не сбиваются.");
+  // } else {
     lines.push("Бафф: 5 минут. Не стакается.");
-  }
+  // }
   return lines.join("\n");
 }
 
@@ -421,11 +421,11 @@ const nextRefreshLabel = computed(() => {
 
 onMounted(() => {
   loadOrRegenerateOffers();
-  if (nextRefreshAt.value) scheduleAutoRefresh();
-  nowForCountdown.value = Date.now();
-  countdownIntervalId = setInterval(() => {
-    nowForCountdown.value = Date.now();
-  }, 1000);
+  // if (nextRefreshAt.value) scheduleAutoRefresh();
+  // nowForCountdown.value = Date.now();
+  // countdownIntervalId = setInterval(() => {
+  //   nowForCountdown.value = Date.now();
+  // }, 1000);
 });
 
 onUnmounted(() => {

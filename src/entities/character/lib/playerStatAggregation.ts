@@ -61,7 +61,7 @@ export interface EquipmentBonuses {
   /** Доля 0..1 после перевода очков защиты от крита. */
   critDefense: number;
   /** Сумма очков духа (без перевода в долю). */
-  spirit: number;
+  // spirit: number;
   /** Доля 0..1 после перевода очков самоисцеления. */
   lifesteal: number;
 }
@@ -70,7 +70,10 @@ export interface EquipmentBonuses {
  * Суммирует эффективные статы снятых предметов в бонусы для героя
  * (перевод очков → доли там, где нужно).
  */
-export function aggregateEquipmentBonuses(partials: ItemStats[]): EquipmentBonuses {
+export function aggregateEquipmentBonuses(
+  partials: ItemStats[],
+  characterLevel: number,
+): EquipmentBonuses {
   const stats: EquipmentBonuses = {
     hp: 0,
     power: 0,
@@ -80,7 +83,7 @@ export function aggregateEquipmentBonuses(partials: ItemStats[]): EquipmentBonus
     armor: 0,
     accuracy: 0,
     critDefense: 0,
-    spirit: 0,
+    // spirit: 0,
     lifesteal: 0,
   };
   let critPoints = 0;
@@ -98,20 +101,23 @@ export function aggregateEquipmentBonuses(partials: ItemStats[]): EquipmentBonus
     stats.armor += effective.armor ?? 0;
     accuracyPoints += effective.accuracy ?? 0;
     critDefensePoints += effective.critDefense ?? 0;
-    stats.spirit += effective.spirit ?? 0;
+    // stats.spirit += effective.spirit ?? 0;
     lifestealPoints += effective.lifesteal ?? 0;
   }
 
-  stats.chanceCrit = critPointsToFraction(critPoints);
-  stats.evasion = evasionPointsToFraction(evasionPoints);
-  stats.accuracy = accuracyPointsToFraction(accuracyPoints);
-  stats.critDefense = critDefensePointsToFraction(critDefensePoints);
-  stats.lifesteal = lifestealPointsToFraction(lifestealPoints);
+  stats.chanceCrit = critPointsToFraction(critPoints, characterLevel);
+  stats.evasion = evasionPointsToFraction(evasionPoints, characterLevel);
+  stats.accuracy = accuracyPointsToFraction(accuracyPoints, characterLevel);
+  stats.critDefense = critDefensePointsToFraction(
+    critDefensePoints,
+    characterLevel,
+  );
+  stats.lifesteal = lifestealPointsToFraction(lifestealPoints, characterLevel);
 
   return stats;
 }
 
-/** Суммы «очков» с предметов до перевода в доли (для UI: «200 очков → 1%»). */
+/** Суммы «очков» с предметов до перевода в доли (для UI: «40 очков → 1%»). */
 export interface EquipmentRawPoints {
   crit: number;
   evasion: number;
@@ -120,10 +126,12 @@ export interface EquipmentRawPoints {
   accuracy: number;
   critDefense: number;
   lifesteal: number;
-  spirit: number;
+  // spirit: number;
 }
 
-export function aggregateEquipmentRawPoints(partials: ItemStats[]): EquipmentRawPoints {
+export function aggregateEquipmentRawPoints(
+  partials: ItemStats[],
+): EquipmentRawPoints {
   const out: EquipmentRawPoints = {
     crit: 0,
     evasion: 0,
@@ -132,7 +140,7 @@ export function aggregateEquipmentRawPoints(partials: ItemStats[]): EquipmentRaw
     accuracy: 0,
     critDefense: 0,
     lifesteal: 0,
-    spirit: 0,
+    // spirit: 0,
   };
   for (const effective of partials) {
     out.crit += effective.chanceCrit ?? 0;
@@ -142,7 +150,7 @@ export function aggregateEquipmentRawPoints(partials: ItemStats[]): EquipmentRaw
     out.accuracy += effective.accuracy ?? 0;
     out.critDefense += effective.critDefense ?? 0;
     out.lifesteal += effective.lifesteal ?? 0;
-    out.spirit += effective.spirit ?? 0;
+    // out.spirit += effective.spirit ?? 0;
   }
   return out;
 }
@@ -169,7 +177,7 @@ export function buildPlayerCombatStats(
     armor: (base.armor ?? 0) + equipment.armor,
     accuracy: Math.min(1, (base.accuracy ?? 0) + equipment.accuracy),
     critDefense: Math.min(1, (base.critDefense ?? 0) + equipment.critDefense),
-    spirit: (base.spirit ?? 0) + equipment.spirit,
+    // spirit: (base.spirit ?? 0) + equipment.spirit,
     lifesteal: Math.min(1, (base.lifesteal ?? 0) + equipment.lifesteal),
   };
 }
@@ -186,9 +194,10 @@ export function speedGearPointsFromTotalSpeedStat(totalSpeed: number): number {
 export function cooldownFactorFromSpeed(
   totalSpeedStat: number,
   extraCooldownReductionFraction: number,
+  characterLevel: number,
 ): number {
   const speedPoints = speedGearPointsFromTotalSpeedStat(totalSpeedStat);
-  const speedFromPoints = speedPointsToFraction(speedPoints);
+  const speedFromPoints = speedPointsToFraction(speedPoints, characterLevel);
   const totalReduction = Math.min(
     MAX_COOLDOWN_REDUCTION_FROM_SPEED,
     speedFromPoints + extraCooldownReductionFraction,
@@ -202,8 +211,9 @@ export function cooldownFactorFromSpeed(
 export function applyElixirArmorPercentToArmorPoints(
   armorPoints: number,
   armorPercentBonus: number,
+  characterLevel: number,
 ): number {
-  const beforeReduction = armorPointsToFraction(armorPoints);
+  const beforeReduction = armorPointsToFraction(armorPoints, characterLevel);
   const afterReduction = Math.min(0.5, beforeReduction + armorPercentBonus);
   return Math.round(afterReduction / ARMOR_POINTS_TO_FRACTION);
 }
@@ -214,9 +224,12 @@ export function applyElixirArmorPercentToArmorPoints(
 export function applyElixirSpeedPercentToSpeedTotal(
   speedTotalBeforeElixir: number,
   speedPercentBonus: number,
+  characterLevel: number,
 ): number {
-  const beforePoints = speedGearPointsFromTotalSpeedStat(speedTotalBeforeElixir);
-  const beforeReduction = speedPointsToFraction(beforePoints);
+  const beforePoints = speedGearPointsFromTotalSpeedStat(
+    speedTotalBeforeElixir,
+  );
+  const beforeReduction = speedPointsToFraction(beforePoints, characterLevel);
   const afterReduction = Math.min(1, beforeReduction + speedPercentBonus);
   const afterPoints = afterReduction / SPEED_POINTS_TO_FRACTION;
   return afterPoints + playerSpeedBaseline();

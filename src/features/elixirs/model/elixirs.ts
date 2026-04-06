@@ -1,6 +1,6 @@
 export type ElixirKind =
-  | "heal_flat" // мгновенное лечение HP (см. healFlatHp)
-  | "spirit_elixir" // временно +очки духа (реген вне боя)
+  // | "heal_flat" // мгновенное лечение HP (см. healFlatHp)
+  // | "spirit_elixir" // временно +очки духа (реген вне боя)
   | "power" // +5 к атаке
   | "armor_percent" // +5% к броне
   | "crit_percent" // +5% к криту
@@ -38,25 +38,25 @@ export const DEFAULT_HEAL_FLAT_HP = 200;
 
 /** Заглушки: все иконки пока один и тот же “зелья восстановления здоровья”. */
 export const ELIXIRS: ElixirDefinition[] = [
-  {
-    id: "elixir-heal_flat",
-    name: "Зелье здоровья",
-    kind: "heal_flat",
-    price: 30,
-    icon: "/images/elixir/elixir_4.png",
-    durationMs: ELIXIR_DURATION_MS,
-    powerDelta: undefined,
-    healFlatHp: 300,
-  },
-  {
-    id: "elixir-regen",
-    name: "Эликсир духа",
-    kind: "spirit_elixir",
-    price: 10,
-    icon: "/images/elixir/elixir_5.png",
-    durationMs: ELIXIR_DURATION_MS,
-    spiritBonus: 1000,
-  },
+  // {
+  //   id: "elixir-heal_flat",
+  //   name: "Зелье здоровья",
+  //   kind: "heal_flat",
+  //   price: 30,
+  //   icon: "/images/elixir/elixir_4.png",
+  //   durationMs: ELIXIR_DURATION_MS,
+  //   powerDelta: undefined,
+  //   healFlatHp: 300,
+  // },
+  // {
+  //   id: "elixir-regen",
+  //   name: "Эликсир духа",
+  //   kind: "spirit_elixir",
+  //   price: 10,
+  //   icon: "/images/elixir/elixir_5.png",
+  //   durationMs: ELIXIR_DURATION_MS,
+  //   spiritBonus: 1000,
+  // },
   {
     id: "elixir-power_plus_5",
     name: "Эликсир атаки",

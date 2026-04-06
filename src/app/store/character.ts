@@ -1,5 +1,9 @@
 import { defineStore } from "pinia";
-import type { EquipmentSlot, ItemInstance, ItemStats } from "@/entities/item/model";
+import type {
+  EquipmentSlot,
+  ItemInstance,
+  ItemStats,
+} from "@/entities/item/model";
 import { getEffectiveStats } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
 import { getDisplayItem } from "@/entities/item/model";
@@ -10,6 +14,7 @@ import {
 import { getItemSellPrice } from "@/shared/lib/merchant/getItemSellPrice";
 import type { MerchantOffer } from "@/entities/merchant/model/merchant-stock";
 import { generateInstanceId } from "@/entities/item/lib/createInstance";
+import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
 
 interface CharacterState {
   gold: number;
@@ -88,7 +93,13 @@ export const useCharacterStore = defineStore("character", {
 
   getters: {
     equipmentStats(state) {
-      return aggregateEquipmentBonuses(collectEquippedPartials(state));
+      const playerProgress = usePlayerProgress();
+      const characterLevel = playerProgress.level.value;
+
+      return aggregateEquipmentBonuses(
+        collectEquippedPartials(state),
+        characterLevel,
+      );
     },
 
     /** Сырые очки статов с экипировки (до перевода в доли), для отображения в UI. */
@@ -231,7 +242,11 @@ export const useCharacterStore = defineStore("character", {
     addItemToResources(instance: ItemInstance): boolean {
       const templateId = instance.templateId;
       const initialCount = Math.max(0, instance.count ?? 1);
-      if (!templateId || !templateId.startsWith("resource-") || initialCount <= 0) {
+      if (
+        !templateId ||
+        !templateId.startsWith("resource-") ||
+        initialCount <= 0
+      ) {
         return false;
       }
 
@@ -325,10 +340,7 @@ export const useCharacterStore = defineStore("character", {
       let remaining = amount;
       while (remaining > 0) {
         const idx = this.resources.findIndex(
-          (s) =>
-            s != null &&
-            s.templateId === templateId &&
-            (s.count ?? 1) > 0,
+          (s) => s != null && s.templateId === templateId && (s.count ?? 1) > 0,
         );
         if (idx === -1) return false;
         const inst = this.resources[idx]!;

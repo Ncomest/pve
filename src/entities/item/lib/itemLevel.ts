@@ -1,13 +1,18 @@
-import type { ItemStats, ItemTemplate, ItemInstance, Item } from "@/entities/item/model";
+import type {
+  ItemStats,
+  ItemTemplate,
+  ItemInstance,
+  Item,
+} from "@/entities/item/model";
 
 /**
  * Множитель статов от уровня вещи.
  * Менять коэффициент 0.1 здесь, если нужно усилить/ослабить рост статов от уровня.
- * Формула: 1 + (itemLevel - 1) * 0.1 (например itemLevel 5 → 1.4).
+ * Формула: 1 + (itemLevel - 1) * 2 (например itemLevel 5 → 1.4).
  * См. docs/balance-items.md.
  */
 export function getStatMultiplier(itemLevel: number): number {
-  return 1 + (itemLevel - 1) * 0.1;
+  return Math.floor((itemLevel - 1) / 3) + 1;
 }
 
 /**
@@ -23,7 +28,30 @@ export function getEffectiveStats(
   rolls?: ItemInstance["rolls"],
   generatedOverride?: ItemStats,
 ): ItemStats {
-  const source = generatedOverride && Object.keys(generatedOverride).length > 0 ? generatedOverride : baseStats;
+  // console.log("═══════════════════════════════════════");
+  // console.log("📊 getEffectiveStats ОТЛАДКА:");
+  // console.log("  generatedOverride (входные):", generatedOverride);
+  // console.log("  generatedOverride.accuracy:", generatedOverride?.accuracy);
+  // console.log("  generatedOverride.chanceCrit:", generatedOverride?.chanceCrit);
+  // console.log("  itemLevel:", itemLevel);
+  // console.log("═══════════════════════════════════════");
+
+  // console.log("========== DEBUG getEffectiveStats ==========");
+  // console.log("1. itemLevel:", itemLevel);
+  // console.log(
+  //   "2. generatedOverride (ваши сгенерированные статы):",
+  //   generatedOverride,
+  // );
+  // console.log("3. baseStats (статы из шаблона):", baseStats);
+
+  const source =
+    generatedOverride && Object.keys(generatedOverride).length > 0
+      ? generatedOverride
+      : baseStats;
+
+  // console.log("4. ИСПОЛЬЗУЕМ source:", source);
+  // console.log("5. Конкретно accuracy в source:", source.accuracy);
+
   const mult = getStatMultiplier(itemLevel);
   const result: ItemStats = {};
 
@@ -68,16 +96,19 @@ export function getEffectiveStats(
     const factor = rolls?.critDefense ?? 1;
     result.critDefense = Math.round(base * factor);
   }
-  if (source.spirit != null) {
-    const base = source.spirit * mult;
-    const factor = rolls?.spirit ?? 1;
-    result.spirit = Math.round(base * factor);
-  }
+  // if (source.spirit != null) {
+  //   const base = source.spirit * mult;
+  //   const factor = rolls?.spirit ?? 1;
+  //   result.spirit = Math.round(base * factor);
+  // }
   if (source.lifesteal != null) {
     const base = source.lifesteal * mult;
     const factor = rolls?.lifesteal ?? 1;
     result.lifesteal = Math.round(base * factor);
   }
+
+  // console.log("7. ФИНАЛЬНЫЕ статы:", result);
+  // console.log("==========================================\n");
 
   return result;
 }
@@ -88,7 +119,7 @@ export function getEffectiveStats(
  */
 export function getDisplayItem(
   instance: ItemInstance,
-  getTemplate: (templateId: string) => ItemTemplate | null
+  getTemplate: (templateId: string) => ItemTemplate | null,
 ): Item | null {
   const template = getTemplate(instance.templateId);
   if (!template) return null;

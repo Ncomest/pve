@@ -17,14 +17,13 @@ export const PLAYER_CHARACTER: Character = {
   stats: {
     hp: 300,
     maxHp: 300,
-    power: 20,
+    power: 5,
     chanceCrit: 0,
     evasion: 0,
     speed: 0,
     armor: 0,
     accuracy: 0,
     critDefense: 0,
-    spirit: 1500,
     lifesteal: 0,
   },
 };

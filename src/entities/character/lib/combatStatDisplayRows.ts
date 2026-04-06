@@ -1,6 +1,9 @@
 import type { Stats } from "@/entities/boss/model";
 import type { ElixirDefinition } from "@/features/elixirs/model/elixirs";
-import type { EquipmentBonuses, EquipmentRawPoints } from "@/entities/character/lib/playerStatAggregation";
+import type {
+  EquipmentBonuses,
+  EquipmentRawPoints,
+} from "@/entities/character/lib/playerStatAggregation";
 import {
   LEVEL_HP_PER_LEVEL,
   LEVEL_POWER_PER_LEVEL,
@@ -21,9 +24,9 @@ import {
   lifestealPointsToFraction,
   speedPointsToFraction,
 } from "@/entities/item/lib/statPoints";
-import { hpPerTickFromSpirit } from "@/features/character/model/usePlayerHp";
+// import { hpPerTickFromSpirit } from "@/features/character/model/usePlayerHp";
 
-const REGEN_TICK_SEC = 10;
+// const REGEN_TICK_SEC = 10;
 
 /** Строки таблицы характеристик (герой / экран боя). */
 export type StatRow =
@@ -55,7 +58,10 @@ export function fmtPctFromFraction(fraction: number): string {
 }
 
 /** Эквивалент «очков» для отображения у босса (в JSON заданы доли). */
-function fractionToPseudoPoints(fraction: number, pointsPerFraction: number): number {
+function fractionToPseudoPoints(
+  fraction: number,
+  pointsPerFraction: number,
+): number {
   if (fraction <= 0) return 0;
   return Math.round(fraction / pointsPerFraction);
 }
@@ -67,7 +73,7 @@ export interface BuildHeroStatRowsArgs {
   raw: EquipmentRawPoints;
   elixirDef: ElixirDefinition | null;
   healthPercentBonusHp: number;
-  spiritElixirBonus: number;
+  // spiritElixirBonus: number;
 }
 
 /** Переопределения для боя: итоговые значения с баффами способностей и т.п. */
@@ -95,7 +101,7 @@ export function buildHeroStatRows(
     raw,
     elixirDef,
     healthPercentBonusHp,
-    spiritElixirBonus,
+    // spiritElixirBonus,
   } = args;
 
   const hpBonusFromLevel = Math.max(0, level - 1) * LEVEL_HP_PER_LEVEL;
@@ -104,15 +110,22 @@ export function buildHeroStatRows(
 
   const levelPowerBonus = Math.max(0, level - 1) * LEVEL_POWER_PER_LEVEL;
 
-  const elixirPowerDelta = elixirDef?.kind === "power" ? elixirDef.powerDelta ?? 0 : 0;
+  const elixirPowerDelta =
+    elixirDef?.kind === "power" ? (elixirDef.powerDelta ?? 0) : 0;
   const elixirCritPercentBonus =
-    elixirDef?.kind === "crit_percent" ? elixirDef.critPercentBonus ?? 0 : 0;
+    elixirDef?.kind === "crit_percent" ? (elixirDef.critPercentBonus ?? 0) : 0;
   const elixirSpeedPercentBonus =
-    elixirDef?.kind === "speed_percent" ? elixirDef.speedPercentBonus ?? 0 : 0;
+    elixirDef?.kind === "speed_percent"
+      ? (elixirDef.speedPercentBonus ?? 0)
+      : 0;
   const elixirEvasionPercentBonus =
-    elixirDef?.kind === "evasion_percent" ? elixirDef.evasionPercentBonus ?? 0 : 0;
+    elixirDef?.kind === "evasion_percent"
+      ? (elixirDef.evasionPercentBonus ?? 0)
+      : 0;
   const elixirArmorPercentBonus =
-    elixirDef?.kind === "armor_percent" ? elixirDef.armorPercentBonus ?? 0 : 0;
+    elixirDef?.kind === "armor_percent"
+      ? (elixirDef.armorPercentBonus ?? 0)
+      : 0;
 
   const equipPower = eq.power ?? 0;
   const equipCrit = eq.chanceCrit ?? 0;
@@ -121,10 +134,16 @@ export function buildHeroStatRows(
   const equipArmor = eq.armor ?? 0;
 
   const critBeforeElixir = (base.chanceCrit ?? 0) + equipCrit;
-  const critAfterElixir = Math.min(1, critBeforeElixir + elixirCritPercentBonus);
+  const critAfterElixir = Math.min(
+    1,
+    critBeforeElixir + elixirCritPercentBonus,
+  );
 
   const evasionBeforeElixir = (base.evasion ?? 0) + equipEvasion;
-  const evasionAfterElixir = Math.min(1, evasionBeforeElixir + elixirEvasionPercentBonus);
+  const evasionAfterElixir = Math.min(
+    1,
+    evasionBeforeElixir + elixirEvasionPercentBonus,
+  );
 
   const baselineSpeed = playerSpeedBaseline();
   const speedTotalBeforeElixir = (base.speed ?? baselineSpeed) + equipSpeed;
@@ -156,18 +175,21 @@ export function buildHeroStatRows(
     (base.lifesteal ?? 0) + lifestealPointsToFraction(raw.lifesteal),
   );
 
-  const gearSpirit = raw.spirit;
-  const totalSpiritDefault =
-    (base.spirit ?? 0) + gearSpirit + spiritElixirBonus;
+  // const gearSpirit = raw.spirit;
+  // const totalSpiritDefault =
+  //   (base.spirit ?? 0) + gearSpirit + spiritElixirBonus;
 
   const attackTotal =
-    battle?.attackTotal ?? base.power + levelPowerBonus + equipPower + elixirPowerDelta;
+    battle?.attackTotal ??
+    base.power + levelPowerBonus + equipPower + elixirPowerDelta;
   const maxHpTotal = battle?.maxHpTotal ?? maxHpDefault;
   const critFraction = battle?.critFraction ?? critAfterElixir;
   const evasionFraction = battle?.evasionFraction ?? evasionAfterElixir;
   const speedFraction =
     battle?.speedStatTotal != null
-      ? speedPointsToFraction(speedGearPointsFromTotalSpeedStat(battle.speedStatTotal))
+      ? speedPointsToFraction(
+          speedGearPointsFromTotalSpeedStat(battle.speedStatTotal),
+        )
       : speedFractionDefault;
   const armorFraction =
     battle?.armorPoints != null
@@ -176,14 +198,14 @@ export function buildHeroStatRows(
   const accuracyFraction = battle?.accuracyFraction ?? accuracyDefault;
   const critDefenseFraction = battle?.critDefenseFraction ?? critDefDefault;
   const lifestealFraction = battle?.lifestealFraction ?? lifestealDefault;
-  const totalSpiritPoints = battle?.spiritPointsTotal ?? totalSpiritDefault;
+  // const totalSpiritPoints = battle?.spiritPointsTotal ?? totalSpiritDefault;
 
-  const hpPerTick = hpPerTickFromSpirit(totalSpiritPoints);
-  const hpPerSec = hpPerTick / REGEN_TICK_SEC;
-  const hpPerSecStr = `${hpPerSec.toLocaleString(undefined, {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 0,
-  })} HP/с`;
+  // const hpPerTick = hpPerTickFromSpirit(totalSpiritPoints);
+  // const hpPerSec = hpPerTick / REGEN_TICK_SEC;
+  // const hpPerSecStr = `${hpPerSec.toLocaleString(undefined, {
+  //   maximumFractionDigits: 2,
+  //   minimumFractionDigits: 0,
+  // })} HP/с`;
 
   return [
     {
@@ -193,10 +215,16 @@ export function buildHeroStatRows(
       total: attackTotal,
     },
     {
-      kind: "pair",
-      label: "Здоровье",
-      fromGear: eq.hp,
-      total: maxHpTotal,
+      kind: "percent",
+      label: "Меткость",
+      gearPoints: Math.round(raw.accuracy),
+      pct: fmtPctFromFraction(accuracyFraction),
+    },
+    {
+      kind: "percent",
+      label: "Крит",
+      gearPoints: Math.round(raw.crit),
+      pct: fmtPctFromFraction(critFraction),
     },
     {
       kind: "percent",
@@ -205,10 +233,10 @@ export function buildHeroStatRows(
       pct: fmtPctFromFraction(speedFraction),
     },
     {
-      kind: "percent",
-      label: "Крит",
-      gearPoints: Math.round(raw.crit),
-      pct: fmtPctFromFraction(critFraction),
+      kind: "pair",
+      label: "Здоровье",
+      fromGear: eq.hp,
+      total: maxHpTotal,
     },
     {
       kind: "percent",
@@ -224,22 +252,16 @@ export function buildHeroStatRows(
     },
     {
       kind: "percent",
-      label: "Меткость",
-      gearPoints: Math.round(raw.accuracy),
-      pct: fmtPctFromFraction(accuracyFraction),
-    },
-    {
-      kind: "percent",
       label: "Защита от крита",
       gearPoints: Math.round(raw.critDefense),
       pct: fmtPctFromFraction(critDefenseFraction),
     },
-    {
-      kind: "spirit",
-      label: "Дух",
-      gearPoints: Math.round(gearSpirit),
-      hpPerSec: hpPerSecStr,
-    },
+    // {
+    //   kind: "spirit",
+    //   label: "Дух",
+    //   gearPoints: Math.round(gearSpirit),
+    //   hpPerSec: hpPerSecStr,
+    // },
     {
       kind: "percent",
       label: "Самоисцеление",
@@ -265,11 +287,14 @@ export function buildBossStatRows(
   const tplSpeed = t.speed ?? baseline;
   const curSpeed = c.speed ?? baseline;
 
-  const hpPerTick = hpPerTickFromSpirit(c.spirit ?? 0);
-  const hpPerSecStr = `${(hpPerTick / REGEN_TICK_SEC).toLocaleString(undefined, {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 0,
-  })} HP/с`;
+  // const hpPerTick = hpPerTickFromSpirit(c.spirit ?? 0);
+  // const hpPerSecStr = `${(hpPerTick / REGEN_TICK_SEC).toLocaleString(
+  //   undefined,
+  //   {
+  //     maximumFractionDigits: 2,
+  //     minimumFractionDigits: 0,
+  //   },
+  // )} HP/с`;
 
   return [
     {
@@ -295,7 +320,10 @@ export function buildBossStatRows(
     {
       kind: "percent",
       label: "Крит",
-      gearPoints: fractionToPseudoPoints(t.chanceCrit ?? 0, CRIT_POINTS_TO_FRACTION),
+      gearPoints: fractionToPseudoPoints(
+        t.chanceCrit ?? 0,
+        CRIT_POINTS_TO_FRACTION,
+      ),
       pct: fmtPctFromFraction(c.chanceCrit ?? 0),
     },
     {
@@ -307,31 +335,43 @@ export function buildBossStatRows(
     {
       kind: "percent",
       label: "Уклонение",
-      gearPoints: fractionToPseudoPoints(t.evasion ?? 0, EVASION_POINTS_TO_FRACTION),
+      gearPoints: fractionToPseudoPoints(
+        t.evasion ?? 0,
+        EVASION_POINTS_TO_FRACTION,
+      ),
       pct: fmtPctFromFraction(c.evasion ?? 0),
     },
     {
       kind: "percent",
       label: "Меткость",
-      gearPoints: fractionToPseudoPoints(t.accuracy ?? 0, ACCURACY_POINTS_TO_FRACTION),
+      gearPoints: fractionToPseudoPoints(
+        t.accuracy ?? 0,
+        ACCURACY_POINTS_TO_FRACTION,
+      ),
       pct: fmtPctFromFraction(c.accuracy ?? 0),
     },
     {
       kind: "percent",
       label: "Защита от крита",
-      gearPoints: fractionToPseudoPoints(t.critDefense ?? 0, CRIT_DEFENSE_POINTS_TO_FRACTION),
+      gearPoints: fractionToPseudoPoints(
+        t.critDefense ?? 0,
+        CRIT_DEFENSE_POINTS_TO_FRACTION,
+      ),
       pct: fmtPctFromFraction(c.critDefense ?? 0),
     },
-    {
-      kind: "spirit",
-      label: "Дух",
-      gearPoints: Math.round(t.spirit ?? 0),
-      hpPerSec: hpPerSecStr,
-    },
+    // {
+    //   kind: "spirit",
+    //   label: "Дух",
+    //   gearPoints: Math.round(t.spirit ?? 0),
+    //   hpPerSec: hpPerSecStr,
+    // },
     {
       kind: "percent",
       label: "Самоисцеление",
-      gearPoints: fractionToPseudoPoints(t.lifesteal ?? 0, LIFESTEAL_POINTS_TO_FRACTION),
+      gearPoints: fractionToPseudoPoints(
+        t.lifesteal ?? 0,
+        LIFESTEAL_POINTS_TO_FRACTION,
+      ),
       pct: fmtPctFromFraction(c.lifesteal ?? 0),
     },
   ];

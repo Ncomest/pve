@@ -1,63 +1,34 @@
 <script setup lang="ts">
-import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
-import { usePlayerHp } from "@/features/character/model/usePlayerHp";
-import { useCharacterStore } from "@/app/store/character";
-import { computed } from "vue";
-import { PLAYER_CHARACTER } from "@/entities/character/model";
-import { useHeroAvatar } from "@/features/inventory/model/useHeroAvatar";
-import { buildHeroStatRows } from "@/entities/character/lib/combatStatDisplayRows";
-import { hpPerTickFromSpirit } from "@/features/character/model/usePlayerHp";
-import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
-import { LEVEL_HP_PER_LEVEL } from "@/entities/character/lib/playerStatAggregation";
-import "./HeroStats.scss";
+  import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
+  // import { usePlayerHp } from "@/features/character/model/usePlayerHp";
+  import { useCharacterStore } from "@/app/store/character";
+  import { computed } from "vue";
+  import { PLAYER_CHARACTER } from "@/entities/character/model";
+  import { useHeroAvatar } from "@/features/inventory/model/useHeroAvatar";
+  import { buildHeroStatRows } from "@/entities/character/lib/combatStatDisplayRows";
+  // import { hpPerTickFromSpirit } from "@/features/character/model/usePlayerHp";
+  import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
+  // import { LEVEL_HP_PER_LEVEL } from "@/entities/character/lib/playerStatAggregation";
+  import "./HeroStats.scss";
 
-const { level, xp, xpToNext, percentToNext } = usePlayerProgress();
-const characterStore = useCharacterStore();
-const elixirsStore = useElixirsStore();
+  const { level, xp, xpToNext, percentToNext } = usePlayerProgress();
+  const characterStore = useCharacterStore();
+  const elixirsStore = useElixirsStore();
 
-const statRows = computed(() =>
-  buildHeroStatRows({
-    base: PLAYER_CHARACTER.stats,
-    level: level.value,
-    equipment: characterStore.equipmentStats,
-    raw: characterStore.equipmentRawPoints,
-    elixirDef: elixirsStore.activeElixirDef,
-    healthPercentBonusHp: elixirsStore.activeHealthPercentBonusApplied,
-    spiritElixirBonus: elixirsStore.activeSpiritElixirBonus,
-  }),
-);
-
-const getMaxHp = () => {
-  const bonusHp = Math.max(0, level.value - 1) * LEVEL_HP_PER_LEVEL;
-  return (
-    PLAYER_CHARACTER.stats.maxHp +
-    bonusHp +
-    characterStore.equipmentStats.hp +
-    elixirsStore.activeHealthPercentBonusApplied
+  const statRows = computed(() =>
+    buildHeroStatRows({
+      base: PLAYER_CHARACTER.stats,
+      level: level.value,
+      equipment: characterStore.equipmentStats,
+      raw: characterStore.equipmentRawPoints,
+      elixirDef: elixirsStore.activeElixirDef,
+      healthPercentBonusHp: elixirsStore.activeHealthPercentBonusApplied,
+    }),
   );
-};
+  const { avatars, selectedAvatarId, selectedSrc, selectAvatar } =
+    useHeroAvatar();
 
-const getSpiritPoints = () =>
-  (PLAYER_CHARACTER.stats.spirit ?? 0) + (characterStore.equipmentStats.spirit ?? 0);
-
-const { useRealtimeHp } = usePlayerHp();
-const { currentHp, currentMaxHp, hpPct } = useRealtimeHp(
-  getMaxHp,
-  () => elixirsStore.activeRegenWindow,
-  getSpiritPoints,
-  () => elixirsStore.activeSpiritElixirBonus,
-);
-
-const isFullHp = computed(() => currentHp.value >= currentMaxHp.value);
-const regenHintText = computed(() => {
-  if (isFullHp.value) return "";
-  const perTick = hpPerTickFromSpirit(getSpiritPoints() + elixirsStore.activeSpiritElixirBonus);
-  return `+${perTick}/10с`;
-});
-
-const { avatars, selectedAvatarId, selectedSrc, selectAvatar } = useHeroAvatar();
-
-const currentAvatarSrc = computed(() => selectedSrc());
+  const currentAvatarSrc = computed(() => selectedSrc());
 </script>
 
 <template>
@@ -84,11 +55,48 @@ const currentAvatarSrc = computed(() => selectedSrc());
           xmlns="http://www.w3.org/2000/svg"
           aria-label="Герой"
         >
-          <circle cx="32" cy="18" r="12" stroke="currentColor" stroke-width="2.5" fill="rgba(99,102,241,0.15)" />
-          <path d="M10 68c0-12 9-22 22-22s22 10 22 22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none" />
-          <line x1="32" y1="46" x2="32" y2="58" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          <line x1="32" y1="52" x2="22" y2="62" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          <line x1="32" y1="52" x2="42" y2="62" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <circle
+            cx="32"
+            cy="18"
+            r="12"
+            stroke="currentColor"
+            stroke-width="2.5"
+            fill="rgba(99,102,241,0.15)"
+          />
+          <path
+            d="M10 68c0-12 9-22 22-22s22 10 22 22"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            fill="none"
+          />
+          <line
+            x1="32"
+            y1="46"
+            x2="32"
+            y2="58"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+          <line
+            x1="32"
+            y1="52"
+            x2="22"
+            y2="62"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+          <line
+            x1="32"
+            y1="52"
+            x2="42"
+            y2="62"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
         </svg>
       </div>
 
@@ -109,24 +117,8 @@ const currentAvatarSrc = computed(() => selectedSrc());
       <div class="hero-stats__level">{{ level }}</div>
 
       <div class="hero-stats__bars-tracks">
-        <!-- Полоса здоровья -->
-        <div class="hero-stats__bar-row">
-
-          <span class="hero-stats__bar-label hero-stats__bar-label--hp">
-            {{ currentHp }} / {{ currentMaxHp }}
-            <span v-if="regenHintText" class="hero-stats__regen-hint">{{ regenHintText }}</span>
-          </span>
-          <div class="hero-stats__bar-wrap">
-            <div
-              class="hero-stats__bar hero-stats__bar--hp"
-              :style="{ width: hpPct + '%' }"
-            />
-          </div>
-        </div>
-
         <!-- Полоса опыта -->
         <div class="hero-stats__bar-row">
-
           <span class="hero-stats__bar-label hero-stats__bar-label--xp">
             {{ xp }} / {{ xpToNext }}
           </span>
@@ -141,24 +133,32 @@ const currentAvatarSrc = computed(() => selectedSrc());
     </div>
 
     <div class="hero-stats__content">
-      <div
-        v-for="row in statRows"
-        :key="row.label"
-        class="hero-stats__row"
-      >
+      <div v-for="row in statRows" :key="row.label" class="hero-stats__row">
         <span class="hero-stats__row-label">{{ row.label }}:</span>
         <span class="hero-stats__row-values">
           <template v-if="row.kind === 'pair'">
-            <span class="hero-stats__val hero-stats__val--muted">{{ row.fromGear }}</span>
-            <span class="hero-stats__val hero-stats__val--total">{{ Math.round(row.total) }}</span>
+            <span class="hero-stats__val hero-stats__val--muted">{{
+              row.fromGear
+            }}</span>
+            <span class="hero-stats__val hero-stats__val--total">{{
+              Math.round(row.total)
+            }}</span>
           </template>
           <template v-else-if="row.kind === 'percent'">
-            <span class="hero-stats__val hero-stats__val--muted">{{ row.gearPoints }}</span>
-            <span class="hero-stats__val hero-stats__val--total">{{ row.pct }}</span>
+            <span class="hero-stats__val hero-stats__val--muted">{{
+              row.gearPoints
+            }}</span>
+            <span class="hero-stats__val hero-stats__val--total">{{
+              row.pct
+            }}</span>
           </template>
           <template v-else>
-            <span class="hero-stats__val hero-stats__val--muted">{{ row.gearPoints }}</span>
-            <span class="hero-stats__val hero-stats__val--total">{{ row.hpPerSec }}</span>
+            <span class="hero-stats__val hero-stats__val--muted">{{
+              row.gearPoints
+            }}</span>
+            <span class="hero-stats__val hero-stats__val--total">{{
+              row.hpPerSec
+            }}</span>
           </template>
         </span>
       </div>

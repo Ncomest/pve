@@ -2,44 +2,26 @@
   import { RouterLink, RouterView, useRoute } from "vue-router";
   import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
   import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
-  import {
-    hpPerTickFromSpirit,
-    usePlayerHp,
-  } from "@/features/character/model/usePlayerHp";
+  // import {
+  //   hpPerTickFromSpirit,
+  //   usePlayerHp,
+  // } from "@/features/character/model/usePlayerHp";
   import { useCharacterStore } from "@/app/store/character";
-  import { PLAYER_CHARACTER } from "@/entities/character/model";
-  import { LEVEL_HP_PER_LEVEL } from "@/entities/character/lib/playerStatAggregation";
+  // import { PLAYER_CHARACTER } from "@/entities/character/model";
+  // import { LEVEL_HP_PER_LEVEL } from "@/entities/character/lib/playerStatAggregation";
   import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
   import { getElixirDefinition } from "@/features/elixirs/model/elixirs";
+  import { useHeroAvatar } from "@/features/inventory/model/useHeroAvatar";
 
-  const { level, xp, xpToNext, percentToNext } = usePlayerProgress();
+  const { level } = usePlayerProgress();
   const characterStore = useCharacterStore();
   characterStore.init();
 
   const elixirsStore = useElixirsStore();
 
-  const getBaseSpirit = () =>
-    (PLAYER_CHARACTER.stats.spirit ?? 0) +
-    (characterStore.equipmentStats.spirit ?? 0);
-
-  const getMaxHp = () => {
-    const bonusHp = Math.max(0, level.value - 1) * LEVEL_HP_PER_LEVEL;
-    return (
-      PLAYER_CHARACTER.stats.maxHp +
-      bonusHp +
-      characterStore.equipmentStats.hp +
-      elixirsStore.activeHealthPercentBonusApplied
-    );
-  };
-
-  const { useRealtimeHp } = usePlayerHp();
-  const { currentHp, currentMaxHp, hpPct } = useRealtimeHp(
-    getMaxHp,
-    () => elixirsStore.activeRegenWindow,
-    getBaseSpirit,
-    () => elixirsStore.activeSpiritElixirBonus,
-  );
-  const isFullHp = computed(() => currentHp.value >= currentMaxHp.value);
+  const { selectedSrc } = useHeroAvatar();
+  const currentAvatarSrc = computed(() => selectedSrc());
+  // console.log("avatars", avatars);
 
   // Оставшееся время считается от `Date.now()`. Чтобы UI всегда пересчитывался,
   // делаем `nowMs` реактивным и обновляем раз в секунду.
@@ -56,19 +38,6 @@
 
   onBeforeUnmount(() => {
     if (nowTickerId !== null) window.clearInterval(nowTickerId);
-  });
-
-  const regenHintText = computed(() => {
-    // Делаем вычисление зависимым от тика, чтобы оно обновлялось.
-    nowMs.value;
-    const hasSpiritElixir = elixirsStore.activeRegenWindow != null;
-    // Если HP полностью, подсказку регенерации скрываем; при активном эликсире духа оставляем.
-    if (!hasSpiritElixir && isFullHp.value) return "";
-
-    const perTick = hpPerTickFromSpirit(
-      getBaseSpirit() + elixirsStore.activeSpiritElixirBonus,
-    );
-    return `+${perTick} ед / 10с`;
   });
 
   const formatRemainingTime = (msLeft: number) => {
@@ -102,35 +71,6 @@
     return nowMs.value < endAt;
   });
 
-  function lerpColor(
-    [r1, g1, b1]: [number, number, number],
-    [r2, g2, b2]: [number, number, number],
-    t: number,
-  ): string {
-    const r = Math.round(r1 + (r2 - r1) * t);
-    const g = Math.round(g1 + (g2 - g1) * t);
-    const b = Math.round(b1 + (b2 - b1) * t);
-    return `rgb(${r},${g},${b})`;
-  }
-
-  const RED: [number, number, number] = [239, 68, 68];
-  const YELLOW: [number, number, number] = [234, 179, 8];
-  const GREEN: [number, number, number] = [34, 197, 94];
-
-  const hpBarStyle = computed(() => {
-    const pct = Math.max(0, Math.min(100, hpPct.value));
-    let color: string;
-    if (pct <= 50) {
-      color = lerpColor(RED, YELLOW, pct / 50);
-    } else {
-      color = lerpColor(YELLOW, GREEN, (pct - 50) / 50);
-    }
-    return {
-      width: `${pct}%`,
-      background: color,
-    };
-  });
-
   const route = useRoute();
   const isBattlePage = computed(() => route.name === "battle");
 
@@ -151,35 +91,17 @@
       <!-- Статус персонажа вместо логотипа -->
       <div class="char-status-column">
         <div class="char-status">
-          <div class="char-status__level">
-            <span class="char-status__level-value">{{ level }}</span>
-            <span class="char-status__level-label">Ур.</span>
-          </div>
-          <div class="char-status__bars">
-            <div class="char-status__bar-row">
-              <div class="char-status__bar-track">
-                <div
-                  class="char-status__bar char-status__bar--hp"
-                  :style="hpBarStyle"
-                />
-              </div>
-              <span class="char-status__bar-text char-status__bar-text--hp">
-                {{ currentHp }}&thinsp;/&thinsp;{{ currentMaxHp }}
-                <span v-if="regenHintText" class="char-status__regen">{{
-                  regenHintText
-                }}</span>
-              </span>
-            </div>
-            <div class="char-status__bar-row">
-              <div class="char-status__bar-track">
-                <div
-                  class="char-status__bar char-status__bar--xp"
-                  :style="{ width: percentToNext + '%' }"
-                />
-              </div>
-              <span class="char-status__bar-text char-status__bar-text--xp">
-                {{ xp }}&thinsp;/&thinsp;{{ xpToNext }} XP
-              </span>
+          <div class="char-status__avatar">
+            <img
+              v-if="currentAvatarSrc"
+              :src="currentAvatarSrc"
+              alt="Аватар героя"
+              class="char-status__avatar-img"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="char-status__level">
+              <span class="char-status__level-value">{{ level }}</span>
             </div>
           </div>
         </div>
@@ -204,7 +126,7 @@
 
       <nav class="app-nav app-nav--desktop">
         <!-- Кнопка Битва — квадратная с иконкой мечей -->
-        <RouterLink to="/" class="nav-link nav-link--battle">
+        <RouterLink to="/boss-select" class="nav-link nav-link--battle">
           <svg
             class="nav-link__icon"
             viewBox="0 0 24 24"
@@ -439,7 +361,9 @@
       </button>
 
       <div v-if="isMenuOpen" :id="menuId" class="app-burger-panel">
-        <p v-if="!elixirShown" class="app-burger-elixir--not-active">Нет активных эликсиров</p>
+        <p v-if="!elixirShown" class="app-burger-elixir--not-active">
+          Нет активных эликсиров
+        </p>
         <div v-if="elixirShown" class="app-burger-elixir">
           <img
             :src="activeElixirDef?.icon ?? undefined"

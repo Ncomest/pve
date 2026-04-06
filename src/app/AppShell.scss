@@ -33,16 +33,37 @@
   gap: 6px;
 }
 
+.char-status__avatar {
+  position: relative;
+  height: 80px;
+  aspect-ratio: 1;
+  border: 2px solid rgba(250, 204, 21, 0.5);
+  border-radius: 50%;
+}
+
+.char-status__avatar-img {
+  border-radius: 50%;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
 .char-status__level {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: 1.5px solid rgba(250, 204, 21, 0.5);
-  border-radius: 6px;
-  background: rgba(250, 204, 21, 0.07);
+  min-width: 20px;
+  min-height: 20px;
+  aspect-ratio: 1;
+  padding: 2px;
+  border: 2px solid rgba(250, 204, 21, 0.5);
+  border-radius: 50%;
+  background: rgba(250, 204, 21);
   flex-shrink: 0;
 }
 
@@ -50,71 +71,15 @@
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: rgba(250, 204, 21, 0.6);
+  color: rgba(250, 204, 21);
   line-height: 1;
 }
 
 .char-status__level-value {
   font-size: 17px;
   font-weight: 700;
-  color: #facc15;
+  color: #302f33;
   line-height: 1;
-}
-
-.char-status__bars {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.char-status__bar-row {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.char-status__bar-track {
-  width: 160px;
-  height: 7px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.char-status__bar {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.4s ease;
-}
-
-.char-status__bar--hp {
-  transition:
-    width 0.3s ease-out,
-    background 0.4s ease-out;
-}
-
-.char-status__bar--xp {
-  background: linear-gradient(90deg, #3b82f6, #60a5fa);
-}
-
-.char-status__bar-text {
-  font-size: 11px;
-  white-space: nowrap;
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.char-status__bar-text--hp {
-  color: rgba(252, 165, 165, 0.9);
-}
-
-.char-status__bar-text--xp {
-  color: rgba(147, 197, 253, 0.85);
-}
-
-.char-status__regen {
-  margin-left: 3px;
-  font-size: 10px;
-  color: rgba(134, 239, 172, 0.8);
 }
 
 /* ── Навигация ── */
@@ -406,16 +371,6 @@
     width: 100%;
   }
 
-  .char-status__bar-row {
-    width: 100%;
-  }
-
-  .char-status__bar-track {
-    width: auto;
-    flex: 1;
-    min-width: 0;
-  }
-
   .app-nav--desktop {
     display: none;
   }
@@ -496,9 +451,12 @@
 }
 
 @media (max-width: 425px) {
-  .char-status__level {
-    width: 34px;
-    height: 34px;
+  .app-main {
+    margin-bottom: 80px;
+  }
+
+  .char-status__avatar {
+    height: 60px;
   }
 
   .char-status__level-value {
