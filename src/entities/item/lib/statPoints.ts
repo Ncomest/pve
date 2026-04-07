@@ -13,16 +13,16 @@
  * См. также docs/balance-items.md и docs/player-character-stats.md.
  * Суммирование очков с экипировки и слияние с базой героя: `entities/character/lib/playerStatAggregation.ts`.
  */
-export const CRIT_POINTS_TO_FRACTION = 0.009 / 10; // 10 очков ≈ 0.25%
-export const EVASION_POINTS_TO_FRACTION = 0.009 / 10; // 10 очков ≈ 0.25%
-export const SPEED_POINTS_TO_FRACTION = 0.009 / 10; // 10 очков скорости ≈ 0.25%
-export const ARMOR_POINTS_TO_FRACTION = 0.02 / 10; // 10 очков брони ≈ 1% снижения урона
-/** 10 очков меткости ≈ 0.25% (как крит) */
-export const ACCURACY_POINTS_TO_FRACTION = 0.0085 / 10;
-/** 10 очков защиты от крита ≈ 0.25% */
-export const CRIT_DEFENSE_POINTS_TO_FRACTION = 0.003 / 10;
-/** 10 очков самоисцеления ≈ 0.05% урона в лечение */
-export const LIFESTEAL_POINTS_TO_FRACTION = 0.0005 / 10;
+export const CRIT_POINTS_TO_FRACTION = 0.009 / 5; // 5 очков ≈ 0.25%
+export const EVASION_POINTS_TO_FRACTION = 0.009 / 5; // 5 очков ≈ 0.25%
+export const SPEED_POINTS_TO_FRACTION = 0.009 / 5; // 5 очков скорости ≈ 0.25%
+export const ARMOR_POINTS_TO_FRACTION = 0.02 / 5; // 5 очков брони ≈ 1% снижения урона
+/** 5 очков меткости ≈ 0.25% (как крит) */
+export const ACCURACY_POINTS_TO_FRACTION = 0.0085 / 5;
+/** 5 очков защиты от крита ≈ 0.25% */
+export const CRIT_DEFENSE_POINTS_TO_FRACTION = 0.003 / 5;
+/** 5 очков самоисцеления ≈ 0.05% урона в лечение */
+export const LIFESTEAL_POINTS_TO_FRACTION = 0.0005 / 5;
 
 /** Переводит очки крита в долю (для статов персонажа/боя). */
 // export function critPointsToFraction(points: number): number {
@@ -74,7 +74,6 @@ export function getConversionEfficiency(level: number): number {
   // Защита от некорректных значений
   const safeLevel = Math.max(1, level || 1);
 
-  // if (safeLevel < 1) return 1;
 
   const falloff = 0.5; // скорость падения (чем меньше, тем медленнее падает)
   const efficiency = 1 / (1 + falloff * (safeLevel - 1));

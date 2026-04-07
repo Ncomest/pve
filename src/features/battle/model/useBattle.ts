@@ -328,9 +328,9 @@ export function useBattle(bossId: () => string | undefined) {
   const damageReductionPercent = ref(0);
   let damageReductionTimerId: ReturnType<typeof setTimeout> | null = null;
 
-  /** Стаки усиления «Потрошение» (от «Размашистого удара», макс 4) */
+  /** Стаки усиления «Потрошение» (от «Размашистого удара», макс 2) */
   const eviscerateStacks = ref(0);
-  const EVISERATE_STACKS_MAX = 4;
+  const EVISERATE_STACKS_MAX = 2;
   /** Бонус крита от «Размашистого удара» */
   const sweepingCritBonus = ref(0);
   let sweepingCritTimerId: ReturnType<typeof setTimeout> | null = null;
@@ -645,26 +645,6 @@ export function useBattle(bossId: () => string | undefined) {
   //===================================//
 
   // TODO: Убрать все ненужные очистки бафов с босса
-  // Очистка бафов с босса
-  // const clearBuffFromBoss = (abilityId: string) => {
-  //   const timeoutId = bossBuffTimeouts.get(abilityId);
-  //   if (timeoutId) {
-  //     clearTimeout(timeoutId);
-  //     bossBuffTimeouts.delete(abilityId);
-  //   }
-  //   // Удаляем бафф из массива
-  //   bossBuffs.value = bossBuffs.value.filter((e) => e.id !== abilityId);
-  // };
-
-  // const clearAllBossBuffs = () => {
-  //   // 1. Очищаем все таймауты из Map и сам Map
-  //   // TODO: откуда идет timeoutId?
-  //   bossBuffTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
-  //   bossBuffTimeouts.clear();
-
-  //   // 2. Очищаем массив баффов/дебаффов на боссе
-  //   bossBuffs.value = [];
-  // };
 
   // ========================== //
   const clearArcaneShieldBuff = () => {
@@ -818,7 +798,7 @@ export function useBattle(bossId: () => string | undefined) {
       // Бонус крита от «Размашистого удара» + шанс крита способности
       const attacker: Stats = {
         ...player.stats,
-        power: playerPower.value,
+        power: playerPower.value * 0.4,
         chanceCrit: Math.min(
           1,
           player.stats.chanceCrit +
@@ -906,6 +886,7 @@ export function useBattle(bossId: () => string | undefined) {
             (e) => e.id !== "sweeping-crit",
           );
           const critEndTime = Date.now() + ability.selfBuffCritDurationMs;
+
           playerBuffs.value = [
             ...playerBuffs.value,
             {
@@ -967,10 +948,11 @@ export function useBattle(bossId: () => string | undefined) {
         }
 
         const tickDmg = Math.round(
-          ability.baseDamageX *
+          (ability.baseDamageX *
             ability.dotTickDamageMultiplier *
             playerPower.value *
-            n,
+            n) /
+            (ability.dotDurationMs / ability.dotTickIntervalMs),
         );
 
         // Очищаем предыдущий DoT от той же способности (включая старые таймеры)
@@ -1904,6 +1886,7 @@ export function useBattle(bossId: () => string | undefined) {
         ...player.stats,
         evasion: effectiveEvasion,
       };
+      
       const { damage, isCrit, isDodged } = calcHit(
         attacker,
         defenderStats,

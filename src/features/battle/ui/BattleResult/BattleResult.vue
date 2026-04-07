@@ -1,21 +1,24 @@
 <script setup lang="ts">
-import type { ItemInstance } from "@/entities/item/model";
-import LootPanel from "@/features/battle/ui/LootPanel/LootPanel.vue";
-import "./BattleResult.scss";
+  import type { ItemInstance } from "@/entities/item/model";
+  import LootPanel from "@/features/battle/ui/LootPanel/LootPanel.vue";
+  import "./BattleResult.scss";
+  import { BattleLog } from "@/features/battle/ui";
+import { BattleLogEntry } from "../../model/useBattle";
 
-const props = defineProps<{
-  winnerText: string;
-  isVictory: boolean;
-  loot: ItemInstance[];
-  showLoot: boolean;
-}>();
+  const props = defineProps<{
+    winnerText: string;
+    isVictory: boolean;
+    loot: ItemInstance[];
+    showLoot: boolean;
+    battleLog: BattleLogEntry[]
+  }>();
 
-const emit = defineEmits<{
-  replay: [];
-  goToBossSelect: [];
-  continue: [];
-  takeItem: [item: ItemInstance];
-}>();
+  const emit = defineEmits<{
+    replay: [];
+    goToBossSelect: [];
+    continue: [];
+    takeItem: [item: ItemInstance];
+  }>();
 </script>
 
 <template>
@@ -31,7 +34,10 @@ const emit = defineEmits<{
         {{ props.isVictory ? "Босс повержен" : props.winnerText }}
       </div>
 
-      <div v-if="props.isVictory && props.showLoot && props.loot.length" class="battle-result-modal__loot">
+      <div
+        v-if="props.isVictory && props.showLoot && props.loot.length"
+        class="battle-result-modal__loot"
+      >
         <LootPanel
           :items="props.loot"
           @take-item="(item) => emit('takeItem', item)"
@@ -64,6 +70,8 @@ const emit = defineEmits<{
           </button>
         </template>
       </div>
+
+      <BattleLog :lines="battleLog" />
     </div>
   </div>
 </template>

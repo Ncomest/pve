@@ -85,7 +85,7 @@ function aggregate(partials) {
     speed: 0,
     accuracy: 0,
     critDefense: 0,
-    spirit: 0,
+    // spirit: 0,
     lifesteal: 0,
   };
   let critPoints = 0;
@@ -103,7 +103,7 @@ function aggregate(partials) {
     stats.armor += e.armor ?? 0;
     accuracyPoints += e.accuracy ?? 0;
     critDefensePoints += e.critDefense ?? 0;
-    stats.spirit += e.spirit ?? 0;
+    // stats.spirit += e.spirit ?? 0;
     lifestealPoints += e.lifesteal ?? 0;
   }
   stats.chanceCrit = Math.min(1, critPoints * CRIT_POINTS_TO_FRACTION);
@@ -115,7 +115,7 @@ function aggregate(partials) {
 }
 
 const LEVEL_HP_PER_LEVEL = 20;
-const LEVEL_POWER_PER_LEVEL = 2;
+const LEVEL_POWER_PER_LEVEL = 1;
 const PLAYER_SPEED_BASELINE = 2;
 
 function buildPlayer(equip, level) {

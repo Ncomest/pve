@@ -4,24 +4,24 @@ const rng = () => Math.random();
 
 /** Базовые «единицы» для масштабирования линий статов (см. docs/balance-items). */
 export const PROC_BASE: ItemStats = {
-  hp: 10,
-  power: 2,
-  armor: 10,
-  chanceCrit: 10,
-  evasion: 10,
-  speed: 10,
-  accuracy: 10,
-  critDefense: 10,
-  lifesteal: 10,
+  hp: 5,
+  power: 1,
+  armor: 5,
+  chanceCrit: 5,
+  evasion: 5,
+  speed: 5,
+  accuracy: 5,
+  critDefense: 5,
+  lifesteal: 5,
 };
 
 /** Веса редкости: белая 90%, зелёная 4%, синяя 3%, эпическая 2%, уникальная 1%. */
 const RARITY_WEIGHTS: { rarity: ItemRarity; weight: number }[] = [
-  { rarity: "common", weight: 1 },
-  { rarity: "uncommon", weight: 4 },
-  { rarity: "rare", weight: 3 },
-  { rarity: "epic", weight: 2 },
-  { rarity: "unique", weight: 90 },
+  { rarity: "common", weight: 4 },
+  { rarity: "uncommon", weight: 20 },
+  { rarity: "rare", weight: 10 },
+  { rarity: "epic", weight: 6 },
+  { rarity: "unique", weight: 60},
 ];
 
 /** Доля силы ролла от «базового дропа» (min..max включительно в процентах). */

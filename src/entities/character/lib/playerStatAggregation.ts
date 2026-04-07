@@ -32,7 +32,7 @@ import {
 export const LEVEL_HP_PER_LEVEL = 20;
 
 /** Прирост силы атаки за каждый уровень персонажа выше 1. */
-export const LEVEL_POWER_PER_LEVEL = 2;
+export const LEVEL_POWER_PER_LEVEL = 1;
 
 /**
  * Максимальная доля сокращения времени кулдаунов от скорости (очки + временные баффы),

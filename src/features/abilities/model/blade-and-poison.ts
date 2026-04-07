@@ -1,7 +1,7 @@
 import type { Ability } from "./types";
 
 /** Базовый множитель урона X для формул класса «Клинок и Яд» (настраивается балансом) */
-const X = 1.0;
+const X = 0.15;
 
 const CLASS_ID = "blade-and-poison";
 
@@ -14,7 +14,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
   {
     id: "cunning-strike",
     name: "Коварный удар",
-    description: "Вы наносите небольшой урон и накапливаете 2 комбо-поинта",
+    description: "Вы наносите небольшой урон и накапливаете 1 комбо-поинта",
     type: "damage",
     value: 0,
     cooldownMs: 0,
@@ -22,16 +22,16 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     role: "generator",
     classId: CLASS_ID,
     baseDamageX: X,
-    comboGain: 2,
+    comboGain: 1,
     effects: [
       { kind: "damage", baseDamageX: X },
-      { kind: "gain_combo", amount: 2 },
+      { kind: "gain_combo", amount: 1 },
     ],
   },
   {
     id: "fierce-strike",
     name: "Свирепый удар",
-    description: "Вы наносите средний удар и получаете 4 комбо-поинта",
+    description: "Вы наносите средний удар и получаете 3 комбо-поинта",
     type: "damage",
     value: 0,
     cooldownMs: 10_000,
@@ -39,7 +39,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     role: "generator",
     classId: CLASS_ID,
     baseDamageX: X,
-    comboGain: 4,
+    comboGain: 3,
     armorDebuffPercent: 0.3,
     armorDebuffDurationMs: 7_000,
   },
@@ -47,7 +47,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     id: "sweeping-strike",
     name: "Размашистый удар",
     description:
-      "Вы наносите средний урон, увеличиваете свой крит на 10% на 3 сек. Так же вы получаете стак, который усиливает урон от потрошения на 15%, максимально 4 стака",
+      "Вы наносите средний урон, получаете 2 комбо-поинта, увеличиваете свой крит на 10% на 3 сек. Так же вы получаете стак, который усиливает урон от потрошения на 15%, максимально 4 стака",
     type: "damage",
     value: 0,
     cooldownMs: 6_000,
@@ -55,12 +55,12 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     role: "generator",
     classId: CLASS_ID,
     baseDamageX: X,
-    comboGain: 3,
+    comboGain: 2,
     selfBuffCritPercent: 0.1,
     selfBuffCritDurationMs: 3_000,
     eviscerateStacksGain: 1,
     eviscerateStackBonusPercent: 0.15,
-    eviscerateMaxStacks: 4,
+    eviscerateMaxStacks: 2,
   },
 
   // --- Финишеры ---
@@ -68,7 +68,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     id: "eviscerate",
     name: "Потрошение",
     description:
-      "Вы наносите сильный урон. Сила урона зависит от количество используемых комбо-поинтов. Используется 2-4 комбо-поинта",
+      "Вы наносите сильный урон. Сила урона зависит от количество используемых комбо-поинтов. Используется 3-6 комбо-поинта",
     type: "damage",
     value: 0,
     cooldownMs: 0,
@@ -84,7 +84,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     id: "poisonous-bite",
     name: "Ядовитый укус",
     description:
-      "Вы тратите 3-5 комбо-поинтов и наносите продолжительный урон ядом в течении 16 сек. Чем больше использовано комбо-понитов, тем больше урона нанесете. С вероятностью 15% вы можете усилить следующий 'Коварный удар' на 100%",
+      "Вы тратите 3-6 комбо-поинтов и наносите продолжительный урон ядом в течении 16 сек. Чем больше использовано комбо-понитов, тем больше урона нанесете. С вероятностью 15% вы можете усилить следующий 'Коварный удар' на 100%",
     type: "damage",
     value: 0,
     cooldownMs: 0,
@@ -97,7 +97,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     dotInstantDamageRatio: 0.5,
     dotDurationMs: 16_000,
     dotTickIntervalMs: 2_000,
-    dotTickDamageMultiplier: 0.3,
+    dotTickDamageMultiplier: 1.2,
     dotProcChance: 0.15,
     dotProcBuffId: "cunning",
     dotProcBuffDurationMs: 15_000,

@@ -15,8 +15,8 @@ export const PLAYER_CHARACTER: Character = {
   xp: 0,
   xpToNext: 100,
   stats: {
-    hp: 50,
-    maxHp: 50,
+    hp: 30,
+    maxHp: 30,
     power: 2,
     chanceCrit: 0,
     evasion: 0,
