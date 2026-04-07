@@ -9,7 +9,7 @@
     "stats": {
       "hp": 15,
       "maxHp": 15,
-      "power": 3,
+      "power": 2,
       "chanceCrit": 0,
       "evasion": 0,
       "armor": 0,
@@ -161,7 +161,7 @@
     "stats": {
       "hp": 70,
       "maxHp": 70,
-      "power": 4,
+      "power": 5,
       "chanceCrit": 0.12,
       "evasion": 0.08,
       "armor": 4,
@@ -269,7 +269,7 @@
     "stats": {
       "hp": 75,
       "maxHp": 75,
-      "power": 3,
+      "power": 5,
       "chanceCrit": 0.11,
       "evasion": 0.09,
       "armor": 3,
@@ -346,7 +346,7 @@
     "stats": {
       "hp": 80,
       "maxHp": 80,
-      "power": 3,
+      "power": 6,
       "chanceCrit": 0.1,
       "evasion": 0.06,
       "armor": 4,
@@ -423,7 +423,7 @@
     "stats": {
       "hp": 120,
       "maxHp": 120,
-      "power": 4,
+      "power": 9,
       "chanceCrit": 0.12,
       "evasion": 0.1,
       "armor": 1,
@@ -519,7 +519,7 @@
     "stats": {
       "hp": 120,
       "maxHp": 120,
-      "power": 4,
+      "power": 9,
       "chanceCrit": 0.14,
       "evasion": 0.12,
       "armor": 2,
@@ -584,7 +584,7 @@
     "stats": {
       "hp": 120,
       "maxHp": 120,
-      "power": 4,
+      "power": 10,
       "chanceCrit": 0.11,
       "evasion": 0.08,
       "armor": 1,
@@ -651,7 +651,7 @@
     "stats": {
       "hp": 170,
       "maxHp": 170,
-      "power": 5,
+      "power": 15,
       "chanceCrit": 0.1,
       "evasion": 0.08,
       "armor": 2,
@@ -739,7 +739,7 @@
     "stats": {
       "hp": 170,
       "maxHp": 170,
-      "power": 5,
+      "power": 15,
       "chanceCrit": 0.11,
       "evasion": 0.1,
       "armor": 2,
@@ -816,7 +816,7 @@
     "stats": {
       "hp": 170,
       "maxHp": 170,
-      "power": 5,
+      "power": 15,
       "chanceCrit": 0.12,
       "evasion": 0.09,
       "armor": 3,
@@ -883,7 +883,7 @@
     "stats": {
       "hp": 210,
       "maxHp": 210,
-      "power": 6,
+      "power": 20,
       "chanceCrit": 0.18,
       "evasion": 0.12,
       "armor": 3,
@@ -998,7 +998,7 @@
     "stats": {
       "hp": 210,
       "maxHp": 4821000,
-      "power": 6,
+      "power": 20,
       "chanceCrit": 0.17,
       "evasion": 0.11,
       "armor": 3,
@@ -1064,7 +1064,7 @@
     "stats": {
       "hp": 210,
       "maxHp": 210,
-      "power": 6,
+      "power": 20,
       "chanceCrit": 0.16,
       "evasion": 0.1,
       "armor": 5,
@@ -1142,7 +1142,7 @@
     "stats": {
       "hp": 250,
       "maxHp": 250,
-      "power": 6,
+      "power": 24,
       "chanceCrit": 0.2,
       "evasion": 0.15,
       "armor": 4,
@@ -1259,7 +1259,7 @@
     "stats": {
       "hp": 250,
       "maxHp": 250,
-      "power": 7,
+      "power": 24,
       "chanceCrit": 0.19,
       "evasion": 0.14,
       "armor": 4,
@@ -1328,7 +1328,7 @@
     "stats": {
       "hp": 250,
       "maxHp": 250,
-      "power": 7,
+      "power": 24,
       "chanceCrit": 0.18,
       "evasion": 0.13,
       "armor": 5,
@@ -1408,7 +1408,7 @@
     "stats": {
       "hp": 290,
       "maxHp": 290,
-      "power": 8,
+      "power": 30,
       "chanceCrit": 0.14,
       "evasion": 0.05,
       "armor": 8,
@@ -1517,7 +1517,7 @@
     "stats": {
       "hp": 290,
       "maxHp": 290,
-      "power": 8,
+      "power": 30,
       "chanceCrit": 0.13,
       "evasion": 0.06,
       "armor": 9,
@@ -1586,7 +1586,7 @@
     "stats": {
       "hp": 290,
       "maxHp": 290,
-      "power": 8,
+      "power": 30,
       "chanceCrit": 0.15,
       "evasion": 0.08,
       "armor": 7,
@@ -1653,7 +1653,7 @@
     "stats": {
       "hp": 330,
       "maxHp": 330,
-      "power": 9,
+      "power": 33,
       "chanceCrit": 0.25,
       "evasion": 0.18,
       "armor": 10,
@@ -1784,7 +1784,7 @@
     "stats": {
       "hp": 330,
       "maxHp": 330,
-      "power": 10,
+      "power": 33,
       "chanceCrit": 0.23,
       "evasion": 0.15,
       "armor": 11,
@@ -1849,7 +1849,7 @@
     "stats": {
       "hp": 330,
       "maxHp": 330,
-      "power": 10,
+      "power": 35,
       "chanceCrit": 0.27,
       "evasion": 0.2,
       "armor": 9,
@@ -1931,7 +1931,7 @@
     "stats": {
       "hp": 370,
       "maxHp": 370,
-      "power": 10,
+      "power": 38,
       "chanceCrit": 0.1,
       "evasion": 0.03,
       "armor": 15,
@@ -2055,7 +2055,7 @@
     "stats": {
       "hp": 370,
       "maxHp": 370,
-      "power": 11,
+      "power": 38,
       "chanceCrit": 0.11,
       "evasion": 0.04,
       "armor": 16,
@@ -2120,7 +2120,7 @@
     "stats": {
       "hp": 370,
       "maxHp": 370,
-      "power": 10,
+      "power": 38,
       "chanceCrit": 0.12,
       "evasion": 0.05,
       "armor": 14,
@@ -2182,7 +2182,7 @@
     "stats": {
       "hp": 430,
       "maxHp": 430,
-      "power": 12,
+      "power": 41,
       "chanceCrit": 0.25,
       "evasion": 0.12,
       "armor": 12,
@@ -2341,7 +2341,7 @@
     "stats": {
       "hp": 430,
       "maxHp": 430,
-      "power": 12,
+      "power": 41,
       "chanceCrit": 0.24,
       "evasion": 0.11,
       "armor": 13,
@@ -2419,7 +2419,7 @@
     "stats": {
       "hp": 430,
       "maxHp": 430,
-      "power": 10,
+      "power": 41,
       "chanceCrit": 0.26,
       "evasion": 0.15,
       "armor": 11,
