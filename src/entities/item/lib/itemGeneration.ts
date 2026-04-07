@@ -17,11 +17,11 @@ export const PROC_BASE: ItemStats = {
 
 /** Веса редкости: белая 90%, зелёная 4%, синяя 3%, эпическая 2%, уникальная 1%. */
 const RARITY_WEIGHTS: { rarity: ItemRarity; weight: number }[] = [
-  { rarity: "common", weight: 60 },
-  { rarity: "uncommon", weight: 20 },
-  { rarity: "rare", weight: 10 },
-  { rarity: "epic", weight: 6 },
-  { rarity: "unique", weight: 4},
+  { rarity: "common", weight: 72 },
+  { rarity: "uncommon", weight: 15 },
+  { rarity: "rare", weight: 7 },
+  { rarity: "epic", weight: 4 },
+  { rarity: "unique", weight: 2},
 ];
 
 /** Доля силы ролла от «базового дропа» (min..max включительно в процентах). */
