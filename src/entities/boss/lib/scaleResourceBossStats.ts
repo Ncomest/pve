@@ -14,15 +14,27 @@ export function scaleResourceBossStats(
   const lvl = Math.max(1, heroLevel);
   const linear = lvl / safeBase;
 
-  const scaledHp = Math.max(1, Math.round(base.maxHp * linear));
-  const scaledPower = Math.max(1, Math.round(base.power * linear));
+  // const hpMultiplier = 0.03; // уменьшаем HP на 30%
+  // const powerMultiplier = 0.3; // уменьшаем урон на 40%
+
+  const scaledHp = Math.max(
+    1,
+    Math.round(
+      base.maxHp * linear,
+      // * hpMultiplier
+    ),
+  );
+  const scaledPower = Math.max(
+    1,
+    Math.round(
+      base.power * linear,
+      // * powerMultiplier
+    ),
+  );
   const scaledArmor = Math.max(0, Math.round((base.armor ?? 0) * linear));
 
   const fracBoost = Math.min(1.35, 0.85 + (lvl - safeBase) * 0.012);
-  const evasion = Math.min(
-    0.55,
-    Math.max(0, (base.evasion ?? 0) * fracBoost),
-  );
+  const evasion = Math.min(0.55, Math.max(0, (base.evasion ?? 0) * fracBoost));
   const chanceCrit = Math.min(
     0.45,
     Math.max(0, (base.chanceCrit ?? 0) * fracBoost),

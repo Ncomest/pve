@@ -7,8 +7,8 @@
     "rarity": "common",
     "xpReward": 20,
     "stats": {
-      "hp": 40,
-      "maxHp": 40,
+      "hp": 15,
+      "maxHp": 15,
       "power": 3,
       "chanceCrit": 0,
       "evasion": 0,
@@ -71,8 +71,8 @@
     "rarity": "common",
     "xpReward": 50,
     "stats": {
-      "hp": 50,
-      "maxHp": 50,
+      "hp": 16,
+      "maxHp": 16,
       "power": 2,
       "chanceCrit": 0.05,
       "evasion": 0.03,
@@ -94,12 +94,12 @@
     "rarity": "common",
     "xpReward": 50,
     "stats": {
-      "hp": 45,
-      "maxHp": 45,
+      "hp": 14,
+      "maxHp": 14,
       "power": 2,
       "chanceCrit": 0.04,
       "evasion": 0.04,
-      "armor": 1,
+      "armor": 0,
       "accuracy": 0.044,
       "critDefense": 0.035
     },
@@ -2419,7 +2419,7 @@
     "stats": {
       "hp": 430,
       "maxHp": 430,
-      "power": 13,
+      "power": 10,
       "chanceCrit": 0.26,
       "evasion": 0.15,
       "armor": 11,
