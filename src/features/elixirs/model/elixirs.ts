@@ -1,12 +1,10 @@
 export type ElixirKind =
-  // | "heal_flat" // мгновенное лечение HP (см. healFlatHp)
-  // | "spirit_elixir" // временно +очки духа (реген вне боя)
   | "power" // +5 к атаке
-  | "armor_percent" // +5% к броне
-  | "crit_percent" // +5% к криту
-  | "speed_percent" // +5% к скорости
+  | "armor_percent" // +3% к броне
+  | "crit_percent" // +3% к криту
+  | "speed_percent" // +3% к скорости
   | "health_percent" // +15% к текущему HP (увеличивает maxHp)
-  | "evasion_percent"; // +5% к уклонению
+  | "evasion_percent"; // +3% к уклонению
 
 export interface ElixirDefinition {
   /** Id совпадает с templateId для ItemInstance. */
@@ -19,44 +17,18 @@ export interface ElixirDefinition {
   icon: string;
   /** Длительность бафа. */
   durationMs: number;
-  /** Дельта для статов (для kind != spirit_elixir и != heal_flat может быть undefined). */
   powerDelta?: number;
   armorPercentBonus?: number;
   critPercentBonus?: number;
   speedPercentBonus?: number;
   evasionPercentBonus?: number;
-  /** Временный бонус к духу (реген HP вне боя: 1 + floor((дух)/50) за тик 10с). */
-  spiritBonus?: number;
-  /** Сколько HP восстановить мгновенно (только для kind === "heal_flat"). */
-  healFlatHp?: number;
 }
 
 export const ELIXIR_DURATION_MS = 5 * 60_000;
 
-/** Если в определении зелья не указан healFlatHp. */
-export const DEFAULT_HEAL_FLAT_HP = 200;
 
 /** Заглушки: все иконки пока один и тот же “зелья восстановления здоровья”. */
 export const ELIXIRS: ElixirDefinition[] = [
-  // {
-  //   id: "elixir-heal_flat",
-  //   name: "Зелье здоровья",
-  //   kind: "heal_flat",
-  //   price: 30,
-  //   icon: "/images/elixir/elixir_4.png",
-  //   durationMs: ELIXIR_DURATION_MS,
-  //   powerDelta: undefined,
-  //   healFlatHp: 300,
-  // },
-  // {
-  //   id: "elixir-regen",
-  //   name: "Эликсир духа",
-  //   kind: "spirit_elixir",
-  //   price: 10,
-  //   icon: "/images/elixir/elixir_5.png",
-  //   durationMs: ELIXIR_DURATION_MS,
-  //   spiritBonus: 1000,
-  // },
   {
     id: "elixir-power_plus_5",
     name: "Эликсир атаки",
@@ -117,10 +89,6 @@ export const ELIXIR_BY_ID: Record<string, ElixirDefinition> =
     string,
     ElixirDefinition
   >;
-
-/** Бонус духа от «Эликсира духа» — совпадает с `ELIXIR_BY_ID['elixir-regen'].spiritBonus`. */
-export const SPIRIT_ELIXIR_BONUS_POINTS =
-  ELIXIR_BY_ID["elixir-regen"]?.spiritBonus ?? 200;
 
 export function getElixirDefinition(id: string): ElixirDefinition | null {
   return ELIXIR_BY_ID[id] ?? null;

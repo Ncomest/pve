@@ -1,4 +1,4 @@
-import type { ItemInstance, ItemStats } from "@/entities/item/model";
+import type { ItemInstance } from "@/entities/item/model";
 import { getTemplate } from "@/entities/item/items-db";
 import {
   generateBaseStatsForRarity,
@@ -49,24 +49,6 @@ export function createItemInstance(
 
   const rarity = rollItemRarity();
   const generatedBaseStats = generateBaseStatsForRarity(rarity);
-
-  // ========== СРОЧНАЯ ОТЛАДКА ==========
-  console.log("═══════════════════════════════════════");
-  console.log("🔍 createItemInstance ОТЛАДКА:");
-  console.log("  templateId:", templateId);
-  console.log("  itemLevel:", itemLevel);
-  console.log("  rarity:", rarity);
-  console.log(
-    "  generatedBaseStats ВСЕ:",
-    JSON.stringify(generatedBaseStats, null, 2),
-  );
-  console.log("  generatedBaseStats.accuracy:", generatedBaseStats.accuracy);
-  console.log(
-    "  generatedBaseStats.chanceCrit:",
-    generatedBaseStats.chanceCrit,
-  );
-  console.log("═══════════════════════════════════════");
-  // =====================================
 
   return {
     instanceId: instanceId ?? generateInstanceId(),

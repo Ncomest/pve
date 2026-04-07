@@ -13,8 +13,6 @@ export interface Stats {
   accuracy?: number;
   /** Защита от крита 0..1: снижает шанс крита по цели */
   critDefense?: number;
-  /** Очки духа (герой): пассивный реген вне боя */
-  spirit?: number;
   /** Самоисцеление 0..1: доля урона по боссу → лечение героя */
   lifesteal?: number;
 }

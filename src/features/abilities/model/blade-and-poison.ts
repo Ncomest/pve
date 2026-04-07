@@ -34,7 +34,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     description: "Вы наносите средний удар и получаете 4 комбо-поинта",
     type: "damage",
     value: 0,
-    cooldownMs: 20_000,
+    cooldownMs: 10_000,
     icon: "/images/hero/ability/backstab.png",
     role: "generator",
     classId: CLASS_ID,
@@ -46,7 +46,8 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
   {
     id: "sweeping-strike",
     name: "Размашистый удар",
-    description: "Вы наносите средний урон, увеличиваете свой крит на 10% на 3 сек. Так же вы получаете стак, который усиливает урон от потрошения на 15%, максимально 4 стака",
+    description:
+      "Вы наносите средний урон, увеличиваете свой крит на 10% на 3 сек. Так же вы получаете стак, который усиливает урон от потрошения на 15%, максимально 4 стака",
     type: "damage",
     value: 0,
     cooldownMs: 6_000,
@@ -66,7 +67,8 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
   {
     id: "eviscerate",
     name: "Потрошение",
-    description: "Вы наносите сильный урон. Сила урона зависит от количество используемых комбо-поинтов. Используется 2-4 комбо-поинта",
+    description:
+      "Вы наносите сильный урон. Сила урона зависит от количество используемых комбо-поинтов. Используется 2-4 комбо-поинта",
     type: "damage",
     value: 0,
     cooldownMs: 0,
@@ -74,14 +76,15 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     role: "finisher",
     classId: CLASS_ID,
     baseDamageX: X,
-    comboCostMin: 2,
-    comboCostMax: 4,
+    comboCostMin: 3,
+    comboCostMax: 6,
     // Урон X*Power*N + до +60% за стаки «Потрошение» (логика в useBattle)
   },
   {
     id: "poisonous-bite",
     name: "Ядовитый укус",
-    description: "Вы тратите 3-5 комбо-поинтов и наносите продолжительный урон ядом в течении 16 сек. Чем больше использовано комбо-понитов, тем больше урона нанесете. С вероятностью 15% вы можете усилить следующий 'Коварный удар' на 100%",
+    description:
+      "Вы тратите 3-5 комбо-поинтов и наносите продолжительный урон ядом в течении 16 сек. Чем больше использовано комбо-понитов, тем больше урона нанесете. С вероятностью 15% вы можете усилить следующий 'Коварный удар' на 100%",
     type: "damage",
     value: 0,
     cooldownMs: 0,
@@ -90,7 +93,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     classId: CLASS_ID,
     baseDamageX: X,
     comboCostMin: 3,
-    comboCostMax: 5,
+    comboCostMax: 6,
     dotInstantDamageRatio: 0.5,
     dotDurationMs: 16_000,
     dotTickIntervalMs: 2_000,
@@ -128,7 +131,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
   //   defenseDamageReductionPercent: 0.2,
   //   defenseDamageReductionDurationMs: 10_000,
   // },
-  
+
   // --- Контроль и мобильность ---
   // {
   //   id: "lightning-flash",
@@ -143,5 +146,4 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
   //   speedPercent: 0.15,
   //   speedDurationMs: 10_000,
   // },
- 
 ];

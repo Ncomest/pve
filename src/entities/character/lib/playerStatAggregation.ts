@@ -60,8 +60,6 @@ export interface EquipmentBonuses {
   accuracy: number;
   /** Доля 0..1 после перевода очков защиты от крита. */
   critDefense: number;
-  /** Сумма очков духа (без перевода в долю). */
-  // spirit: number;
   /** Доля 0..1 после перевода очков самоисцеления. */
   lifesteal: number;
 }
@@ -83,7 +81,6 @@ export function aggregateEquipmentBonuses(
     armor: 0,
     accuracy: 0,
     critDefense: 0,
-    // spirit: 0,
     lifesteal: 0,
   };
   let critPoints = 0;
@@ -101,7 +98,6 @@ export function aggregateEquipmentBonuses(
     stats.armor += effective.armor ?? 0;
     accuracyPoints += effective.accuracy ?? 0;
     critDefensePoints += effective.critDefense ?? 0;
-    // stats.spirit += effective.spirit ?? 0;
     lifestealPoints += effective.lifesteal ?? 0;
   }
 
@@ -126,7 +122,6 @@ export interface EquipmentRawPoints {
   accuracy: number;
   critDefense: number;
   lifesteal: number;
-  // spirit: number;
 }
 
 export function aggregateEquipmentRawPoints(
@@ -140,7 +135,6 @@ export function aggregateEquipmentRawPoints(
     accuracy: 0,
     critDefense: 0,
     lifesteal: 0,
-    // spirit: 0,
   };
   for (const effective of partials) {
     out.crit += effective.chanceCrit ?? 0;
@@ -150,7 +144,6 @@ export function aggregateEquipmentRawPoints(
     out.accuracy += effective.accuracy ?? 0;
     out.critDefense += effective.critDefense ?? 0;
     out.lifesteal += effective.lifesteal ?? 0;
-    // out.spirit += effective.spirit ?? 0;
   }
   return out;
 }
@@ -177,7 +170,6 @@ export function buildPlayerCombatStats(
     armor: (base.armor ?? 0) + equipment.armor,
     accuracy: Math.min(1, (base.accuracy ?? 0) + equipment.accuracy),
     critDefense: Math.min(1, (base.critDefense ?? 0) + equipment.critDefense),
-    // spirit: (base.spirit ?? 0) + equipment.spirit,
     lifesteal: Math.min(1, (base.lifesteal ?? 0) + equipment.lifesteal),
   };
 }

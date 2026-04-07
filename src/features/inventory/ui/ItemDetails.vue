@@ -64,9 +64,6 @@ const emit = defineEmits<{
         Защита от крита:
         <span class="item-details__stat-value">+{{ item.stats.critDefense }}</span>
       </div>
-      <div v-if="item.stats.spirit" class="item-details__stat">
-        Дух: <span class="item-details__stat-value">+{{ item.stats.spirit }}</span>
-      </div>
       <div v-if="item.stats.lifesteal" class="item-details__stat">
         Самоисцеление:
         <span class="item-details__stat-value">+{{ item.stats.lifesteal }}</span>

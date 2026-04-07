@@ -2,13 +2,7 @@
   import { RouterLink, RouterView, useRoute } from "vue-router";
   import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
   import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
-  // import {
-  //   hpPerTickFromSpirit,
-  //   usePlayerHp,
-  // } from "@/features/character/model/usePlayerHp";
   import { useCharacterStore } from "@/app/store/character";
-  // import { PLAYER_CHARACTER } from "@/entities/character/model";
-  // import { LEVEL_HP_PER_LEVEL } from "@/entities/character/lib/playerStatAggregation";
   import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
   import { getElixirDefinition } from "@/features/elixirs/model/elixirs";
   import { useHeroAvatar } from "@/features/inventory/model/useHeroAvatar";
@@ -21,7 +15,6 @@
 
   const { selectedSrc } = useHeroAvatar();
   const currentAvatarSrc = computed(() => selectedSrc());
-  // console.log("avatars", avatars);
 
   // Оставшееся время считается от `Date.now()`. Чтобы UI всегда пересчитывался,
   // делаем `nowMs` реактивным и обновляем раз в секунду.

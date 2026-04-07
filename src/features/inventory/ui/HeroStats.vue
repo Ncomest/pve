@@ -1,14 +1,11 @@
 <script setup lang="ts">
   import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
-  // import { usePlayerHp } from "@/features/character/model/usePlayerHp";
   import { useCharacterStore } from "@/app/store/character";
   import { computed } from "vue";
   import { PLAYER_CHARACTER } from "@/entities/character/model";
   import { useHeroAvatar } from "@/features/inventory/model/useHeroAvatar";
   import { buildHeroStatRows } from "@/entities/character/lib/combatStatDisplayRows";
-  // import { hpPerTickFromSpirit } from "@/features/character/model/usePlayerHp";
   import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
-  // import { LEVEL_HP_PER_LEVEL } from "@/entities/character/lib/playerStatAggregation";
   import "./HeroStats.scss";
 
   const { level, xp, xpToNext, percentToNext } = usePlayerProgress();
@@ -150,14 +147,6 @@
             }}</span>
             <span class="hero-stats__val hero-stats__val--total">{{
               row.pct
-            }}</span>
-          </template>
-          <template v-else>
-            <span class="hero-stats__val hero-stats__val--muted">{{
-              row.gearPoints
-            }}</span>
-            <span class="hero-stats__val hero-stats__val--total">{{
-              row.hpPerSec
             }}</span>
           </template>
         </span>

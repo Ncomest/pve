@@ -13,14 +13,14 @@
  * См. также docs/balance-items.md и docs/player-character-stats.md.
  * Суммирование очков с экипировки и слияние с базой героя: `entities/character/lib/playerStatAggregation.ts`.
  */
-export const CRIT_POINTS_TO_FRACTION = 0.0025 / 10; // 10 очков ≈ 0.25%
-export const EVASION_POINTS_TO_FRACTION = 0.0025 / 10; // 10 очков ≈ 0.25%
-export const SPEED_POINTS_TO_FRACTION = 0.0025 / 10; // 10 очков скорости ≈ 0.25%
-export const ARMOR_POINTS_TO_FRACTION = 0.037 / 10; // 10 очков брони ≈ 1% снижения урона
+export const CRIT_POINTS_TO_FRACTION = 0.009 / 10; // 10 очков ≈ 0.25%
+export const EVASION_POINTS_TO_FRACTION = 0.009 / 10; // 10 очков ≈ 0.25%
+export const SPEED_POINTS_TO_FRACTION = 0.009 / 10; // 10 очков скорости ≈ 0.25%
+export const ARMOR_POINTS_TO_FRACTION = 0.02 / 10; // 10 очков брони ≈ 1% снижения урона
 /** 10 очков меткости ≈ 0.25% (как крит) */
-export const ACCURACY_POINTS_TO_FRACTION = 0.0095 / 10;
+export const ACCURACY_POINTS_TO_FRACTION = 0.0085 / 10;
 /** 10 очков защиты от крита ≈ 0.25% */
-export const CRIT_DEFENSE_POINTS_TO_FRACTION = 0.0025 / 10;
+export const CRIT_DEFENSE_POINTS_TO_FRACTION = 0.003 / 10;
 /** 10 очков самоисцеления ≈ 0.05% урона в лечение */
 export const LIFESTEAL_POINTS_TO_FRACTION = 0.0005 / 10;
 
@@ -72,21 +72,15 @@ export interface ScalingConfig {
 /** Получить эффективность конвертации для текущего уровня */
 export function getConversionEfficiency(level: number): number {
   // Защита от некорректных значений
-  if (!level || level < 1) return 1;
+  const safeLevel = Math.max(1, level || 1);
 
-  // Новая формула: eff(L) = 1 / (1 + falloff * (L-1))
-  // level 1: 1.0 (100% эффективности)
-  // level 2: 1 / 1.4 = 0.714 (71%)
-  // level 3: 1 / 1.8 = 0.555 (55%)
-  // level 5: 1 / 2.6 = 0.384 (38%)
-  // level 10: 1 / 4.6 = 0.217 (21%)
-  // level 20: 1 / 8.6 = 0.116 (11%)
+  // if (safeLevel < 1) return 1;
 
-  const falloff = 0.4; // скорость падения (чем меньше, тем медленнее падает)
-  const efficiency = 1 / (1 + falloff * (level - 1));
+  const falloff = 0.5; // скорость падения (чем меньше, тем медленнее падает)
+  const efficiency = 1 / (1 + falloff * (safeLevel - 1));
 
-  // Гарантируем, что эффективность не падает ниже 5%
-  return Math.max(0.05, Math.min(1, efficiency));
+  // Гарантируем, что эффективность не падает ниже 10%
+  return Math.max(0.1, Math.min(1, efficiency));
 }
 
 /** Конвертирует очки крита в процент с учётом уровня */
@@ -109,12 +103,13 @@ export function speedPointsToFraction(points: number, level: number): number {
   return Math.min(1, points * SPEED_POINTS_TO_FRACTION * efficiency);
 }
 
+/** Конвертирует очки меткости в долю с учётом уровня */
 export function accuracyPointsToFraction(
   points: number,
   level: number,
 ): number {
   const efficiency = getConversionEfficiency(level);
-  // const baseConversion = 0.007 / 10;
+  // const baseConversion = 0.0025 / 10;
   return Math.min(1, points * ACCURACY_POINTS_TO_FRACTION * efficiency);
 }
 

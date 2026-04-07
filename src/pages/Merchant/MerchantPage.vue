@@ -14,7 +14,7 @@ import { SLOT_NAMES, type ItemSlot } from "@/entities/item/model";
 import InventoryGrid from "@/features/inventory/ui/InventoryGrid.vue";
 import ConsumablesGrid from "@/features/inventory/ui/ConsumablesGrid.vue";
 import {
-  DEFAULT_HEAL_FLAT_HP,
+  // DEFAULT_HEAL_FLAT_HP,
   ELIXIRS,
   getElixirDefinition,
 } from "@/features/elixirs/model/elixirs";
@@ -101,10 +101,6 @@ const selectedElixirDescription = computed(() => {
   if (!def) return "";
   const base = `Бафф: 5 минут.\nНе стакается: выпивание сбивает предыдущий.`;
   switch (def.kind) {
-    // case "heal_flat":
-    //   return `Восстанавливает ${def.healFlatHp ?? DEFAULT_HEAL_FLAT_HP} HP мгновенно.\nАктивные эликсиры/баффы не сбиваются.`;
-    // case "spirit_elixir":
-    //   return `Временно +${def.spiritBonus ?? 200} к духу (сильнее реген HP вне боя).\n${base}`;
     case "power":
       return `Увеличивает атаку: +${def.powerDelta ?? 5}.\n${base}`;
     case "armor_percent":
@@ -196,7 +192,6 @@ function getEquipmentOfferTooltip(offer: MerchantOffer): string {
   if (item.stats.armor != null) lines.push(`Броня: +${item.stats.armor}`);
   if (item.stats.accuracy != null) lines.push(`Меткость: +${item.stats.accuracy}`);
   if (item.stats.critDefense != null) lines.push(`Защита от крита: +${item.stats.critDefense}`);
-  if (item.stats.spirit != null) lines.push(`Дух: +${item.stats.spirit}`);
   if (item.stats.lifesteal != null) lines.push(`Самоисцеление: +${item.stats.lifesteal}`);
   lines.push(`Цена торговца: ${offer.price} зол.`);
   return lines.join("\n");
@@ -214,7 +209,6 @@ function getEquipmentOfferStatsLines(offer: MerchantOffer): string[] {
   if (item.stats.armor != null) lines.push(`Броня: +${item.stats.armor}`);
   if (item.stats.accuracy != null) lines.push(`Меткость: +${item.stats.accuracy}`);
   if (item.stats.critDefense != null) lines.push(`Защита от крита: +${item.stats.critDefense}`);
-  // if (item.stats.spirit != null) lines.push(`Дух: +${item.stats.spirit}`);
   if (item.stats.lifesteal != null) lines.push(`Самоисцеление: +${item.stats.lifesteal}`);
   return lines;
 }
@@ -225,12 +219,6 @@ function getElixirOfferTooltip(elixir: (typeof ELIXIRS)[number]): string {
   const lines: string[] = [];
   lines.push(base.trimEnd());
   switch (def.kind) {
-    // case "heal_flat":
-    //   lines.push(`Восстанавливает ${def.healFlatHp ?? DEFAULT_HEAL_FLAT_HP} HP мгновенно.`);
-    //   break;
-    // case "spirit_elixir":
-    //   lines.push(`Временно +${def.spiritBonus ?? 200} к духу (реген HP вне боя).`);
-    //   break;
     case "power":
       lines.push(`Атака +${def.powerDelta ?? 5}.`);
       break;
@@ -509,9 +497,6 @@ onUnmounted(() => {
               </div>
               <div v-if="selectedDisplayItem.stats.critDefense != null" class="merchant-page__item-stat">
                 Защита от крита: +{{ selectedDisplayItem.stats.critDefense }}
-              </div>
-              <div v-if="selectedDisplayItem.stats.spirit != null" class="merchant-page__item-stat">
-                Дух: +{{ selectedDisplayItem.stats.spirit }}
               </div>
               <div v-if="selectedDisplayItem.stats.lifesteal != null" class="merchant-page__item-stat">
                 Самоисцеление: +{{ selectedDisplayItem.stats.lifesteal }}

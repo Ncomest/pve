@@ -26,7 +26,6 @@ export interface ItemStats {
   /** Очки, как крит/уклонение */
   accuracy?: number;
   critDefense?: number;
-  spirit?: number;
   /** Очки самоисцеления, как крит */
   lifesteal?: number;
 }

@@ -5,15 +5,8 @@ import { useCharacterStore } from "@/app/store/character";
 // import { LEVEL_HP_PER_LEVEL } from "@/entities/character/lib/playerStatAggregation";
 // import { calcCurrentHp, readHpFromStorage, saveHpSnapshot } from "@/features/character/model/usePlayerHp";
 import { createItemInstance } from "@/entities/item/lib/createInstance";
-import type {
-  ElixirDefinition,
-  //  ElixirKind
-} from "./elixirs";
-import {
-  // DEFAULT_HEAL_FLAT_HP,
-  getElixirDefinition,
-  // SPIRIT_ELIXIR_BONUS_POINTS,
-} from "./elixirs";
+import type { ElixirDefinition } from "./elixirs";
+import { getElixirDefinition } from "./elixirs";
 import { PLAYER_CHARACTER } from "@/entities/character/model";
 
 // type RegenWindow = { startAt: number; endAt: number };
@@ -27,28 +20,6 @@ interface ElixirsState {
   /** Для health_percent: сколько HP добавлено к maxHp. */
   activeHealthPercentBonusHp: number;
 }
-
-// const getWorldBaseMaxHp = () => {
-//   // Базовый maxHp: уровень + экипировка. Баф эликсира не добавляем.
-//   const characterStore = useCharacterStore();
-//   const playerProgress = usePlayerProgress();
-
-//   const bonusHp = Math.max(0, playerProgress.level.value - 1) * LEVEL_HP_PER_LEVEL;
-//   return PLAYER_CHARACTER.stats.maxHp + bonusHp + characterStore.equipmentStats.hp;
-// };
-
-// const getWorldBaseSpirit = () => {
-//   const characterStore = useCharacterStore();
-//   return (PLAYER_CHARACTER.stats.spirit ?? 0) + (characterStore.equipmentStats.spirit ?? 0);
-// };
-
-// function getActiveRegenWindow(kind: ElixirKind, startAt: number | null, endAt: number | null): RegenWindow | null {
-//   if (kind !== "spirit_elixir") return null;
-//   if (startAt == null || endAt == null) return null;
-//   const now = Date.now();
-//   if (now >= endAt) return null;
-//   return { startAt, endAt };
-// }
 
 export const useElixirsStore = defineStore("elixirs", {
   state: (): ElixirsState => ({
@@ -77,19 +48,6 @@ export const useElixirsStore = defineStore("elixirs", {
       if (!state.activeElixirEndAt) return 0;
       return Math.max(0, state.activeElixirEndAt - Date.now());
     },
-
-    // activeRegenWindow(state): RegenWindow | null {
-    //   const def = this.activeElixirDef;
-    //   if (!def) return null;
-    //   return getActiveRegenWindow(def.kind, state.activeElixirStartAt, state.activeElixirEndAt);
-    // },
-
-    /** Бонус духа от активного эликсира духа (0, если бафа нет). */
-    // activeSpiritElixirBonus(): number {
-    //   const def = this.activeElixirDef;
-    //   if (!def || def.kind !== "spirit_elixir") return 0;
-    //   return def.spiritBonus ?? SPIRIT_ELIXIR_BONUS_POINTS;
-    // },
 
     activeHealthPercentBonusApplied(state): number {
       if (!state.activeElixirId || state.activeElixirEndAt == null) return 0;
@@ -161,23 +119,6 @@ export const useElixirsStore = defineStore("elixirs", {
       // Считаем HP "прямо сейчас" до применения нового бафа.
       // Это нужно, например, для здоровья +15% к текущему HP.
       const now = Date.now();
-      // const baseMaxHp = getWorldBaseMaxHp();
-
-      // const oldEndAt = this.activeElixirEndAt ?? null;
-      // const oldActive = oldEndAt != null && now < oldEndAt;
-
-      // const activeIdBefore = this.activeElixirId;
-      // const defBefore =
-      //   activeIdBefore && oldActive
-      //     ? getElixirDefinition(activeIdBefore)
-      //     : null;
-
-      // const isHealthPercentBefore = defBefore?.kind === "health_percent";
-      // const isSpiritElixirBefore = defBefore?.kind === "spirit_elixir";
-
-      // const currentMaxHpBefore = isHealthPercentBefore
-      //   ? PLAYER_CHARACTER.stats.maxHp + this.activeHealthPercentBonusHp
-      //   : PLAYER_CHARACTER.stats.maxHp;
 
       // Применяем мгновенный эффект (если есть) и обновляем localStorage.
       const durationMs = def.durationMs;
@@ -188,12 +129,6 @@ export const useElixirsStore = defineStore("elixirs", {
         def.kind === "health_percent"
           ? Math.max(0, Math.round(PLAYER_CHARACTER.stats.hp * 0.15))
           : 0;
-
-      // const nextMaxHp = baseMaxHp + nextHealthPercentBonusHp;
-      // const nextHp =
-      //   def.kind === "health_percent"
-      //     ? Math.min(nextMaxHp, nextHealthPercentBonusHp)
-      //     : currentHpBefore;
 
       // Удаляем эликсир из инвентаря.
       characterStore.consumeItemFromConsumables(idx, 1);

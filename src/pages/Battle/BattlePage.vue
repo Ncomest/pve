@@ -88,7 +88,6 @@ const playerStatRows = computed(() =>
       raw: characterStore.equipmentRawPoints,
       elixirDef: elixirsStore.activeElixirDef,
       healthPercentBonusHp: elixirsStore.activeHealthPercentBonusApplied,
-      spiritElixirBonus: elixirsStore.activeSpiritElixirBonus,
     },
     {
       attackTotal: playerPower.value,
@@ -100,7 +99,6 @@ const playerStatRows = computed(() =>
       accuracyFraction: player.stats.accuracy ?? 0,
       critDefenseFraction: player.stats.critDefense ?? 0,
       lifestealFraction: player.stats.lifesteal ?? 0,
-      spiritPointsTotal: player.stats.spirit ?? 0,
     },
   ),
 );
@@ -277,10 +275,6 @@ onUnmounted(() => {
                 <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
                 <span class="battle-page__stats-strong">{{ row.pct }}</span>
               </template>
-              <template v-else>
-                <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
-                <span class="battle-page__stats-strong">{{ row.hpPerSec }}</span>
-              </template>
             </dd>
           </div>
         </dl>
@@ -315,10 +309,6 @@ onUnmounted(() => {
                 <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
                 <span class="battle-page__stats-strong">{{ row.pct }}</span>
               </template>
-              <template v-else>
-                <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
-                <span class="battle-page__stats-strong">{{ row.hpPerSec }}</span>
-              </template>
             </dd>
           </div>
         </dl>
@@ -345,10 +335,6 @@ onUnmounted(() => {
                   <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
                   <span class="battle-page__stats-strong">{{ row.pct }}</span>
                 </template>
-                <template v-else>
-                  <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
-                  <span class="battle-page__stats-strong">{{ row.hpPerSec }}</span>
-                </template>
               </dd>
             </div>
           </dl>
@@ -370,10 +356,6 @@ onUnmounted(() => {
                 <template v-else-if="row.kind === 'percent'">
                   <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
                   <span class="battle-page__stats-strong">{{ row.pct }}</span>
-                </template>
-                <template v-else>
-                  <span class="battle-page__stats-muted">{{ row.gearPoints }}</span>
-                  <span class="battle-page__stats-strong">{{ row.hpPerSec }}</span>
                 </template>
               </dd>
             </div>

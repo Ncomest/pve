@@ -24,9 +24,6 @@ import {
   lifestealPointsToFraction,
   speedPointsToFraction,
 } from "@/entities/item/lib/statPoints";
-// import { hpPerTickFromSpirit } from "@/features/character/model/usePlayerHp";
-
-// const REGEN_TICK_SEC = 10;
 
 /** Строки таблицы характеристик (герой / экран боя). */
 export type StatRow =
@@ -41,12 +38,6 @@ export type StatRow =
       label: string;
       fromGear: number;
       total: number;
-    }
-  | {
-      kind: "spirit";
-      label: string;
-      gearPoints: number;
-      hpPerSec: string;
     };
 
 /** Итоговая доля 0..1 → строка вида «1%» / «0,25%». */
@@ -73,7 +64,6 @@ export interface BuildHeroStatRowsArgs {
   raw: EquipmentRawPoints;
   elixirDef: ElixirDefinition | null;
   healthPercentBonusHp: number;
-  // spiritElixirBonus: number;
 }
 
 /** Переопределения для боя: итоговые значения с баффами способностей и т.п. */
@@ -87,12 +77,12 @@ export interface HeroBattleStatOverrides {
   accuracyFraction?: number;
   critDefenseFraction?: number;
   lifestealFraction?: number;
-  spiritPointsTotal?: number;
 }
 
 export function buildHeroStatRows(
   args: BuildHeroStatRowsArgs,
   battle?: HeroBattleStatOverrides,
+  characterLevel?: number,
 ): StatRow[] {
   const {
     base,
@@ -101,8 +91,10 @@ export function buildHeroStatRows(
     raw,
     elixirDef,
     healthPercentBonusHp,
-    // spiritElixirBonus,
   } = args;
+
+  // Защита от undefined
+  const safeLevel = Math.max(1, characterLevel ?? level ?? 1);
 
   const hpBonusFromLevel = Math.max(0, level - 1) * LEVEL_HP_PER_LEVEL;
   const hpBonusTotal = hpBonusFromLevel + eq.hp + healthPercentBonusHp;
@@ -150,34 +142,37 @@ export function buildHeroStatRows(
   const speedTotalAfterElixir = applyElixirSpeedPercentToSpeedTotal(
     speedTotalBeforeElixir,
     elixirSpeedPercentBonus,
+    safeLevel,
   );
   const speedFractionDefault = speedPointsToFraction(
     speedGearPointsFromTotalSpeedStat(speedTotalAfterElixir),
+    safeLevel,
   );
 
   const armorBeforePoints = (base.armor ?? 0) + equipArmor;
   const armorAfterPoints = applyElixirArmorPercentToArmorPoints(
     armorBeforePoints,
     elixirArmorPercentBonus,
+    safeLevel,
   );
-  const armorFractionDefault = armorPointsToFraction(armorAfterPoints);
+  const armorFractionDefault = armorPointsToFraction(
+    armorAfterPoints,
+    safeLevel,
+  );
 
   const accuracyDefault = Math.min(
     1,
-    (base.accuracy ?? 0) + accuracyPointsToFraction(raw.accuracy),
+    (base.accuracy ?? 0) + accuracyPointsToFraction(raw.accuracy, safeLevel),
   );
   const critDefDefault = Math.min(
     1,
-    (base.critDefense ?? 0) + critDefensePointsToFraction(raw.critDefense),
+    (base.critDefense ?? 0) +
+      critDefensePointsToFraction(raw.critDefense, safeLevel),
   );
   const lifestealDefault = Math.min(
     1,
-    (base.lifesteal ?? 0) + lifestealPointsToFraction(raw.lifesteal),
+    (base.lifesteal ?? 0) + lifestealPointsToFraction(raw.lifesteal, safeLevel),
   );
-
-  // const gearSpirit = raw.spirit;
-  // const totalSpiritDefault =
-  //   (base.spirit ?? 0) + gearSpirit + spiritElixirBonus;
 
   const attackTotal =
     battle?.attackTotal ??
@@ -189,23 +184,16 @@ export function buildHeroStatRows(
     battle?.speedStatTotal != null
       ? speedPointsToFraction(
           speedGearPointsFromTotalSpeedStat(battle.speedStatTotal),
+          safeLevel,
         )
       : speedFractionDefault;
   const armorFraction =
     battle?.armorPoints != null
-      ? armorPointsToFraction(battle.armorPoints)
+      ? armorPointsToFraction(battle.armorPoints, safeLevel)
       : armorFractionDefault;
   const accuracyFraction = battle?.accuracyFraction ?? accuracyDefault;
   const critDefenseFraction = battle?.critDefenseFraction ?? critDefDefault;
   const lifestealFraction = battle?.lifestealFraction ?? lifestealDefault;
-  // const totalSpiritPoints = battle?.spiritPointsTotal ?? totalSpiritDefault;
-
-  // const hpPerTick = hpPerTickFromSpirit(totalSpiritPoints);
-  // const hpPerSec = hpPerTick / REGEN_TICK_SEC;
-  // const hpPerSecStr = `${hpPerSec.toLocaleString(undefined, {
-  //   maximumFractionDigits: 2,
-  //   minimumFractionDigits: 0,
-  // })} HP/с`;
 
   return [
     {
@@ -256,12 +244,6 @@ export function buildHeroStatRows(
       gearPoints: Math.round(raw.critDefense),
       pct: fmtPctFromFraction(critDefenseFraction),
     },
-    // {
-    //   kind: "spirit",
-    //   label: "Дух",
-    //   gearPoints: Math.round(gearSpirit),
-    //   hpPerSec: hpPerSecStr,
-    // },
     {
       kind: "percent",
       label: "Самоисцеление",
@@ -287,15 +269,6 @@ export function buildBossStatRows(
   const tplSpeed = t.speed ?? baseline;
   const curSpeed = c.speed ?? baseline;
 
-  // const hpPerTick = hpPerTickFromSpirit(c.spirit ?? 0);
-  // const hpPerSecStr = `${(hpPerTick / REGEN_TICK_SEC).toLocaleString(
-  //   undefined,
-  //   {
-  //     maximumFractionDigits: 2,
-  //     minimumFractionDigits: 0,
-  //   },
-  // )} HP/с`;
-
   return [
     {
       kind: "pair",
@@ -314,7 +287,7 @@ export function buildBossStatRows(
       label: "Скорость",
       gearPoints: Math.round(speedGearPointsFromTotalSpeedStat(tplSpeed)),
       pct: fmtPctFromFraction(
-        speedPointsToFraction(speedGearPointsFromTotalSpeedStat(curSpeed)),
+        speedPointsToFraction(speedGearPointsFromTotalSpeedStat(curSpeed), 1),
       ),
     },
     {
@@ -330,7 +303,7 @@ export function buildBossStatRows(
       kind: "percent",
       label: "Броня",
       gearPoints: Math.round(t.armor ?? 0),
-      pct: fmtPctFromFraction(armorPointsToFraction(effectiveArmorPoints)),
+      pct: fmtPctFromFraction(armorPointsToFraction(effectiveArmorPoints, 1)),
     },
     {
       kind: "percent",
@@ -359,12 +332,6 @@ export function buildBossStatRows(
       ),
       pct: fmtPctFromFraction(c.critDefense ?? 0),
     },
-    // {
-    //   kind: "spirit",
-    //   label: "Дух",
-    //   gearPoints: Math.round(t.spirit ?? 0),
-    //   hpPerSec: hpPerSecStr,
-    // },
     {
       kind: "percent",
       label: "Самоисцеление",

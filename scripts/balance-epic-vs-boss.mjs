@@ -238,7 +238,6 @@ for (const level of [1, 2, 5, 10]) {
   const itemLevel = 1 + level * 3;
   const boss = BOSSES.find((b) => b.level === level);
   if (!boss) {
-    console.log(`Нет босса уровня ${level}`);
     continue;
   }
   let wins = 0;
@@ -255,7 +254,4 @@ for (const level of [1, 2, 5, 10]) {
     if (out === "player") wins++;
     if (out === "tie") ties++;
   }
-  console.log(
-    `Уровень ${level} | босс: ${boss.name} | itemLevel=${itemLevel} | побед ${(100 * wins) / RUNS}% | ничьих ${(100 * ties) / RUNS}% (автоатака vs автоатака, без способностей)`,
-  );
 }

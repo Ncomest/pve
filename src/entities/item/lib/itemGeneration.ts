@@ -17,11 +17,11 @@ export const PROC_BASE: ItemStats = {
 
 /** Веса редкости: белая 90%, зелёная 4%, синяя 3%, эпическая 2%, уникальная 1%. */
 const RARITY_WEIGHTS: { rarity: ItemRarity; weight: number }[] = [
-  { rarity: "common", weight: 90 },
+  { rarity: "common", weight: 1 },
   { rarity: "uncommon", weight: 4 },
   { rarity: "rare", weight: 3 },
   { rarity: "epic", weight: 2 },
-  { rarity: "unique", weight: 1 },
+  { rarity: "unique", weight: 90 },
 ];
 
 /** Доля силы ролла от «базового дропа» (min..max включительно в процентах). */
@@ -50,7 +50,6 @@ export function generateBaseStatsForRarity(rarity: ItemRarity): ItemStats {
       (minPercent + Math.random() * (maxPercent - minPercent)) / 100;
     const baseValue = PROC_BASE[key] ?? 0;
     const result = Math.max(1, Math.round(baseValue * percent));
-    console.log(`📊 ${key}: база=${baseValue} * ${percent}% = ${result}`);
     return result;
   };
 

@@ -23,10 +23,8 @@ import type { BattleEffectContext } from "@/features/battle/model/applyAbilityEf
 import { useCooldowns } from "@/shared/lib/cooldowns/useCooldowns";
 import { expGainedFromMonster } from "@/shared/lib/experience/experience";
 import { usePlayerProgress } from "@/features/character/model/usePlayerProgress";
-// import { usePlayerHp } from "@/features/character/model/usePlayerHp";
 import { useCharacterStore } from "@/app/store/character";
 import { useElixirsStore } from "@/features/elixirs/model/useElixirsStore";
-// import { SPIRIT_ELIXIR_BONUS_POINTS } from "@/features/elixirs/model/elixirs";
 import { ALL_TEMPLATE_IDS, getTemplate } from "@/entities/item/items-db";
 import { getResourceDropTemplateId } from "@/entities/boss/lib/resourceBossDrops";
 import { scaleResourceBossStats } from "@/entities/boss/lib/scaleResourceBossStats";
@@ -71,7 +69,6 @@ const cloneStats = (stats: Stats): Stats => ({
   armor: stats.armor ?? 0,
   accuracy: stats.accuracy ?? 0,
   critDefense: stats.critDefense ?? 0,
-  spirit: stats.spirit ?? 0,
   lifesteal: stats.lifesteal ?? 0,
 });
 
@@ -86,7 +83,10 @@ const calcHit = (
   attacker: Stats,
   defender: Stats,
   critMultiplier: number = DEFAULT_CRIT_MULTIPLIER,
+  characterLevel: number,
 ) => {
+  // const characterStore = usePlayerProgress();
+  // const characterLevel
   const dodgeChance = Math.max(
     0,
     (defender.evasion ?? 0) - (attacker.accuracy ?? 0),
@@ -107,7 +107,7 @@ const calcHit = (
   const raw = Math.round(base * (isCrit ? critMultiplier : 1)) + flatFromPower;
   // Броня снижает урон в процентах: 50 брони = 1% снижения
   const armor = defender.armor ?? 0;
-  const reduction = armorPointsToFraction(armor);
+  const reduction = armorPointsToFraction(armor, characterLevel);
   const damage = Math.max(1, Math.round(raw * (1 - reduction)));
   return { damage, isCrit, isDodged: false };
 };
@@ -122,6 +122,7 @@ export function useBattle(bossId: () => string | undefined) {
   const resourceBossIdSet = shallowRef<Set<string>>(new Set());
   const playerProgress = usePlayerProgress();
   const characterStore = useCharacterStore();
+  const characterLevel = playerProgress.level.value;
   // const playerHp = usePlayerHp();
   const elixirsStore = useElixirsStore();
 
@@ -157,8 +158,6 @@ export function useBattle(bossId: () => string | undefined) {
 
   // Эликсиры могут менять maxHp/статы в бою.
   const healthPercentBonus = elixirsStore.activeHealthPercentBonusApplied;
-  // const regenWindow = elixirsStore.activeRegenWindow;
-  // const spiritElixirBonus = elixirsStore.activeSpiritElixirBonus;
 
   const initialStats = {
     ...basePlayerStatsForRevert,
@@ -166,18 +165,10 @@ export function useBattle(bossId: () => string | undefined) {
     hp: basePlayerStatsForRevert.hp + healthPercentBonus,
   };
 
-  // playerHp.init(
-  //   initialStats.maxHp,
-  //   regenWindow,
-  //   initialStats.spirit ?? 0,
-  //   spiritElixirBonus,
-  // );
-
   const player = reactive({
     name: PLAYER_CHARACTER.name,
     stats: {
       ...initialStats,
-      // hp: 7542,
     },
   });
 
@@ -252,7 +243,6 @@ export function useBattle(bossId: () => string | undefined) {
       player.stats.speed = basePlayerStatsForRevert.speed;
       player.stats.accuracy = basePlayerStatsForRevert.accuracy;
       player.stats.critDefense = basePlayerStatsForRevert.critDefense;
-      player.stats.spirit = basePlayerStatsForRevert.spirit;
       player.stats.lifesteal = basePlayerStatsForRevert.lifesteal;
       player.stats.maxHp = basePlayerStatsForRevert.maxHp;
       player.stats.hp = Math.min(player.stats.hp, player.stats.maxHp);
@@ -263,13 +253,6 @@ export function useBattle(bossId: () => string | undefined) {
     elixirRevertTimeoutId = window.setTimeout(revert, remainingMs);
 
     switch (activeElixirDef.kind) {
-      // case "heal_flat":
-      //   break;
-      // case "spirit_elixir":
-      //   player.stats.spirit =
-      //     (player.stats.spirit ?? 0) +
-      //     (activeElixirDef.spiritBonus ?? SPIRIT_ELIXIR_BONUS_POINTS);
-      //   break;
       case "power":
         player.stats.power += activeElixirDef.powerDelta ?? 0;
         break;
@@ -277,6 +260,7 @@ export function useBattle(bossId: () => string | undefined) {
         player.stats.armor = applyElixirArmorPercentToArmorPoints(
           player.stats.armor ?? 0,
           activeElixirDef.armorPercentBonus ?? 0,
+          characterLevel,
         );
         break;
       case "crit_percent":
@@ -289,6 +273,7 @@ export function useBattle(bossId: () => string | undefined) {
         player.stats.speed = applyElixirSpeedPercentToSpeedTotal(
           player.stats.speed ?? playerSpeedBaseline(),
           activeElixirDef.speedPercentBonus ?? 0,
+          characterLevel,
         );
         break;
       case "health_percent":
@@ -498,6 +483,7 @@ export function useBattle(bossId: () => string | undefined) {
     cooldownFactorFromSpeed(
       player.stats.speed ?? playerSpeedBaseline(),
       speedBonus.value,
+      characterLevel,
     ),
   );
 
@@ -794,7 +780,12 @@ export function useBattle(bossId: () => string | undefined) {
         clearBossArmorDebuff,
         pushLog,
         calcHit: (a, d) =>
-          calcHit(a, d, ability.critMultiplier ?? DEFAULT_CRIT_MULTIPLIER),
+          calcHit(
+            a,
+            d,
+            ability.critMultiplier ?? DEFAULT_CRIT_MULTIPLIER,
+            characterLevel,
+          ),
         clampHp,
         isBattleOver: () => isBattleOver.value,
         addTimeoutId: (id) => {
@@ -839,6 +830,7 @@ export function useBattle(bossId: () => string | undefined) {
         attacker,
         defenderStats,
         ability.critMultiplier ?? DEFAULT_CRIT_MULTIPLIER,
+        characterLevel,
       );
 
       if (isDodged) {
@@ -1192,6 +1184,7 @@ export function useBattle(bossId: () => string | undefined) {
         attacker,
         defenderStats,
         ability.critMultiplier ?? DEFAULT_CRIT_MULTIPLIER,
+        characterLevel,
       );
       if (isDodged) {
         spawnBossDmg("Уклон", "dodge");
@@ -1659,7 +1652,12 @@ export function useBattle(bossId: () => string | undefined) {
       ...boss.stats,
       power: getBossEffectivePower() * (ability.baseDamageX ?? 1),
     };
-    const { damage, isCrit, isDodged } = calcHit(attacker, defenderStats);
+    const { damage, isCrit, isDodged } = calcHit(
+      attacker,
+      defenderStats,
+      DEFAULT_CRIT_MULTIPLIER,
+      characterLevel,
+    );
 
     if (isDodged) {
       spawnPlayerDmg("Уклон", "dodge");
@@ -1906,7 +1904,12 @@ export function useBattle(bossId: () => string | undefined) {
         ...player.stats,
         evasion: effectiveEvasion,
       };
-      const { damage, isCrit, isDodged } = calcHit(attacker, defenderStats);
+      const { damage, isCrit, isDodged } = calcHit(
+        attacker,
+        defenderStats,
+        DEFAULT_CRIT_MULTIPLIER,
+        characterLevel,
+      );
 
       if (isDodged) {
         spawnPlayerDmg("Уклон", "dodge");

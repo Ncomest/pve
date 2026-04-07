@@ -7,14 +7,14 @@
     "rarity": "common",
     "xpReward": 50,
     "stats": {
-      "hp": 1000,
-      "maxHp": 1000,
-      "power": 8,
+      "hp": 200,
+      "maxHp": 200,
+      "power": 2,
       "chanceCrit": 0.05,
       "evasion": 0.02,
       "armor": 0,
       "accuracy": 0.045,
-      "critDefense": 0.034999999999999996
+      "critDefense": 0.02
     },
     "buffs": [
       {
@@ -39,7 +39,7 @@
         "type": "damage",
         "icon": "/images/bosses/icons/special/poison_3.png",
         "cooldownMs": 18000,
-        "castTimeMs": 2500,
+        "castTimeMs": 3000,
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Слизь подпрыгивает и обрушивается на цель",

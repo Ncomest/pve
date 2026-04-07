@@ -47,7 +47,6 @@ export function scaleResourceBossStats(
     accuracy,
     critDefense,
     speed: base.speed,
-    spirit: base.spirit,
     lifesteal: base.lifesteal,
   };
 }

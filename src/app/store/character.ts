@@ -94,7 +94,14 @@ export const useCharacterStore = defineStore("character", {
   getters: {
     equipmentStats(state) {
       const playerProgress = usePlayerProgress();
-      const characterLevel = playerProgress.level.value;
+      let characterLevel = playerProgress.level.value;
+
+      // Защита от 0
+      if (!characterLevel || characterLevel < 1) {
+        characterLevel = 1;
+        console.warn("Уровень персонажа не определён, используем 1");
+      }
+
 
       return aggregateEquipmentBonuses(
         collectEquippedPartials(state),
