@@ -985,9 +985,9 @@
     "rarity": "epic",
     "xpReward": 180,
     "stats": {
-      "hp": 7000,
-      "maxHp": 7000,
-      "power": 25,
+      "hp": 60,
+      "maxHp": 60,
+      "power": 4,
       "chanceCrit": 0.15,
       "evasion": 0.35,
       "armor": 8,
