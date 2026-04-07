@@ -21,17 +21,17 @@ const RARITY_WEIGHTS: { rarity: ItemRarity; weight: number }[] = [
   { rarity: "uncommon", weight: 15 },
   { rarity: "rare", weight: 7 },
   { rarity: "epic", weight: 4 },
-  { rarity: "unique", weight: 2},
+  { rarity: "unique", weight: 2 },
 ];
 
 /** Доля силы ролла от «базового дропа» (min..max включительно в процентах). */
 const RARITY_STRENGTH_RANGE: Record<ItemRarity, { min: number; max: number }> =
   {
-    common: { min: 60, max: 80 },
-    uncommon: { min: 70, max: 85 },
+    common: { min: 70, max: 80 },
+    uncommon: { min: 75, max: 90 },
     rare: { min: 80, max: 90 },
-    epic: { min: 90, max: 95 },
-    unique: { min: 100, max: 100 },
+    epic: { min: 80, max: 100 },
+    unique: { min: 95, max: 100 },
   };
 
 function pick<T>(a: T, b: T): T {
@@ -61,6 +61,9 @@ export function generateBaseStatsForRarity(rarity: ItemRarity): ItemStats {
     if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
     else out.hp = rollStatValue("hp");
 
+    if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
+    else out.speed = rollStatValue("speed");
+
     return out;
   }
 
@@ -73,6 +76,9 @@ export function generateBaseStatsForRarity(rarity: ItemRarity): ItemStats {
 
     if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
     else out.speed = rollStatValue("speed");
+
+    if (pick(0, 1) === 0) out.critDefense = rollStatValue("critDefense");
+    else out.evasion = rollStatValue("evasion");
 
     return out;
   }
@@ -90,6 +96,8 @@ export function generateBaseStatsForRarity(rarity: ItemRarity): ItemStats {
     if (pick(0, 1) === 0) out.critDefense = rollStatValue("critDefense");
     else out.evasion = rollStatValue("evasion");
 
+    out.lifesteal = rollStatValue("lifesteal");
+
     return out;
   }
 
@@ -100,12 +108,11 @@ export function generateBaseStatsForRarity(rarity: ItemRarity): ItemStats {
     if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
     else out.hp = rollStatValue("hp");
 
-    if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
-    else out.speed = rollStatValue("speed");
-
     if (pick(0, 1) === 0) out.critDefense = rollStatValue("critDefense");
     else out.evasion = rollStatValue("evasion");
 
+    out.chanceCrit = rollStatValue("chanceCrit");
+    out.speed = rollStatValue("speed");
     out.lifesteal = rollStatValue("lifesteal");
 
     return out;
