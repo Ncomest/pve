@@ -80,6 +80,60 @@
       "accuracy": 0.045,
       "critDefense": 0.035
     },
+    "bossAbilities": [
+      {
+        "id": "slime-crawler-acid",
+        "name": "Кислотный плевок",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/poison_1.png",
+        "cooldownMs": 16000,
+        "castTimeMs": 2500,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Слабая кислота по цели",
+        "baseDamageX": 1.2
+      },
+      {
+        "id": "slime-crawler-pound",
+        "name": "Каток",
+        "type": "damage",
+        "icon": "/images/bosses/icons/special/strike_1.png",
+        "cooldownMs": 19000,
+        "castTimeMs": 2800,
+        "category": "uninterruptible",
+        "canBeInterrupted": false,
+        "requiredDefensiveTag": "block",
+        "description": "Перекатывается на героя, блокируется щитом",
+        "baseDamageX": 2.8
+      },
+      {
+        "id": "rapid-reload",
+        "name": "Быстрая перестройка",
+        "type": "buff",
+        "icon": "/images/bosses/icons/special/rapidshot.png",
+        "cooldownMs": 24000,
+        "castTimeMs": 2500,
+        "category": "self_buff",
+        "canBeInterrupted": true,
+        "description": "Ускоряет наступление — сильнее удар",
+        "selfBuffType": "damage",
+        "selfBuffValue": 0.3,
+        "selfBuffDurationMs": 10000,
+        "dispellable": true
+      },
+      {
+        "id": "slime-crawler-sip",
+        "name": "Глоток слюны",
+        "type": "heal",
+        "icon": "/images/bosses/icons/special/potion_4.png",
+        "cooldownMs": 26000,
+        "castTimeMs": 2500,
+        "category": "interruptible",
+        "canBeInterrupted": true,
+        "description": "Восстанавливает HP",
+        "value": 45
+      }
+    ],
     "abilityConfig": {
       "startDelayMs": 8000,
       "minAbilityIntervalMs": 10000,
