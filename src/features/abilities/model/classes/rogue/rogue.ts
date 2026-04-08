@@ -1,15 +1,15 @@
-import type { Ability } from "./types";
+import type { Ability } from "../../types";
 
-/** Базовый множитель урона X для формул класса «Клинок и Яд» (настраивается балансом) */
-const X = 0.15;
+/** Базовый множитель урона X для формул класса «Разбойник» (настраивается балансом) */
+const X = 0.16;
 
-const CLASS_ID = "blade-and-poison";
+const CLASS_ID = "rogue";
 
 /**
- * Способности класса «Клинок и Яд».
+ * Способности класса «Разбойник».
  * Генераторы дают комбо-поинты, финишеры тратят их. Формулы: X * Power, X * Power * N.
  */
-export const BLADE_AND_POISON_ABILITIES: Ability[] = [
+export const ROGUE_ABILITIES: Ability[] = [
   // --- Генераторы комбо-поинтов ---
   {
     id: "cunning-strike",
@@ -21,7 +21,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     icon: "/images/hero/ability/sinister_strike.png",
     role: "generator",
     classId: CLASS_ID,
-    baseDamageX: X,
+    baseDamageX: 0.2,
     comboGain: 1,
     effects: [
       { kind: "damage", baseDamageX: X },
@@ -60,7 +60,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     selfBuffCritDurationMs: 3_000,
     eviscerateStacksGain: 1,
     eviscerateStackBonusPercent: 0.15,
-    eviscerateMaxStacks: 2,
+    eviscerateMaxStacks: 3,
   },
 
   // --- Финишеры ---
@@ -97,7 +97,7 @@ export const BLADE_AND_POISON_ABILITIES: Ability[] = [
     dotInstantDamageRatio: 0.5,
     dotDurationMs: 16_000,
     dotTickIntervalMs: 2_000,
-    dotTickDamageMultiplier: 1.2,
+    dotTickDamageMultiplier: 1.05,
     dotProcChance: 0.15,
     dotProcBuffId: "cunning",
     dotProcBuffDurationMs: 15_000,

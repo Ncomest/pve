@@ -24,6 +24,7 @@ import {
   lifestealPointsToFraction,
   speedPointsToFraction,
 } from "@/entities/item/lib/statPoints";
+import { getSelectedRaceBonus } from "@/features/character/model/race";
 
 /** Строки таблицы характеристик (герой / экран боя). */
 export type StatRow =
@@ -95,10 +96,24 @@ export function buildHeroStatRows(
 
   // Защита от undefined
   const safeLevel = Math.max(1, characterLevel ?? level ?? 1);
+  const raceBonus = getSelectedRaceBonus();
+  const effectiveBase: Stats = {
+    ...base,
+    hp: base.hp + (raceBonus.hp ?? 0),
+    maxHp: base.maxHp + (raceBonus.maxHp ?? 0) + (raceBonus.hp ?? 0),
+    power: base.power + (raceBonus.power ?? 0),
+    chanceCrit: (base.chanceCrit ?? 0) + (raceBonus.chanceCrit ?? 0),
+    evasion: (base.evasion ?? 0) + (raceBonus.evasion ?? 0),
+    speed: (base.speed ?? 0) + (raceBonus.speed ?? 0),
+    armor: (base.armor ?? 0) + (raceBonus.armor ?? 0),
+    accuracy: (base.accuracy ?? 0) + (raceBonus.accuracy ?? 0),
+    critDefense: (base.critDefense ?? 0) + (raceBonus.critDefense ?? 0),
+    lifesteal: (base.lifesteal ?? 0) + (raceBonus.lifesteal ?? 0),
+  };
 
   const hpBonusFromLevel = Math.max(0, level - 1) * LEVEL_HP_PER_LEVEL;
   const hpBonusTotal = hpBonusFromLevel + eq.hp + healthPercentBonusHp;
-  const maxHpDefault = base.maxHp + hpBonusTotal;
+  const maxHpDefault = effectiveBase.maxHp + hpBonusTotal;
 
   const levelPowerBonus = Math.max(0, level - 1) * LEVEL_POWER_PER_LEVEL;
 
@@ -125,20 +140,21 @@ export function buildHeroStatRows(
   const equipEvasion = eq.evasion ?? 0;
   const equipArmor = eq.armor ?? 0;
 
-  const critBeforeElixir = (base.chanceCrit ?? 0) + equipCrit;
+  const critBeforeElixir = (effectiveBase.chanceCrit ?? 0) + equipCrit;
   const critAfterElixir = Math.min(
     1,
     critBeforeElixir + elixirCritPercentBonus,
   );
 
-  const evasionBeforeElixir = (base.evasion ?? 0) + equipEvasion;
+  const evasionBeforeElixir = (effectiveBase.evasion ?? 0) + equipEvasion;
   const evasionAfterElixir = Math.min(
     1,
     evasionBeforeElixir + elixirEvasionPercentBonus,
   );
 
   const baselineSpeed = playerSpeedBaseline();
-  const speedTotalBeforeElixir = (base.speed ?? baselineSpeed) + equipSpeed;
+  const speedTotalBeforeElixir =
+    (effectiveBase.speed ?? baselineSpeed) + equipSpeed;
   const speedTotalAfterElixir = applyElixirSpeedPercentToSpeedTotal(
     speedTotalBeforeElixir,
     elixirSpeedPercentBonus,
@@ -149,7 +165,7 @@ export function buildHeroStatRows(
     safeLevel,
   );
 
-  const armorBeforePoints = (base.armor ?? 0) + equipArmor;
+  const armorBeforePoints = (effectiveBase.armor ?? 0) + equipArmor;
   const armorAfterPoints = applyElixirArmorPercentToArmorPoints(
     armorBeforePoints,
     elixirArmorPercentBonus,
@@ -162,21 +178,23 @@ export function buildHeroStatRows(
 
   const accuracyDefault = Math.min(
     1,
-    (base.accuracy ?? 0) + accuracyPointsToFraction(raw.accuracy, safeLevel),
+    (effectiveBase.accuracy ?? 0) +
+      accuracyPointsToFraction(raw.accuracy, safeLevel),
   );
   const critDefDefault = Math.min(
     1,
-    (base.critDefense ?? 0) +
+    (effectiveBase.critDefense ?? 0) +
       critDefensePointsToFraction(raw.critDefense, safeLevel),
   );
   const lifestealDefault = Math.min(
     1,
-    (base.lifesteal ?? 0) + lifestealPointsToFraction(raw.lifesteal, safeLevel),
+    (effectiveBase.lifesteal ?? 0) +
+      lifestealPointsToFraction(raw.lifesteal, safeLevel),
   );
 
   const attackTotal =
     battle?.attackTotal ??
-    base.power + levelPowerBonus + equipPower + elixirPowerDelta;
+    effectiveBase.power + levelPowerBonus + equipPower + elixirPowerDelta;
   const maxHpTotal = battle?.maxHpTotal ?? maxHpDefault;
   const critFraction = battle?.critFraction ?? critAfterElixir;
   const evasionFraction = battle?.evasionFraction ?? evasionAfterElixir;

@@ -3,21 +3,20 @@
   import LootPanel from "@/features/battle/ui/LootPanel/LootPanel.vue";
   import "./BattleResult.scss";
   import { BattleLog } from "@/features/battle/ui";
-import { BattleLogEntry } from "../../model/useBattle";
+  import { BattleLogEntry } from "../../model/useBattle";
 
   const props = defineProps<{
     winnerText: string;
     isVictory: boolean;
     loot: ItemInstance[];
     showLoot: boolean;
-    battleLog: BattleLogEntry[]
+    battleLog: BattleLogEntry[];
   }>();
 
   const emit = defineEmits<{
     replay: [];
     goToBossSelect: [];
     continue: [];
-    takeItem: [item: ItemInstance];
   }>();
 </script>
 
@@ -38,11 +37,10 @@ import { BattleLogEntry } from "../../model/useBattle";
         v-if="props.isVictory && props.showLoot && props.loot.length"
         class="battle-result-modal__loot"
       >
-        <LootPanel
-          :items="props.loot"
-          @take-item="(item) => emit('takeItem', item)"
-        />
+        <LootPanel :items="props.loot" :allow-take="false" />
       </div>
+
+      <BattleLog :lines="battleLog" />
 
       <div class="battle-result-modal__actions">
         <button
@@ -70,8 +68,6 @@ import { BattleLogEntry } from "../../model/useBattle";
           </button>
         </template>
       </div>
-
-      <BattleLog :lines="battleLog" />
     </div>
   </div>
 </template>

@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import type { Boss, Buff, Debuff } from "@/entities/boss/model";
+import { useCharacterStore } from "@/app/store/character";
 
 /** Разбить массив на строки по 5 ячеек */
 function chunkBy5<T>(arr: T[]): T[][] {
@@ -13,10 +14,23 @@ function chunkBy5<T>(arr: T[]): T[][] {
 
 export function useBossSelect() {
   const router = useRouter();
+  const characterStore = useCharacterStore();
   const selectedInfo = ref<Boss | null>(null);
+  const inventoryWarningOpen = ref(false);
 
   const handleSelectBoss = (boss: Boss) => {
+    const hasFreeInventorySlot = characterStore.inventory.some(
+      (slot) => slot === null,
+    );
+    if (!hasFreeInventorySlot) {
+      inventoryWarningOpen.value = true;
+      return;
+    }
     router.push({ name: "battle", params: { bossId: boss.id } });
+  };
+
+  const closeInventoryWarning = () => {
+    inventoryWarningOpen.value = false;
   };
 
   const openInfo = (boss: Boss) => {
@@ -28,8 +42,10 @@ export function useBossSelect() {
 
   return {
     selectedInfo,
+    inventoryWarningOpen,
     handleSelectBoss,
     openInfo,
+    closeInventoryWarning,
     buffRows,
     debuffRows,
   };

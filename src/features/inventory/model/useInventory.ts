@@ -63,6 +63,12 @@ export function useInventory() {
   const isItemEquipped = computed(() => false);
 
   const selectedEquippedItem = computed<ItemInstance | null>(() => {
+    if (selectedItem.value) {
+      const selectedTemplate = getTemplate(selectedItem.value.item.templateId);
+      if (!selectedTemplate || selectedTemplate.slot === "resource") return null;
+      return characterStore.equipped[selectedTemplate.slot] ?? null;
+    }
+
     if (!selectedEquippedSlot.value) return null;
     return characterStore.equipped[selectedEquippedSlot.value] ?? null;
   });

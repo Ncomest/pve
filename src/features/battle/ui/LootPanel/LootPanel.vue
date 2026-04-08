@@ -7,9 +7,15 @@ import { rarityColor } from "@/entities/item/lib/rarityColor";
 import { getResourceItemIconSrc } from "@/entities/item/lib/resourceItemIcon";
 import "./LootPanel.scss";
 
-const props = defineProps<{
-  items: ItemInstance[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    items: ItemInstance[];
+    allowTake?: boolean;
+  }>(),
+  {
+    allowTake: true,
+  },
+);
 
 const emit = defineEmits<{
   takeItem: [item: ItemInstance];
@@ -103,6 +109,7 @@ function lootItemIconSrc(
         </div>
 
         <button
+          v-if="props.allowTake"
           type="button"
           class="loot-panel__take-btn"
           @click="props.items[idx] && emit('takeItem', props.items[idx]!)"

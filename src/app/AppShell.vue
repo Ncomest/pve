@@ -210,8 +210,28 @@
           <span>Крафт</span>
         </RouterLink>
 
+        <!-- Кнопка Инвентарь -->
+        <RouterLink to="/" class="nav-link nav-link--inventory">
+          <svg
+            class="nav-link__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M4.5 8h15l-1.2 11H5.7L4.5 8zM8 8V6a4 4 0 1 1 8 0v2"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>Инвентарь</span>
+        </RouterLink>
+
         <!-- Кнопка Персонаж с иконкой -->
-        <RouterLink to="/" class="nav-link nav-link--character">
+        <RouterLink to="/character" class="nav-link nav-link--character">
           <svg
             class="nav-link__icon"
             viewBox="0 0 24 24"
@@ -471,8 +491,27 @@
           </svg>
         </RouterLink>
 
+        <!-- Кнопка Инвентарь -->
+        <RouterLink to="/" class="nav-link nav-link--inventory">
+          <svg
+            class="nav-link__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M4.5 8h15l-1.2 11H5.7L4.5 8zM8 8V6a4 4 0 1 1 8 0v2"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </RouterLink>
+
         <!-- Кнопка Персонаж с иконкой -->
-        <RouterLink to="/" class="nav-link nav-link--character">
+        <RouterLink to="/character" class="nav-link nav-link--character">
           <svg
             class="nav-link__icon"
             viewBox="0 0 24 24"

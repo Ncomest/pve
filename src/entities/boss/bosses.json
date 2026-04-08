@@ -235,7 +235,7 @@
         "canBeInterrupted": true,
         "description": "Босс усиливает свои клыки, удваивая силу атаки на 11 секунд",
         "selfBuffType": "damage",
-        "selfBuffValue": 3,
+        "selfBuffValue": 0.6,
         "selfBuffDurationMs": 11000,
         "dispellable": false,
         "buffRequiresDispellable": false
@@ -306,7 +306,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Босс восстанавливает 500 HP. Прерывается способностью Rebuke",
-        "value": 500
+        "value": 45
       }
     ],
     "abilityConfig": {
@@ -462,7 +462,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Восстанавливает здоровье",
-        "value": 280
+        "value": 40
       }
     ],
     "abilityConfig": {
@@ -1059,7 +1059,7 @@
     "xpReward": 165,
     "stats": {
       "hp": 210,
-      "maxHp": 4821000,
+      "maxHp": 210,
       "power": 21,
       "chanceCrit": 0.17,
       "evasion": 0.11,
@@ -1186,7 +1186,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Восстанавливает здоровье",
-        "value": 450
+        "value": 55
       }
     ],
     "abilityConfig": {
@@ -1564,7 +1564,7 @@
         "category": "interruptible",
         "canBeInterrupted": true,
         "description": "Медведь восстанавливает здоровье. Прерывается Rebuke",
-        "value": 800
+        "value": 70
       }
     ],
     "abilityConfig": {
@@ -1978,7 +1978,7 @@
         "canBeInterrupted": true,
         "description": "Смазывает клинок ядом — удваивает силу",
         "selfBuffType": "damage",
-        "selfBuffValue": 3,
+        "selfBuffValue": 0.6,
         "selfBuffDurationMs": 11000,
         "dispellable": true,
         "buffRequiresDispellable": true

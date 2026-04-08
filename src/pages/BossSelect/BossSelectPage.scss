@@ -746,3 +746,64 @@
     font-weight: 500;
   }
 }
+
+.boss-select-page__inventory-warning-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.boss-select-page__inventory-warning-modal {
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(234, 179, 8, 0.5);
+  border-radius: 14px;
+  padding: 28px 32px;
+  max-width: 380px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(234, 179, 8, 0.2);
+}
+
+.boss-select-page__inventory-warning-icon {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.boss-select-page__inventory-warning-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(253, 224, 71, 0.95);
+}
+
+.boss-select-page__inventory-warning-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.5;
+}
+
+.boss-select-page__inventory-warning-btn {
+  margin-top: 4px;
+  padding: 9px 28px;
+  border-radius: 8px;
+  border: 1px solid rgba(234, 179, 8, 0.5);
+  background: rgba(161, 98, 7, 0.4);
+  color: rgba(253, 224, 71, 0.95);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.12s ease-out, border-color 0.12s ease-out;
+
+  &:hover {
+    background: rgba(161, 98, 7, 0.7);
+    border-color: rgba(234, 179, 8, 0.8);
+  }
+}

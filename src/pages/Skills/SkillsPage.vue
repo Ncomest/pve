@@ -1,9 +1,11 @@
 <script setup lang="ts">
   import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-  import { useSkillsStore } from "@/app/store/skills";
+  import {
+    HERO_CLASS_STORAGE_KEY,
+    useSkillsStore,
+  } from "@/app/store/skills";
   import {
     ABILITIES,
-    BLADE_AND_POISON_ABILITIES,
     ALL_ABILITIES,
   } from "@/features/abilities/model/abilities";
   import type { Ability } from "@/features/abilities/model/types";
@@ -28,6 +30,19 @@
     string,
     (typeof Icons)[keyof typeof Icons]
   >;
+
+  const selectedClassId = computed(() => {
+    const classId = skillsStore.currentClassId;
+    return classId === "__none__" ? "" : classId;
+  });
+
+  const classAbilities = computed(() =>
+    ALL_ABILITIES.filter(
+      (ability) => ability.classId && ability.classId === selectedClassId.value,
+    ),
+  );
+
+  const hasClassAbilities = computed(() => classAbilities.value.length > 0);
 
   function assignToSlot(panelIndex: number, slotIndex: number) {
     if (selectedAbilityId.value) {
@@ -73,7 +88,7 @@
   const activeAbilities = computed(() =>
     activeAbilitiesTab.value === "general"
       ? ABILITIES
-      : BLADE_AND_POISON_ABILITIES,
+      : classAbilities.value,
   );
 
   const mobileDescriptions = computed(() => {
@@ -81,7 +96,15 @@
       return "Эти способности позволяют выполнять механику боя с боссом — уклоняться от атак, прерывать врага, очищать дебаффы и восстанавливать здоровье.";
     }
 
-    return "Способности класса «Клинок и Яд» для нанесения урона, управления и усиления комбинаций.";
+    if (!selectedClassId.value) {
+      return "Сначала выберите класс на странице персонажа.";
+    }
+
+    if (!hasClassAbilities.value) {
+      return "Классовые способности для этого класса находятся в разработке.";
+    }
+
+    return "Классовые способности выбранного класса.";
   });
 
   watch(activeAbilitiesTab, () => {
@@ -96,6 +119,9 @@
   };
 
   onMounted(() => {
+    const initialClassId = localStorage.getItem(HERO_CLASS_STORAGE_KEY) ?? "";
+    skillsStore.setActiveClass(initialClassId);
+
     if (typeof window === "undefined") return;
     mq = window.matchMedia("(max-width: 600px)");
     updateIsMobile();
@@ -214,8 +240,17 @@
         }}
       </h2>
       <p class="ability-list__description">{{ mobileDescriptions }}</p>
+      <p
+        v-if="activeAbilitiesTab === 'class' && selectedClassId && !hasClassAbilities"
+        class="ability-list__description"
+      >
+        В разработке
+      </p>
 
-      <div class="ability-list__grid">
+      <div
+        v-if="activeAbilities.length > 0"
+        class="ability-list__grid"
+      >
         <div
           v-for="ability in activeAbilities"
           :key="ability.id"
@@ -360,6 +395,18 @@
           </div>
         </div>
       </div>
+      <p
+        v-else
+        class="ability-list__description"
+      >
+        {{
+          activeAbilitiesTab === "general"
+            ? "Способности пока отсутствуют."
+            : selectedClassId
+              ? "В разработке"
+              : "Выберите класс, чтобы увидеть классовые способности."
+        }}
+      </p>
     </section>
   </div>
 </template>

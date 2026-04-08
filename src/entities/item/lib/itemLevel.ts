@@ -7,12 +7,18 @@ import type {
 
 /**
  * Множитель статов от уровня вещи.
- * Менять коэффициент 0.1 здесь, если нужно усилить/ослабить рост статов от уровня.
- * Формула: 1 + (itemLevel - 1) * 2 (например itemLevel 5 → 1.4).
+ * Рост ступенчатый:
+ * - 1..6 уровень: x1
+ * - 7..9 уровень: x2
+ * - 10..12 уровень: x3 и т.д.
+ * Это удерживает верхнюю границу проков в целевых рамках:
+ * itemLevel 4 -> максимум как у базы (например 15),
+ * itemLevel 7 -> максимум в 2 раза выше базы (например 30).
  * См. docs/balance-items.md.
  */
 export function getStatMultiplier(itemLevel: number): number {
-  return Math.floor((itemLevel - 1) / 3) + 1;
+  const safeLevel = Math.max(1, itemLevel);
+  return Math.max(1, Math.floor((safeLevel - 1) / 3));
 }
 
 /**

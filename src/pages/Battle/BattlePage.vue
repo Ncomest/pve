@@ -59,7 +59,6 @@
     bossEffectiveArmor,
     loot,
     showLoot,
-    takeLootItem,
     playerBuffs,
     playerDebuffs,
     bossBuffs,
@@ -406,7 +405,6 @@
       :is-victory="isVictory"
       :loot="loot"
       :show-loot="showLoot"
-      @take-item="takeLootItem"
       @replay="resetBattle"
       @go-to-boss-select="handleFlee"
       @continue="handleFlee"

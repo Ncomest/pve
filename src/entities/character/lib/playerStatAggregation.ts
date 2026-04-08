@@ -16,6 +16,7 @@
 import type { Stats } from "@/entities/boss/model";
 import type { ItemStats } from "@/entities/item/model";
 import { PLAYER_CHARACTER } from "@/entities/character/model";
+import { getSelectedRaceBonus } from "@/features/character/model/race";
 import {
   critPointsToFraction,
   evasionPointsToFraction,
@@ -156,21 +157,39 @@ export function buildPlayerCombatStats(
   equipment: EquipmentBonuses,
   level: number,
 ): Stats {
+  const raceBonus = getSelectedRaceBonus();
+  const effectiveBase: Stats = {
+    ...base,
+    hp: base.hp + (raceBonus.hp ?? 0),
+    maxHp: base.maxHp + (raceBonus.maxHp ?? 0) + (raceBonus.hp ?? 0),
+    power: base.power + (raceBonus.power ?? 0),
+    chanceCrit: (base.chanceCrit ?? 0) + (raceBonus.chanceCrit ?? 0),
+    evasion: (base.evasion ?? 0) + (raceBonus.evasion ?? 0),
+    speed: (base.speed ?? 0) + (raceBonus.speed ?? 0),
+    armor: (base.armor ?? 0) + (raceBonus.armor ?? 0),
+    accuracy: (base.accuracy ?? 0) + (raceBonus.accuracy ?? 0),
+    critDefense: (base.critDefense ?? 0) + (raceBonus.critDefense ?? 0),
+    lifesteal: (base.lifesteal ?? 0) + (raceBonus.lifesteal ?? 0),
+  };
+
   const bonusHp = Math.max(0, level - 1) * LEVEL_HP_PER_LEVEL;
   const bonusPower = Math.max(0, level - 1) * LEVEL_POWER_PER_LEVEL;
   const baseline = playerSpeedBaseline();
 
   return {
-    hp: base.maxHp + bonusHp + equipment.hp,
-    maxHp: base.maxHp + bonusHp + equipment.hp,
-    power: base.power + bonusPower + equipment.power,
-    chanceCrit: Math.min(1, (base.chanceCrit ?? 0) + equipment.chanceCrit),
-    evasion: Math.min(1, (base.evasion ?? 0) + equipment.evasion),
-    speed: (base.speed ?? baseline) + equipment.speed,
-    armor: (base.armor ?? 0) + equipment.armor,
-    accuracy: Math.min(1, (base.accuracy ?? 0) + equipment.accuracy),
-    critDefense: Math.min(1, (base.critDefense ?? 0) + equipment.critDefense),
-    lifesteal: Math.min(1, (base.lifesteal ?? 0) + equipment.lifesteal),
+    hp: effectiveBase.maxHp + bonusHp + equipment.hp,
+    maxHp: effectiveBase.maxHp + bonusHp + equipment.hp,
+    power: effectiveBase.power + bonusPower + equipment.power,
+    chanceCrit: Math.min(1, (effectiveBase.chanceCrit ?? 0) + equipment.chanceCrit),
+    evasion: Math.min(1, (effectiveBase.evasion ?? 0) + equipment.evasion),
+    speed: (effectiveBase.speed ?? baseline) + equipment.speed,
+    armor: (effectiveBase.armor ?? 0) + equipment.armor,
+    accuracy: Math.min(1, (effectiveBase.accuracy ?? 0) + equipment.accuracy),
+    critDefense: Math.min(
+      1,
+      (effectiveBase.critDefense ?? 0) + equipment.critDefense,
+    ),
+    lifesteal: Math.min(1, (effectiveBase.lifesteal ?? 0) + equipment.lifesteal),
   };
 }
 

@@ -4,6 +4,10 @@
   gap: 6px;
   align-content: start;
 
+  @media (max-width: 425px) {
+    order: 3;
+  }
+
   &__slot {
     aspect-ratio: 1 / 1;
     border-radius: 8px;
@@ -29,7 +33,11 @@
 
     &--filled {
       border-style: solid;
-      border-color: color-mix(in srgb, var(--rarity-color, rgba(148, 163, 184, 0.35)) 40%, rgba(148, 163, 184, 0.2));
+      border-color: color-mix(
+        in srgb,
+        var(--rarity-color, rgba(148, 163, 184, 0.35)) 40%,
+        rgba(148, 163, 184, 0.2)
+      );
     }
 
     &--selected {

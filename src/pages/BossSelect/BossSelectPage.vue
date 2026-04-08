@@ -39,8 +39,10 @@ const visibleCount = ref(PAGE_SIZE);
 
 const {
   selectedInfo,
+  inventoryWarningOpen,
   handleSelectBoss,
   openInfo,
+  closeInventoryWarning,
 } = useBossSelect();
 
 const fullListForTab = computed(() =>
@@ -179,5 +181,29 @@ onUnmounted(() => {
       />
     </div>
 
+    <Teleport to="body">
+      <div
+        v-if="inventoryWarningOpen"
+        class="boss-select-page__inventory-warning-overlay"
+        @click.self="closeInventoryWarning"
+      >
+        <div class="boss-select-page__inventory-warning-modal">
+          <div class="boss-select-page__inventory-warning-icon">⚠️</div>
+          <h3 class="boss-select-page__inventory-warning-title">
+            Недостаточно места в инвентаре
+          </h3>
+          <p class="boss-select-page__inventory-warning-text">
+            Освободите хотя бы один слот в инвентаре, чтобы начать бой.
+          </p>
+          <button
+            type="button"
+            class="boss-select-page__inventory-warning-btn"
+            @click="closeInventoryWarning"
+          >
+            Понятно
+          </button>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>

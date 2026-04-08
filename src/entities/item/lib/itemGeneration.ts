@@ -6,16 +6,16 @@ const rng = () => Math.random();
 export const PROC_BASE: ItemStats = {
   hp: 5,
   power: 1,
-  armor: 5,
-  chanceCrit: 5,
-  evasion: 5,
-  speed: 5,
-  accuracy: 5,
-  critDefense: 5,
-  lifesteal: 5,
+  armor: 15,
+  chanceCrit: 15,
+  evasion: 15,
+  speed: 15,
+  accuracy: 15,
+  critDefense: 15,
+  lifesteal: 15,
 };
 
-/** Веса редкости: белая 90%, зелёная 4%, синяя 3%, эпическая 2%, уникальная 1%. */
+/** Веса редкости: белая 72%, зелёная 15%, синяя 7%, эпическая 4%, уникальная 2%. */
 const RARITY_WEIGHTS: { rarity: ItemRarity; weight: number }[] = [
   { rarity: "common", weight: 72 },
   { rarity: "uncommon", weight: 15 },
@@ -38,6 +38,10 @@ function pick<T>(a: T, b: T): T {
   return rng() < 0.5 ? a : b;
 }
 
+function roundToTwo(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
 /**
  * Генерирует базовые статы предмета по редкости (до множителя уровня вещи).
  */
@@ -49,7 +53,9 @@ export function generateBaseStatsForRarity(rarity: ItemRarity): ItemStats {
     const percent =
       (minPercent + Math.random() * (maxPercent - minPercent)) / 100;
     const baseValue = PROC_BASE[key] ?? 0;
-    const result = Math.max(1, Math.round(baseValue * percent));
+    // Не округляем до целого слишком рано, иначе на высоком itemLevel
+    // получаются «ступеньки» (кратно множителю уровня).
+    const result = Math.max(1, roundToTwo(baseValue * percent));
     return result;
   };
 

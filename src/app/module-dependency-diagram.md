@@ -15,7 +15,7 @@ graph TB
     %% Слой PAGES
     BattlePage[pages/Battle]
     BossSelectPage[pages/BossSelect]
-    CharacterPage[pages/Character]
+    InventoryPage[pages/Inventory]
     MerchantPage[pages/Merchant]
     SkillsPage[pages/Skills]
     
@@ -60,7 +60,7 @@ graph TB
     App --> Store
     Router --> BattlePage
     Router --> BossSelectPage
-    Router --> CharacterPage
+    Router --> InventoryPage
     Router --> MerchantPage
     Router --> SkillsPage
     
@@ -74,9 +74,9 @@ graph TB
     BossSelectPage --> BossLoot
     BossSelectPage --> Boss
     
-    CharacterPage --> Inventory
-    CharacterPage --> PlayerProgress
-    CharacterPage --> CharStore
+    InventoryPage --> Inventory
+    InventoryPage --> PlayerProgress
+    InventoryPage --> CharStore
     
     MerchantPage --> CharStore
     MerchantPage --> Merchant
@@ -145,7 +145,7 @@ graph TB
     classDef sharedLayer fill:#a8dadc,stroke:#457b9d,stroke-width:2px,color:#000
     
     class App,Main,Router,Store,CharStore,SkillsStore appLayer
-    class BattlePage,BossSelectPage,CharacterPage,MerchantPage,SkillsPage pagesLayer
+    class BattlePage,BossSelectPage,InventoryPage,MerchantPage,SkillsPage pagesLayer
     class Battle,BattleEffects,BattleUI,BossSelect,BossLoot,Abilities,BladePoison,Inventory,PlayerProgress,PlayerHp,Skills featuresLayer
     class Character,CharacterUI,Boss,BossUI,Item,ItemsDB,Merchant entitiesLayer
     class HealthBar,EffectSlots,AbilityTooltip,DamageNumbers,Icons,Cooldowns,Effects,Experience,Labels,Hotkey,MerchantLib sharedLayer
@@ -168,7 +168,7 @@ graph TB
 **Страницы:**
 - `Battle` — экран боя с боссом
 - `BossSelect` — выбор босса для битвы
-- `Character` — инвентарь и экипировка персонажа
+- `Inventory` — инвентарь и экипировка персонажа
 - `Merchant` — торговец (покупка/продажа предметов)
 - `Skills` — управление навыками и способностями
 
@@ -243,7 +243,7 @@ BattlePage → useBattle → {
 
 ### Система инвентаря
 ```
-CharacterPage → useInventory → characterStore → {
+InventoryPage → useInventory → characterStore → {
   inventory (слоты предметов)
   equipped (надетая экипировка)
   equipmentStats (суммарные статы)

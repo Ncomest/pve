@@ -16,7 +16,10 @@ import type {
 import type { ActiveEffect } from "@/shared/lib/effects/types";
 import { loadBossCatalog } from "@/entities/boss/lib/loadBossCatalog";
 import { PLAYER_CHARACTER } from "@/entities/character/model";
-import { ABILITIES, ALL_ABILITIES } from "@/features/abilities/model/abilities";
+import {
+  ABILITIES,
+  ALL_ABILITIES,
+} from "@/features/abilities/model/abilities";
 import type { Ability } from "@/features/abilities/model/types";
 import { applyEffects } from "@/features/battle/model/applyAbilityEffects";
 import type { BattleEffectContext } from "@/features/battle/model/applyAbilityEffects";
@@ -353,7 +356,7 @@ export function useBattle(bossId: () => string | undefined) {
   }>({});
 
   const pushLog = (line: string, type: BattleLogEntryType = "other") => {
-    battleLog.value = [{ text: line, type }, ...battleLog.value].slice(0, 12);
+    battleLog.value = [{ text: line, type }, ...battleLog.value];
   };
 
   /** Разница уровней: босс выше героя → штраф урона героя по боссу и бонус урона босса по герою. */
@@ -474,7 +477,18 @@ export function useBattle(bossId: () => string | undefined) {
     resetAll: resetGcd,
   } = useCooldowns();
 
-  const GCD_KEY = "__gcd__";
+  const GCD_COMMON_KEY = "__gcd_common__";
+  const GCD_CLASS_KEY = "__gcd_class__";
+  const commonGcdAbilityIds = new Set(ABILITIES.map((a) => a.id));
+  const classGcdAbilityIds = new Set(
+    ALL_ABILITIES.filter((a) => !!a.classId).map((a) => a.id),
+  );
+
+  const getGcdKeyForAbility = (id: string): string | null => {
+    if (commonGcdAbilityIds.has(id)) return GCD_COMMON_KEY;
+    if (classGcdAbilityIds.has(id)) return GCD_CLASS_KEY;
+    return null;
+  };
 
   /**
    * Коэффициент скорости для КД (см. `cooldownFactorFromSpeed` в playerStatAggregation).
@@ -495,7 +509,9 @@ export function useBattle(bossId: () => string | undefined) {
     Math.max(0, Math.round(ms * speedFactor.value));
 
   const isAbilityReady = (id: string) => {
-    if (!isReady(id) || !isGcdReady(GCD_KEY)) return false;
+    if (!isReady(id)) return false;
+    const gcdKey = getGcdKeyForAbility(id);
+    if (gcdKey && !isGcdReady(gcdKey)) return false;
     // Финишер недоступен, если накоплено меньше минимума комбо-поинтов
     const ability = ALL_ABILITIES.find((a) => a.id === id);
     if (ability?.role === "finisher" && ability.comboCostMin !== undefined) {
@@ -508,8 +524,12 @@ export function useBattle(bossId: () => string | undefined) {
    * Возвращает оставшийся кулдаун для способности с учётом GCD.
    * Если GCD > собственного кулдауна способности — возвращает GCD.
    */
-  const cooldownLeftMs = (id: string): number =>
-    Math.max(cooldownsLeftMs[id] ?? 0, gcdLeftMs[GCD_KEY] ?? 0);
+  const cooldownLeftMs = (id: string): number => {
+    const own = cooldownsLeftMs[id] ?? 0;
+    const gcdKey = getGcdKeyForAbility(id);
+    if (!gcdKey) return own;
+    return Math.max(own, gcdLeftMs[gcdKey] ?? 0);
+  };
 
   /** Собственный кулдаун способности без учёта GCD */
   const ownCooldownLeftMs = (id: string): number => cooldownsLeftMs[id] ?? 0;
@@ -524,7 +544,7 @@ export function useBattle(bossId: () => string | undefined) {
       const ability = ALL_ABILITIES.find((a) => a.id === abilityId);
       return ability ? applySpeed(ability.cooldownMs) : GCD_MS.value;
     }
-    return GCD_MS.value;
+    return getGcdKeyForAbility(abilityId) ? GCD_MS.value : 0;
   };
 
   const abilityCooldownText = (id: string) =>
@@ -536,7 +556,10 @@ export function useBattle(bossId: () => string | undefined) {
    */
   const triggerCooldowns = (id: string, ms: number) => {
     setCooldown(id, applySpeed(ms));
-    setGcd(GCD_KEY, GCD_MS.value);
+    const gcdKey = getGcdKeyForAbility(id);
+    if (gcdKey) {
+      setGcd(gcdKey, GCD_MS.value);
+    }
   };
 
   const powerBoostLeftMs = ref(0);
@@ -1073,6 +1096,89 @@ export function useBattle(bossId: () => string | undefined) {
         ? Math.max(0, boss.stats.armor - bossArmorDebuff.value.value)
         : boss.stats.armor;
       const defenderStats: Stats = { ...boss.stats, armor: effectiveBossArmor };
+
+      // Способность с DoT (например, «Ядовитый выстрел» охотника):
+      // мгновенный урон + периодический урон по цели.
+      if (
+        ability.baseDamageX !== undefined &&
+        ability.dotDurationMs !== undefined &&
+        ability.dotTickIntervalMs !== undefined
+      ) {
+        const attacker: Stats = {
+          ...player.stats,
+          power: playerPower.value * ability.baseDamageX,
+          chanceCrit: Math.min(
+            1,
+            player.stats.chanceCrit + (ability.chanceCrit ?? 0),
+          ),
+        };
+        const { damage, isCrit, isDodged } = calcHit(
+          attacker,
+          defenderStats,
+          ability.critMultiplier ?? DEFAULT_CRIT_MULTIPLIER,
+          characterLevel,
+        );
+
+        if (isDodged) {
+          spawnBossDmg("Уклон", "dodge");
+          pushLog(`${ability.name}: босс уклонился.`, "boss-dodge");
+          triggerCooldowns(ability.id, ability.cooldownMs);
+          return;
+        }
+
+        const instantRatio = ability.dotInstantDamageRatio ?? 0.2;
+        const instantDamage = Math.max(1, Math.round(damage * instantRatio));
+        const instantApplied = applyDamageToBoss(instantDamage);
+        spawnBossDmg(instantApplied, "damage", isCrit);
+
+        const ticksCount = Math.max(
+          1,
+          Math.floor(ability.dotDurationMs / ability.dotTickIntervalMs),
+        );
+        const tickMultiplier = ability.dotTickDamageMultiplier ?? 1;
+        const tickDamage = Math.max(
+          1,
+          Math.round((playerPower.value * ability.baseDamageX * tickMultiplier) / ticksCount),
+        );
+
+        clearPoisonDot(ability.id);
+        const endTime = Date.now() + ability.dotDurationMs;
+        bossDebuffs.value = [
+          ...bossDebuffs.value,
+          {
+            id: ability.id,
+            name: ability.name,
+            icon: ability.icon ?? "IconBleed",
+            durationSeconds: ability.dotDurationMs / 1000,
+            endTime,
+          },
+        ];
+
+        poisonDotIntervalId = setInterval(() => {
+          if (isBattleOver.value || Date.now() >= endTime) return;
+          const tickApplied = applyDamageToBoss(tickDamage);
+          spawnBossDmg(tickApplied, "damage");
+          pushLog(`Яд (${ability.name}): −${tickApplied} HP у босса.`, "player-damage");
+        }, ability.dotTickIntervalMs);
+
+        poisonDotEndTimeoutId = setTimeout(() => {
+          if (poisonDotIntervalId !== null) {
+            clearInterval(poisonDotIntervalId);
+            poisonDotIntervalId = null;
+          }
+          poisonDotEndTimeoutId = null;
+          bossDebuffs.value = bossDebuffs.value.filter((e) => e.id !== ability.id);
+        }, ability.dotDurationMs);
+
+        pushLog(
+          `${ability.name}: ${instantApplied} урона${isCrit ? " (крит)" : ""} + яд ${Math.round(
+            ability.dotDurationMs / 1000,
+          )}с.`,
+          "player-damage",
+        );
+        triggerCooldowns(ability.id, ability.cooldownMs);
+        return;
+      }
 
       // Способность с кровотечением: плоский урон + DoT
       if (
@@ -2015,21 +2121,6 @@ export function useBattle(bossId: () => string | undefined) {
     }
   };
 
-  const takeLootItem = (instance: ItemInstance) => {
-    const tmpl = getTemplate(instance.templateId);
-    const success =
-      tmpl?.slot === "resource"
-        ? characterStore.addItemToResources(instance)
-        : characterStore.addItemToInventory(instance);
-    if (success) {
-      loot.value = loot.value.filter(
-        (i) => i.instanceId !== instance.instanceId,
-      );
-      const display = getDisplayItem(instance, getTemplate);
-      pushLog(`Получен предмет: ${display?.name ?? "?"}`);
-    }
-  };
-
   // Синхронизируем HP игрока в хранилище при каждом изменении
   // watch(
   //   () => player.stats.hp,
@@ -2084,6 +2175,21 @@ export function useBattle(bossId: () => string | undefined) {
         }
 
         if (loot.value.length > 0) {
+          for (const instance of loot.value) {
+            const tmpl = getTemplate(instance.templateId);
+            const success =
+              tmpl?.slot === "resource"
+                ? characterStore.addItemToResources(instance)
+                : characterStore.addItemToInventory(instance);
+            const display = getDisplayItem(instance, getTemplate);
+            if (success) {
+              pushLog(`Получен предмет: ${display?.name ?? "?"}.`);
+            } else {
+              pushLog(
+                `Не удалось выдать предмет: ${display?.name ?? "неизвестный предмет"}.`,
+              );
+            }
+          }
           showLoot.value = true;
         }
       }
@@ -2163,7 +2269,6 @@ export function useBattle(bossId: () => string | undefined) {
     bossEffectiveArmor,
     loot,
     showLoot,
-    takeLootItem,
     playerBuffs,
     playerDebuffs,
     bossBuffs,
