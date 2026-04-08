@@ -32,6 +32,8 @@
     castCanBeInterrupted?: boolean;
     castRequiredTag?: BossDefensiveTag;
     castDebuffType?: "poison" | "curse" | "burn" | "ground" | "bleed";
+    castDebuffRequiresCleanse?: boolean;
+    castDispellable?: boolean;
   }>();
 
   const attackCooldownProgress = computed(() => {
@@ -79,10 +81,17 @@
   const mechanicTagText = computed(() => {
     if (!hasCast.value) return "";
 
-    if (props.castRequiredTag === "block") return "Блокировать";
-    if (props.castCategory === "interruptible") return "Прервать";
-    if (props.castCategory === "cleansable-debuff") return "Очистить";
-    if (props.debuffs) return "Рассеить";
+    if (props.castRequiredTag === "block") return "Блокируемое";
+    if (props.castDebuffRequiresCleanse || props.castCategory === "cleansable-debuff") {
+      return "Очищаемое";
+    }
+    if (props.castDispellable || props.castCategory === "dispellable-buff") {
+      return "Рассеиваемое";
+    }
+    if (props.castCanBeInterrupted || props.castCategory === "interruptible") {
+      return "Прерываемое";
+    }
+    return "";
   });
 </script>
 

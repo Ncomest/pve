@@ -113,13 +113,14 @@
         "icon": "/images/bosses/icons/special/rapidshot.png",
         "cooldownMs": 24000,
         "castTimeMs": 2500,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Ускоряет наступление — сильнее удар",
         "selfBuffType": "damage",
         "selfBuffValue": 0.3,
         "selfBuffDurationMs": 10000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       },
       {
         "id": "slime-crawler-sip",
@@ -236,7 +237,8 @@
         "selfBuffType": "damage",
         "selfBuffValue": 3,
         "selfBuffDurationMs": 11000,
-        "dispellable": false
+        "dispellable": false,
+        "buffRequiresDispellable": false
       },
       {
         "id": "infected-bite",
@@ -245,7 +247,7 @@
         "icon": "/images/bosses/icons/special/bite.png",
         "cooldownMs": 20000,
         "castTimeMs": 3000,
-        "category": "persistent_debuff",
+        "category": "cleansable-debuff",
         "canBeInterrupted": false,
         "description": "Укус накладывает заразу, наносящую 8 урона каждые 2с в течение 8с. Снимается Cleanse",
         "baseDamageX": 0.5,
@@ -338,12 +340,13 @@
         "icon": "/images/bosses/icons/special/taunt.png",
         "cooldownMs": 23000,
         "castTimeMs": 2800,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "description": "Возбуждает себя — больше урона на 40% на 10 секунд. Рассеиваемое",
         "selfBuffType": "damage",
         "selfBuffValue": 0.4,
         "selfBuffDurationMs": 10000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       },
       {
         "id": "hyena-maul",
@@ -427,13 +430,14 @@
         "icon": "/images/bosses/icons/special/barrier_1.png",
         "cooldownMs": 26000,
         "castTimeMs": 3000,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Надувается — плотнее кожа",
         "selfBuffType": "armor",
         "selfBuffValue": 0.45,
         "selfBuffDurationMs": 9000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       },
       {
         "id": "toad-hop",
@@ -520,7 +524,7 @@
         "icon": "/images/bosses/icons/special/bite.png",
         "cooldownMs": 15000,
         "castTimeMs": 2500,
-        "category": "persistent_debuff",
+        "category": "cleansable-debuff",
         "canBeInterrupted": true,
         "description": "Укус наносит урон и вызывает кровотечение на 6 секунд",
         "baseDamageX": 1.8,
@@ -548,13 +552,14 @@
         "icon": "/images/bosses/icons/special/taunt.png",
         "cooldownMs": 25000,
         "castTimeMs": 3000,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Волк воет, усиливая свою атаку на 8 секунд",
         "selfBuffType": "damage",
         "selfBuffValue": 0.5,
         "selfBuffDurationMs": 10000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       }
     ],
     "abilityConfig": {
@@ -600,13 +605,14 @@
         "icon": "/images/bosses/icons/special/cry_1.png",
         "cooldownMs": 24000,
         "castTimeMs": 2800,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Усиливает атаку",
         "selfBuffType": "damage",
         "selfBuffValue": 0.5,
         "selfBuffDurationMs": 10000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       },
       {
         "id": "lynx-rake",
@@ -665,7 +671,7 @@
         "icon": "/images/bosses/icons/special/bite.png",
         "cooldownMs": 21000,
         "castTimeMs": 3000,
-        "category": "persistent_debuff",
+        "category": "cleansable-debuff",
         "canBeInterrupted": false,
         "description": "Глубокий укус с ядом",
         "baseDamageX": 0.7,
@@ -754,7 +760,7 @@
         "icon": "/images/bosses/icons/special/potion_4.png",
         "cooldownMs": 20000,
         "castTimeMs": 3000,
-        "category": "persistent_debuff",
+        "category": "cleansable-debuff",
         "canBeInterrupted": false,
         "description": "Наносит урон и отравляет цель. Снимается Cleanse",
         "baseDamageX": 2.6,
@@ -845,13 +851,14 @@
         "icon": "/images/bosses/icons/special/rapidshot.png",
         "cooldownMs": 25000,
         "castTimeMs": 2500,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Короткий выброс адреналина",
         "selfBuffType": "damage",
         "selfBuffValue": 0.3,
         "selfBuffDurationMs": 10000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       }
     ],
     "abilityConfig": {
@@ -1027,13 +1034,14 @@
         "icon": "/images/bosses/icons/special/rapidshot.png",
         "cooldownMs": 28000,
         "castTimeMs": 2500,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Увеличивает силу следующих выстрелов на 10 секунд",
         "selfBuffType": "damage",
         "selfBuffValue": 0.3,
         "selfBuffDurationMs": 10000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       }
     ],
     "abilityConfig": {
@@ -1146,13 +1154,14 @@
         "icon": "/images/bosses/icons/special/roar_1.png",
         "cooldownMs": 24000,
         "castTimeMs": 3000,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Бешенство",
         "selfBuffType": "damage",
         "selfBuffValue": 0.5,
         "selfBuffDurationMs": 12000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       },
       {
         "id": "orc-charge",
@@ -1274,7 +1283,7 @@
         "icon": "/images/bosses/icons/special/curse_1.png",
         "cooldownMs": 22000,
         "castTimeMs": 3000,
-        "category": "persistent_debuff",
+        "category": "cleansable-debuff",
         "canBeInterrupted": true,
         "debuffRequiresCleanse": true,
         "debuffType": "curse",
@@ -1288,13 +1297,14 @@
         "icon": "/images/bosses/icons/special/barrier_1.png",
         "cooldownMs": 26000,
         "castTimeMs": 3000,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Призывает барьер, повышающий броню на 8 секунд",
         "selfBuffType": "armor",
         "selfBuffValue": 0.5,
         "selfBuffDurationMs": 8000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       }
     ],
     "abilityConfig": {
@@ -1357,13 +1367,14 @@
         "icon": "/images/bosses/icons/special/barrier_1.png",
         "cooldownMs": 26000,
         "castTimeMs": 3000,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Укрепляет оболочку",
         "selfBuffType": "armor",
         "selfBuffValue": 0.5,
         "selfBuffDurationMs": 8000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       }
     ],
     "abilityConfig": {
@@ -1409,7 +1420,7 @@
         "icon": "/images/bosses/icons/special/curse_2.png",
         "cooldownMs": 23000,
         "castTimeMs": 3200,
-        "category": "persistent_debuff",
+        "category": "cleansable-debuff",
         "canBeInterrupted": true,
         "debuffRequiresCleanse": true,
         "debuffType": "curse",
@@ -1521,13 +1532,14 @@
         "icon": "/images/bosses/icons/special/roar_1.png",
         "cooldownMs": 25000,
         "castTimeMs": 3000,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Медведь ревёт, усиливая урон на 10 секунд",
         "selfBuffType": "damage",
         "selfBuffValue": 0.4,
         "selfBuffDurationMs": 10000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       },
       {
         "id": "paw-slam",
@@ -1615,13 +1627,14 @@
         "icon": "/images/bosses/icons/special/roar_1.png",
         "cooldownMs": 25000,
         "castTimeMs": 3000,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Ярость",
         "selfBuffType": "damage",
         "selfBuffValue": 0.4,
         "selfBuffDurationMs": 10000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       }
     ],
     "abilityConfig": {
@@ -1768,13 +1781,14 @@
         "icon": "/images/bosses/icons/special/cry_1.png",
         "cooldownMs": 22000,
         "castTimeMs": 3000,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Вождь кричит, усиливая свой урон на 12 секунд",
         "selfBuffType": "damage",
         "selfBuffValue": 0.5,
         "selfBuffDurationMs": 12000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       },
       {
         "id": "yatagan-strike",
@@ -1811,7 +1825,7 @@
         "icon": "/images/bosses/icons/special/potion_5.png",
         "cooldownMs": 24000,
         "castTimeMs": 3000,
-        "category": "persistent_debuff",
+        "category": "cleansable-debuff",
         "canBeInterrupted": true,
         "description": "Швыряет яд. Урон и отравление. Снимается Cleanse",
         "baseDamageX": 0.6,
@@ -1930,7 +1944,7 @@
         "icon": "/images/bosses/icons/special/potion_5.png",
         "cooldownMs": 24000,
         "castTimeMs": 3000,
-        "category": "persistent_debuff",
+        "category": "cleansable-debuff",
         "canBeInterrupted": true,
         "description": "Брызги яда",
         "baseDamageX": 0.55,
@@ -1960,13 +1974,14 @@
         "icon": "/images/bosses/icons/special/dagger_1.png",
         "cooldownMs": 26000,
         "castTimeMs": 3000,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Смазывает клинок ядом — удваивает силу",
         "selfBuffType": "damage",
         "selfBuffValue": 3,
         "selfBuffDurationMs": 11000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       }
     ],
     "abilityConfig": {
@@ -2072,13 +2087,14 @@
         "icon": "/images/bosses/icons/special/skin_1.png",
         "cooldownMs": 28000,
         "castTimeMs": 3000,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Укрепляет каменную оболочку, повышая броню на 10 секунд",
         "selfBuffType": "armor",
         "selfBuffValue": 0.6,
         "selfBuffDurationMs": 10000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       },
       {
         "id": "golem-repair",
@@ -2136,13 +2152,14 @@
         "icon": "/images/bosses/icons/special/skin_1.png",
         "cooldownMs": 27000,
         "castTimeMs": 3000,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Покрывается коркой",
         "selfBuffType": "armor",
         "selfBuffValue": 0.6,
         "selfBuffDurationMs": 10000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       },
       {
         "id": "crystal-slam",
@@ -2357,13 +2374,14 @@
         "icon": "/images/bosses/icons/special/tail_2.png",
         "cooldownMs": 30000,
         "castTimeMs": 3000,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Чешуя твердеет, повышая броню на 12 секунд",
         "selfBuffType": "armor",
         "selfBuffValue": 0.5,
         "selfBuffDurationMs": 12000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       },
       {
         "id": "claw-rake",
@@ -2423,13 +2441,14 @@
         "icon": "/images/bosses/icons/special/skin_1.png",
         "cooldownMs": 29000,
         "castTimeMs": 3000,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Уплотняет чешую",
         "selfBuffType": "armor",
         "selfBuffValue": 0.5,
         "selfBuffDurationMs": 12000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       },
       {
         "id": "wyrm-spit",
@@ -2504,7 +2523,7 @@
         "icon": "/images/bosses/icons/special/bite.png",
         "cooldownMs": 19000,
         "castTimeMs": 3000,
-        "category": "persistent_debuff",
+        "category": "cleansable-debuff",
         "canBeInterrupted": false,
         "description": "Яд из трёх пастей",
         "baseDamageX": 0.9,
@@ -2534,13 +2553,14 @@
         "icon": "/images/bosses/icons/special/roar_1.png",
         "cooldownMs": 26000,
         "castTimeMs": 3200,
-        "category": "self_buff",
+        "category": "dispellable-buff",
         "canBeInterrupted": true,
         "description": "Все головы ревут",
         "selfBuffType": "damage",
         "selfBuffValue": 0.5,
         "selfBuffDurationMs": 12000,
-        "dispellable": true
+        "dispellable": true,
+        "buffRequiresDispellable": true
       }
     ],
     "abilityConfig": {
