@@ -56,7 +56,7 @@
     playerEffectiveEvasion,
     playerEffectiveSpeed,
     playerArmor,
-    bossEffectiveArmor,
+    // bossEffectiveArmor,
     loot,
     showLoot,
     playerBuffs,
