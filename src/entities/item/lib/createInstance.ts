@@ -48,7 +48,7 @@ export function createItemInstance(
   }
 
   const rarity = rollItemRarity();
-  const generatedBaseStats = generateBaseStatsForRarity(rarity);
+  const generatedBaseStats = generateBaseStatsForRarity(rarity, template.slot);
 
   return {
     instanceId: instanceId ?? generateInstanceId(),

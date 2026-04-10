@@ -26,7 +26,6 @@ export interface ElixirDefinition {
 
 export const ELIXIR_DURATION_MS = 5 * 60_000;
 
-
 /** Заглушки: все иконки пока один и тот же “зелья восстановления здоровья”. */
 export const ELIXIRS: ElixirDefinition[] = [
   {
@@ -36,7 +35,7 @@ export const ELIXIRS: ElixirDefinition[] = [
     price: 20,
     icon: "/images/elixir/elixir_1.png",
     durationMs: ELIXIR_DURATION_MS,
-    powerDelta: 5,
+    powerDelta: 2,
   },
   {
     id: "elixir-armor_plus_5",

@@ -1,26 +1,60 @@
-import type { ItemRarity, ItemStats } from "@/entities/item/model";
+import type { ItemRarity, ItemSlot, ItemStats } from "@/entities/item/model";
 
 const rng = () => Math.random();
 
-/** Базовые «единицы» для масштабирования линий статов (см. docs/balance-items). */
-export const PROC_BASE: ItemStats = {
-  hp: 5,
-  power: 1,
-  armor: 15,
-  chanceCrit: 15,
-  evasion: 15,
-  speed: 15,
-  accuracy: 15,
-  critDefense: 15,
-  lifesteal: 15,
+type ProcBaseKey =
+  | "hp"
+  | "power"
+  | "armor"
+  | "chanceCrit"
+  | "evasion"
+  | "speed"
+  | "accuracy"
+  | "critDefense"
+  | "lifesteal";
+
+type ProcBaseStats = Partial<Record<ProcBaseKey, number>>;
+
+/** Базовые «единицы» для масштабирования линий статов на оружии. */
+export const PROC_BASE_WEAPON: ProcBaseStats = {
+  power: 5,
+  chanceCrit: 25,
+  evasion: 25,
+  speed: 25,
+  accuracy: 25,
+  critDefense: 25,
+  lifesteal: 25,
 };
 
-/** Веса редкости: белая 72%, зелёная 15%, синяя 7%, эпическая 4%, уникальная 2%. */
+/** Базовые «единицы» для масштабирования линий статов на броне. */
+export const PROC_BASE_ARMOR: ProcBaseStats = {
+  hp: 5,
+  armor: 25,
+  chanceCrit: 25,
+  evasion: 25,
+  speed: 25,
+  accuracy: 25,
+  critDefense: 25,
+  lifesteal: 25,
+};
+
+/** Базовые «единицы» для масштабирования линий статов на ювелирке. */
+export const PROC_BASE_JEWELRY: ProcBaseStats = {
+  hp: 15,
+  chanceCrit: 25,
+  evasion: 25,
+  speed: 25,
+  accuracy: 25,
+  critDefense: 25,
+  lifesteal: 25,
+};
+
+/** Веса редкости: белая 75%, зелёная 12%, синяя 8%, эпическая 3%, уникальная 2%. */
 const RARITY_WEIGHTS: { rarity: ItemRarity; weight: number }[] = [
-  { rarity: "common", weight: 72 },
-  { rarity: "uncommon", weight: 15 },
-  { rarity: "rare", weight: 7 },
-  { rarity: "epic", weight: 4 },
+  { rarity: "common", weight: 75 },
+  { rarity: "uncommon", weight: 12 },
+  { rarity: "rare", weight: 8 },
+  { rarity: "epic", weight: 3 },
   { rarity: "unique", weight: 2 },
 ];
 
@@ -45,14 +79,32 @@ function roundToTwo(value: number): number {
 /**
  * Генерирует базовые статы предмета по редкости (до множителя уровня вещи).
  */
-export function generateBaseStatsForRarity(rarity: ItemRarity): ItemStats {
+export function generateBaseStatsForRarity(
+  rarity: ItemRarity,
+  slot?: ItemSlot,
+): ItemStats {
   const out: ItemStats = {};
+  const isWeapon = slot === "weapon";
+  const isJewelry =
+    slot === "ring" || slot === "necklace" || slot === "earring";
+  const canRollArmor =
+    slot === "helmet" ||
+    slot === "chest" ||
+    slot === "belt" ||
+    slot === "pants" ||
+    slot === "boots" ||
+    slot === "shield";
+  const procBase = isWeapon
+    ? PROC_BASE_WEAPON
+    : isJewelry
+      ? PROC_BASE_JEWELRY
+      : PROC_BASE_ARMOR;
 
-  const rollStatValue = (key: keyof typeof PROC_BASE) => {
+  const rollStatValue = (key: ProcBaseKey) => {
     const { min: minPercent, max: maxPercent } = RARITY_STRENGTH_RANGE[rarity];
     const percent =
       (minPercent + Math.random() * (maxPercent - minPercent)) / 100;
-    const baseValue = PROC_BASE[key] ?? 0;
+    const baseValue = procBase[key] ?? 0;
     // Не округляем до целого слишком рано, иначе на высоком itemLevel
     // получаются «ступеньки» (кратно множителю уровня).
     const result = Math.max(1, roundToTwo(baseValue * percent));
@@ -61,83 +113,148 @@ export function generateBaseStatsForRarity(rarity: ItemRarity): ItemStats {
 
   // Логика выбора статов для разных редкостей
   if (rarity === "common") {
-    if (pick(0, 1) === 0) out.power = rollStatValue("power");
-    else out.armor = rollStatValue("armor");
-
-    if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
-    else out.hp = rollStatValue("hp");
-
-    if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
-    else out.speed = rollStatValue("speed");
+    if (isWeapon) {
+      out.power = rollStatValue("power");
+    } else if (canRollArmor) {
+      out.armor = rollStatValue("armor");
+      out.hp = rollStatValue("hp");
+    } else if (isJewelry) {
+      out.hp = rollStatValue("hp");
+    }
 
     return out;
   }
 
   if (rarity === "uncommon") {
-    if (pick(0, 1) === 0) out.power = rollStatValue("power");
-    else out.armor = rollStatValue("armor");
+    if (isWeapon) {
+      out.power = rollStatValue("power");
 
-    if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
-    else out.hp = rollStatValue("hp");
+      if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
+      else out.lifesteal = rollStatValue("lifesteal");
+    } else if (canRollArmor) {
+      out.armor = rollStatValue("armor");
+      out.hp = rollStatValue("hp");
 
-    if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
-    else out.speed = rollStatValue("speed");
+      if (pick(0, 1) === 0) out.critDefense = rollStatValue("critDefense");
+      else out.evasion = rollStatValue("evasion");
+    } else if (isJewelry) {
+      out.hp = rollStatValue("hp");
 
-    if (pick(0, 1) === 0) out.critDefense = rollStatValue("critDefense");
-    else out.evasion = rollStatValue("evasion");
+      if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
+      else out.speed = rollStatValue("speed");
+    }
 
     return out;
   }
 
   if (rarity === "rare") {
-    if (pick(0, 1) === 0) out.power = rollStatValue("power");
-    else out.armor = rollStatValue("armor");
+    if (isWeapon) {
+      out.power = rollStatValue("power");
 
-    if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
-    else out.hp = rollStatValue("hp");
+      if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
+      else out.lifesteal = rollStatValue("lifesteal");
 
-    if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
-    else out.speed = rollStatValue("speed");
+      out.chanceCrit = rollStatValue("chanceCrit");
+    } else if (canRollArmor) {
+      out.armor = rollStatValue("armor");
+      out.hp = rollStatValue("hp");
 
-    if (pick(0, 1) === 0) out.critDefense = rollStatValue("critDefense");
-    else out.evasion = rollStatValue("evasion");
+      if (pick(0, 1) === 0) out.critDefense = rollStatValue("critDefense");
+      else out.evasion = rollStatValue("evasion");
 
-    out.lifesteal = rollStatValue("lifesteal");
+      if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
+      else out.speed = rollStatValue("speed");
+    } else if (isJewelry) {
+      out.hp = rollStatValue("hp");
+
+      if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
+      else out.speed = rollStatValue("speed");
+
+      if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
+      else out.lifesteal = rollStatValue("lifesteal");
+    }
 
     return out;
   }
 
   if (rarity === "epic") {
-    if (pick(0, 1) === 0) out.power = rollStatValue("power");
-    else out.armor = rollStatValue("armor");
+    if (isWeapon) {
+      out.power = rollStatValue("power");
 
-    if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
-    else out.hp = rollStatValue("hp");
+      if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
+      else out.lifesteal = rollStatValue("lifesteal");
 
-    if (pick(0, 1) === 0) out.critDefense = rollStatValue("critDefense");
-    else out.evasion = rollStatValue("evasion");
+      out.chanceCrit = rollStatValue("chanceCrit");
+      out.speed = rollStatValue("speed");
+    } else if (canRollArmor) {
+      out.armor = rollStatValue("armor");
+      out.hp = rollStatValue("hp");
 
-    out.chanceCrit = rollStatValue("chanceCrit");
-    out.speed = rollStatValue("speed");
-    out.lifesteal = rollStatValue("lifesteal");
+      if (pick(0, 1) === 0) out.critDefense = rollStatValue("critDefense");
+      else out.evasion = rollStatValue("evasion");
+
+      if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
+      else out.speed = rollStatValue("speed");
+
+      out.accuracy = rollStatValue("accuracy");
+    } else if (isJewelry) {
+      out.hp = rollStatValue("hp");
+
+      if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
+      else out.speed = rollStatValue("speed");
+
+      if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
+      else out.lifesteal = rollStatValue("lifesteal");
+
+      out.evasion = rollStatValue("evasion");
+    }
 
     return out;
   }
 
-  // unique - все статы
-  out.power = rollStatValue("power");
-  out.armor = rollStatValue("armor");
-  out.accuracy = rollStatValue("accuracy");
-  out.hp = rollStatValue("hp");
-  out.chanceCrit = rollStatValue("chanceCrit");
-  out.speed = rollStatValue("speed");
-  out.critDefense = rollStatValue("critDefense");
-  out.evasion = rollStatValue("evasion");
-  out.lifesteal = rollStatValue("lifesteal");
+  if (rarity === "unique") {
+    if (isWeapon) {
+      out.power = rollStatValue("power");
+
+      if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
+      else out.lifesteal = rollStatValue("lifesteal");
+
+      out.chanceCrit = rollStatValue("chanceCrit");
+      out.speed = rollStatValue("speed");
+
+      if (pick(0, 1) === 0) out.evasion = rollStatValue("evasion");
+      else out.critDefense = rollStatValue("critDefense");
+    } else if (canRollArmor) {
+      out.armor = rollStatValue("armor");
+      out.hp = rollStatValue("hp");
+
+      if (pick(0, 1) === 0) out.critDefense = rollStatValue("critDefense");
+      else out.evasion = rollStatValue("evasion");
+
+      if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
+      else out.speed = rollStatValue("speed");
+
+      out.accuracy = rollStatValue("accuracy");
+      out.lifesteal = rollStatValue("lifesteal");
+    } else if (isJewelry) {
+      out.hp = rollStatValue("hp");
+
+      if (pick(0, 1) === 0) out.chanceCrit = rollStatValue("chanceCrit");
+      else out.speed = rollStatValue("speed");
+
+      if (pick(0, 1) === 0) out.accuracy = rollStatValue("accuracy");
+      else out.lifesteal = rollStatValue("lifesteal");
+
+      out.evasion = rollStatValue("evasion");
+      out.critDefense = rollStatValue("critDefense");
+    }
+
+    return out;
+  }
 
   return out;
 }
-/** Случайная редкость по весам 90/4/3/2/1. */
+/** Случайная редкость по весам 75/12/8/3/2. */
 export function rollItemRarity(): ItemRarity {
   const total = RARITY_WEIGHTS.reduce((s, x) => s + x.weight, 0);
   let r = rng() * total;

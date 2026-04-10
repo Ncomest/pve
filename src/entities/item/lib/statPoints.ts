@@ -13,14 +13,14 @@
  * См. также docs/balance-items.md и docs/player-character-stats.md.
  * Суммирование очков с экипировки и слияние с базой героя: `entities/character/lib/playerStatAggregation.ts`.
  */
-export const CRIT_POINTS_TO_FRACTION = 0.009 / 15; // 15 очков ≈ 0.25%
+export const CRIT_POINTS_TO_FRACTION = 0.02 / 15; // 15 очков ≈ 0.25%
 export const EVASION_POINTS_TO_FRACTION = 0.009 / 15; // 15 очков ≈ 0.25%
-export const SPEED_POINTS_TO_FRACTION = 0.009 / 15; // 15 очков скорости ≈ 0.25%
-export const ARMOR_POINTS_TO_FRACTION = 0.02 / 15; // 15 очков брони ≈ 1% снижения урона
+export const SPEED_POINTS_TO_FRACTION = 0.04 / 15; // 15 очков скорости ≈ 0.25%
+export const ARMOR_POINTS_TO_FRACTION = 0.04 / 15; // 15 очков брони ≈ 1% снижения урона
 /** 15 очков меткости ≈ 0.25% (как крит) */
-export const ACCURACY_POINTS_TO_FRACTION = 0.009 / 15;
+export const ACCURACY_POINTS_TO_FRACTION = 0.02 / 15;
 /** 15 очков защиты от крита ≈ 0.25% */
-export const CRIT_DEFENSE_POINTS_TO_FRACTION = 0.003 / 15;
+export const CRIT_DEFENSE_POINTS_TO_FRACTION = 0.02 / 15;
 /** 15 очков самоисцеления ≈ 0.05% урона в лечение */
 export const LIFESTEAL_POINTS_TO_FRACTION = 0.0005 / 15;
 

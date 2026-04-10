@@ -108,9 +108,14 @@ const calcHit = (
   // Бонус от силы: каждые 25 ед. power дают +1 урона (плоско)
   const flatFromPower = Math.floor((attacker.power ?? 0) / 25);
   const raw = Math.round(base * (isCrit ? critMultiplier : 1)) + flatFromPower;
-  // Броня снижает урон в процентах: 50 брони = 1% снижения
+  // Поддержка двух форматов брони:
+  // - 0..1: доля снижения урона (0.4 = 40%)
+  // - >1: старые "очки брони", переводимые через формулу
   const armor = defender.armor ?? 0;
-  const reduction = armorPointsToFraction(armor, characterLevel);
+  const reduction =
+    armor <= 1
+      ? Math.min(1, Math.max(0, armor))
+      : armorPointsToFraction(armor, characterLevel);
   const damage = Math.max(1, Math.round(raw * (1 - reduction)));
   return { damage, isCrit, isDodged: false };
 };
