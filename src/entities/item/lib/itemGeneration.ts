@@ -28,7 +28,7 @@ export const PROC_BASE_WEAPON: ProcBaseStats = {
 
 /** Базовые «единицы» для масштабирования линий статов на броне. */
 export const PROC_BASE_ARMOR: ProcBaseStats = {
-  hp: 5,
+  hp: 10,
   armor: 25,
   chanceCrit: 25,
   evasion: 25,

@@ -130,7 +130,7 @@ export function useBattle(bossId: () => string | undefined) {
   const resourceBossIdSet = shallowRef<Set<string>>(new Set());
   const playerProgress = usePlayerProgress();
   const characterStore = useCharacterStore();
-  const characterLevel = playerProgress.level.value;
+  const characterLevel = computed(() => playerProgress.level.value);
   // const playerHp = usePlayerHp();
   const elixirsStore = useElixirsStore();
 
@@ -268,7 +268,7 @@ export function useBattle(bossId: () => string | undefined) {
         player.stats.armor = applyElixirArmorPercentToArmorPoints(
           player.stats.armor ?? 0,
           activeElixirDef.armorPercentBonus ?? 0,
-          characterLevel,
+          characterLevel.value,
         );
         break;
       case "crit_percent":
@@ -281,7 +281,7 @@ export function useBattle(bossId: () => string | undefined) {
         player.stats.speed = applyElixirSpeedPercentToSpeedTotal(
           player.stats.speed ?? playerSpeedBaseline(),
           activeElixirDef.speedPercentBonus ?? 0,
-          characterLevel,
+          characterLevel.value,
         );
         break;
       case "health_percent":
@@ -502,7 +502,7 @@ export function useBattle(bossId: () => string | undefined) {
     cooldownFactorFromSpeed(
       player.stats.speed ?? playerSpeedBaseline(),
       speedBonus.value,
-      characterLevel,
+      characterLevel.value,
     ),
   );
 
@@ -792,7 +792,7 @@ export function useBattle(bossId: () => string | undefined) {
             a,
             d,
             ability.critMultiplier ?? DEFAULT_CRIT_MULTIPLIER,
-            characterLevel,
+            characterLevel.value,
           ),
         clampHp,
         isBattleOver: () => isBattleOver.value,
@@ -838,7 +838,7 @@ export function useBattle(bossId: () => string | undefined) {
         attacker,
         defenderStats,
         ability.critMultiplier ?? DEFAULT_CRIT_MULTIPLIER,
-        characterLevel,
+        characterLevel.value,
       );
 
       if (isDodged) {
@@ -1121,7 +1121,7 @@ export function useBattle(bossId: () => string | undefined) {
           attacker,
           defenderStats,
           ability.critMultiplier ?? DEFAULT_CRIT_MULTIPLIER,
-          characterLevel,
+          characterLevel.value,
         );
 
         if (isDodged) {
@@ -1267,7 +1267,7 @@ export function useBattle(bossId: () => string | undefined) {
       // Обычная атака
       const attacker: Stats = {
         ...player.stats,
-        power: playerPower.value,
+        power: playerPower.value * (ability.baseDamageX ?? 1),
         chanceCrit: Math.min(
           1,
           player.stats.chanceCrit + (ability.chanceCrit ?? 0),
@@ -1277,7 +1277,7 @@ export function useBattle(bossId: () => string | undefined) {
         attacker,
         defenderStats,
         ability.critMultiplier ?? DEFAULT_CRIT_MULTIPLIER,
-        characterLevel,
+        characterLevel.value,
       );
       if (isDodged) {
         spawnBossDmg("Уклон", "dodge");
@@ -1749,7 +1749,7 @@ export function useBattle(bossId: () => string | undefined) {
       attacker,
       defenderStats,
       DEFAULT_CRIT_MULTIPLIER,
-      characterLevel,
+      characterLevel.value,
     );
 
     if (isDodged) {
@@ -2002,7 +2002,7 @@ export function useBattle(bossId: () => string | undefined) {
         attacker,
         defenderStats,
         DEFAULT_CRIT_MULTIPLIER,
-        characterLevel,
+        characterLevel.value,
       );
 
       if (isDodged) {

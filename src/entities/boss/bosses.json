@@ -219,7 +219,7 @@
       "power": 6,
       "chanceCrit": 0.12,
       "evasion": 0.08,
-      "armor": 0.04,
+      "armor": 0.05,
       "accuracy": 0.066,
       "critDefense": 0.05
     },
@@ -328,7 +328,7 @@
       "power": 6,
       "chanceCrit": 0.11,
       "evasion": 0.09,
-      "armor": 0.03,
+      "armor": 0.05,
       "accuracy": 0.065,
       "critDefense": 0.048
     },
@@ -406,7 +406,7 @@
       "power": 6,
       "chanceCrit": 0.1,
       "evasion": 0.06,
-      "armor": 0.04,
+      "armor": 0.05,
       "accuracy": 0.066,
       "critDefense": 0.05
     },
@@ -484,7 +484,7 @@
       "power": 10,
       "chanceCrit": 0.12,
       "evasion": 0.1,
-      "armor": 0.01,
+      "armor": 0.1,
       "accuracy": 0.066,
       "critDefense": 0.055
     },
@@ -581,7 +581,7 @@
       "power": 10,
       "chanceCrit": 0.14,
       "evasion": 0.12,
-      "armor": 0.02,
+      "armor": 0.1,
       "accuracy": 0.068,
       "critDefense": 0.052
     },
@@ -647,7 +647,7 @@
       "power": 10,
       "chanceCrit": 0.11,
       "evasion": 0.08,
-      "armor": 0.01,
+      "armor": 0.1,
       "accuracy": 0.07,
       "critDefense": 0.056
     },
@@ -714,7 +714,7 @@
       "power": 14,
       "chanceCrit": 0.1,
       "evasion": 0.08,
-      "armor": 0.02,
+      "armor": 0.12,
       "accuracy": 0.06,
       "critDefense": 0.05
     },
@@ -802,7 +802,7 @@
       "power": 14,
       "chanceCrit": 0.11,
       "evasion": 0.1,
-      "armor": 0.02,
+      "armor": 0.12,
       "accuracy": 0.062,
       "critDefense": 0.05
     },
@@ -880,7 +880,7 @@
       "power": 14,
       "chanceCrit": 0.12,
       "evasion": 0.09,
-      "armor": 0.03,
+      "armor": 0.12,
       "accuracy": 0.061,
       "critDefense": 0.052
     },
@@ -947,7 +947,7 @@
       "power": 21,
       "chanceCrit": 0.18,
       "evasion": 0.12,
-      "armor": 0.03,
+      "armor": 0.15,
       "accuracy": 0.08399999999999999,
       "critDefense": 0.06
     },
@@ -1063,7 +1063,7 @@
       "power": 21,
       "chanceCrit": 0.17,
       "evasion": 0.11,
-      "armor": 0.03,
+      "armor": 0.15,
       "accuracy": 0.082,
       "critDefense": 0.058
     },
@@ -1129,7 +1129,7 @@
       "power": 21,
       "chanceCrit": 0.16,
       "evasion": 0.1,
-      "armor": 0.05,
+      "armor": 0.15,
       "accuracy": 0.078,
       "critDefense": 0.062
     },
@@ -1208,7 +1208,7 @@
       "power": 28,
       "chanceCrit": 0.2,
       "evasion": 0.15,
-      "armor": 0.04,
+      "armor": 0.18,
       "accuracy": 0.09,
       "critDefense": 0.0675
     },
@@ -1326,7 +1326,7 @@
       "power": 28,
       "chanceCrit": 0.19,
       "evasion": 0.14,
-      "armor": 0.04,
+      "armor": 0.18,
       "accuracy": 0.088,
       "critDefense": 0.065
     },
@@ -1396,7 +1396,7 @@
       "power": 28,
       "chanceCrit": 0.18,
       "evasion": 0.13,
-      "armor": 0.05,
+      "armor": 0.18,
       "accuracy": 0.091,
       "critDefense": 0.068
     },
@@ -1476,7 +1476,7 @@
       "power": 34,
       "chanceCrit": 0.14,
       "evasion": 0.05,
-      "armor": 0.08,
+      "armor": 0.21,
       "accuracy": 0.07200000000000001,
       "critDefense": 0.042499999999999996
     },
@@ -1586,7 +1586,7 @@
       "power": 34,
       "chanceCrit": 0.13,
       "evasion": 0.06,
-      "armor": 0.09,
+      "armor": 0.21,
       "accuracy": 0.073,
       "critDefense": 0.043
     },
@@ -1656,7 +1656,7 @@
       "power": 34,
       "chanceCrit": 0.15,
       "evasion": 0.08,
-      "armor": 0.07,
+      "armor": 0.21,
       "accuracy": 0.075,
       "critDefense": 0.046
     },
@@ -1723,7 +1723,7 @@
       "power": 40,
       "chanceCrit": 0.25,
       "evasion": 0.18,
-      "armor": 0.1,
+      "armor": 0.24,
       "accuracy": 0.105,
       "critDefense": 0.075
     },
@@ -1855,7 +1855,7 @@
       "power": 40,
       "chanceCrit": 0.23,
       "evasion": 0.15,
-      "armor": 0.11,
+      "armor": 0.24,
       "accuracy": 0.1,
       "critDefense": 0.072
     },
@@ -1920,7 +1920,7 @@
       "power": 40,
       "chanceCrit": 0.27,
       "evasion": 0.2,
-      "armor": 0.09,
+      "armor": 0.24,
       "accuracy": 0.108,
       "critDefense": 0.078
     },
@@ -2003,7 +2003,7 @@
       "power": 46,
       "chanceCrit": 0.1,
       "evasion": 0.03,
-      "armor": 0.15,
+      "armor": 0.27,
       "accuracy": 0.06,
       "critDefense": 0.0375
     },
@@ -2128,7 +2128,7 @@
       "power": 46,
       "chanceCrit": 0.11,
       "evasion": 0.04,
-      "armor": 0.16,
+      "armor": 0.27,
       "accuracy": 0.061,
       "critDefense": 0.038
     },
@@ -2194,7 +2194,7 @@
       "power": 46,
       "chanceCrit": 0.12,
       "evasion": 0.05,
-      "armor": 0.14,
+      "armor": 0.27,
       "accuracy": 0.062,
       "critDefense": 0.04
     },
@@ -2256,7 +2256,7 @@
       "power": 55,
       "chanceCrit": 0.25,
       "evasion": 0.12,
-      "armor": 0.12,
+      "armor": 0.30,
       "accuracy": 0.105,
       "critDefense": 0.06
     },
@@ -2416,7 +2416,7 @@
       "power": 55,
       "chanceCrit": 0.24,
       "evasion": 0.11,
-      "armor": 0.13,
+      "armor": 0.30,
       "accuracy": 0.102,
       "critDefense": 0.058
     },
@@ -2495,7 +2495,7 @@
       "power": 55,
       "chanceCrit": 0.26,
       "evasion": 0.15,
-      "armor": 0.11,
+      "armor": 0.30,
       "accuracy": 0.1,
       "critDefense": 0.06
     },

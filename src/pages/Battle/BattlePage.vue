@@ -106,7 +106,7 @@
     buildBossStatRows(
       selectedBoss.value?.stats ?? boss.stats,
       boss.stats,
-      bossEffectiveArmor.value,
+      boss.stats.armor * 1000,
     ),
   );
 
@@ -276,18 +276,14 @@
             :key="'hero-' + row.label"
             class="battle-page__stats-row"
           >
-            <dt>{{ row.label }}</dt>
+            <dt class="battle-page__stats-dt">{{ row.label }}</dt>
             <dd class="battle-page__stats-dd">
               <template v-if="row.kind === 'pair'">
-                <span class="battle-page__stats-muted">{{ row.fromGear }}</span>
                 <span class="battle-page__stats-strong">{{
                   Math.round(row.total)
                 }}</span>
               </template>
               <template v-else-if="row.kind === 'percent'">
-                <span class="battle-page__stats-muted">{{
-                  row.gearPoints
-                }}</span>
                 <span class="battle-page__stats-strong">{{ row.pct }}</span>
               </template>
             </dd>
@@ -314,18 +310,14 @@
             :key="'boss-' + row.label"
             class="battle-page__stats-row"
           >
-            <dt>{{ row.label }}</dt>
+            <dt class="battle-page__stats-dt">{{ row.label }}</dt>
             <dd class="battle-page__stats-dd">
               <template v-if="row.kind === 'pair'">
-                <span class="battle-page__stats-muted">{{ row.fromGear }}</span>
                 <span class="battle-page__stats-strong">{{
                   Math.round(row.total)
                 }}</span>
               </template>
               <template v-else-if="row.kind === 'percent'">
-                <span class="battle-page__stats-muted">{{
-                  row.gearPoints
-                }}</span>
                 <span class="battle-page__stats-strong">{{ row.pct }}</span>
               </template>
             </dd>
@@ -368,6 +360,7 @@
             </div>
           </dl>
         </div>
+
         <div class="battle-page__stats-panel battle-page__stats-panel--boss">
           <h3 class="battle-page__stats-title">{{ boss.name }}</h3>
           <dl class="battle-page__stats-list">

@@ -46,7 +46,8 @@
 
   const showMetaRow = computed(
     () =>
-      (props.boss.bossAbilities?.length ?? 0) > 0 || resourceLootPreview.value != null,
+      (props.boss.bossAbilities?.length ?? 0) > 0 ||
+      resourceLootPreview.value != null,
   );
 
   const emit = defineEmits<{
@@ -176,9 +177,11 @@
                 :class="`boss-select-entry__loot-cell--${resourceLootPreview.rarity}`"
                 :title="`${resourceLootPreview.name} ×1`"
               >
-                <span class="boss-select-entry__loot-emoji" aria-hidden="true">{{
-                  resourceLootPreview.icon
-                }}</span>
+                <span
+                  class="boss-select-entry__loot-emoji"
+                  aria-hidden="true"
+                  >{{ resourceLootPreview.icon }}</span
+                >
               </div>
             </div>
           </div>
@@ -359,7 +362,8 @@
           <span>Атака</span><span>{{ boss.stats.power }}</span>
         </div>
         <div class="boss-select-entry__stat-row">
-          <span>Броня</span><span>{{ boss.stats.armor }}</span>
+          <span>Броня</span
+          ><span>{{ Math.round((boss.stats.armor ?? 0) * 100) }}%</span>
         </div>
         <div class="boss-select-entry__stat-row">
           <span>Меткость</span

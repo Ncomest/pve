@@ -25,7 +25,11 @@
     color: rgba(255, 255, 255, 0.75);
     background: rgba(255, 255, 255, 0.04);
     cursor: pointer;
-    transition: color 0.15s, background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    transition:
+      color 0.15s,
+      background 0.15s,
+      border-color 0.15s,
+      box-shadow 0.15s;
 
     &:hover {
       color: #fca5a5;
@@ -177,6 +181,7 @@
     justify-content: space-between;
     align-items: baseline;
     gap: 8px;
+    border-bottom: 1px;
 
     dt {
       margin: 0;
@@ -194,6 +199,10 @@
       font-variant-numeric: tabular-nums;
       color: rgba(255, 255, 255, 0.92);
     }
+  }
+
+  &__stats-dt {
+    text-wrap: nowrap;
   }
 
   &__stats-dd {

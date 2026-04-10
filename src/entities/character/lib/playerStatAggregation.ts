@@ -25,6 +25,7 @@ import {
   lifestealPointsToFraction,
   speedPointsToFraction,
   armorPointsToFraction,
+  getConversionEfficiency,
   SPEED_POINTS_TO_FRACTION,
   ARMOR_POINTS_TO_FRACTION,
 } from "@/entities/item/lib/statPoints";
@@ -226,7 +227,8 @@ export function applyElixirArmorPercentToArmorPoints(
 ): number {
   const beforeReduction = armorPointsToFraction(armorPoints, characterLevel);
   const afterReduction = Math.min(0.5, beforeReduction + armorPercentBonus);
-  return Math.round(afterReduction / ARMOR_POINTS_TO_FRACTION);
+  const efficiency = getConversionEfficiency(characterLevel);
+  return Math.round(afterReduction / (ARMOR_POINTS_TO_FRACTION * efficiency));
 }
 
 /**
@@ -242,6 +244,7 @@ export function applyElixirSpeedPercentToSpeedTotal(
   );
   const beforeReduction = speedPointsToFraction(beforePoints, characterLevel);
   const afterReduction = Math.min(1, beforeReduction + speedPercentBonus);
-  const afterPoints = afterReduction / SPEED_POINTS_TO_FRACTION;
+  const efficiency = getConversionEfficiency(characterLevel);
+  const afterPoints = afterReduction / (SPEED_POINTS_TO_FRACTION * efficiency);
   return afterPoints + playerSpeedBaseline();
 }

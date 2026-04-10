@@ -1,7 +1,7 @@
 import type { Ability } from "../../types";
 
 /** Базовый множитель урона X для формул класса «Охотник» (настраивается балансом) */
-const X = 0.17;
+const X = 0.3;
 
 const CLASS_ID = "hunter";
 
@@ -15,7 +15,7 @@ export const HUNTER_ABILITIES: Ability[] = [
     cooldownMs: 0,
     icon: "/images/hero/ability/cobra_shoot_1.png",
     classId: CLASS_ID,
-    baseDamageX: X,
+    baseDamageX: 3 * X,
   },
   {
     id: "kill_command",
@@ -26,7 +26,7 @@ export const HUNTER_ABILITIES: Ability[] = [
     cooldownMs: 4_000,
     icon: "/images/hero/ability/kill_command_1.png",
     classId: CLASS_ID,
-    baseDamageX: 0.4,
+    baseDamageX: 3.7 * X,
   },
   {
     id: "explosive_shot",
@@ -37,7 +37,7 @@ export const HUNTER_ABILITIES: Ability[] = [
     cooldownMs: 8_000,
     icon: "/images/hero/ability/explosive_shot_1.png",
     classId: CLASS_ID,
-    baseDamageX: 0.55,
+    baseDamageX: 4.1 * X,
   },
   {
     id: "spear",
@@ -48,7 +48,7 @@ export const HUNTER_ABILITIES: Ability[] = [
     cooldownMs: 10_000,
     icon: "/images/hero/ability/spear_1.png",
     classId: CLASS_ID,
-    baseDamageX: 0.75,
+    baseDamageX: 4.5 * X,
   },
   {
     id: "spring_shot",
@@ -59,10 +59,10 @@ export const HUNTER_ABILITIES: Ability[] = [
     cooldownMs: 10_000,
     icon: "/images/hero/ability/spring_shot_1.png",
     classId: CLASS_ID,
-    baseDamageX: X,
+    baseDamageX: 2 * X,
     dotInstantDamageRatio: 0.2,
     dotDurationMs: 16_000,
     dotTickIntervalMs: 2_000,
-    dotTickDamageMultiplier: 1.1,
+    dotTickDamageMultiplier: 3,
   },
 ];
